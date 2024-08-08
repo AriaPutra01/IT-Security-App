@@ -1,0 +1,47 @@
+<!-- index.html -->
+
+<html>
+  <head>
+    <title>Export Data to Excel</title>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Export Data to Excel</h1>
+    <table id="sag-table">
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>NoMemo</th>
+          <th>Perihal</th>
+          <th>Pic</th>
+        </tr>
+      </thead>
+      <tbody id="sag-data">
+        {{ range .Sags }}
+        <tr>
+          <td>{{ .Tanggal.Format "2006-01-02" }}</td>
+          <td>{{ .NoMemo }}</td>
+          <td>{{ .Perihal }}</td>
+          <td>{{ .Pic }}</td>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+    <button id="export-btn">Export to Excel</button>
+    <script>
+      document.getElementById("export-btn").addEventListener("click", function() {
+        window.location.href = "/export";
+      });
+    </script>
+  </body>
+</html>
