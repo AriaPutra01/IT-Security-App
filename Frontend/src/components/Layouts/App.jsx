@@ -10,21 +10,6 @@ import {
 } from "react-icons/hi";
 import { Dropdown } from "flowbite-react";
 import { DarkThemeToggle, Flowbite } from "flowbite-react";
-// Pages
-// Dashboard
-import FeatureDashboard from "../Fragments/Dashboard/FeatureDashboard";
-// Dokumen
-import { IndexSag } from "../Fragments/Services/Dokumen/CrudSag";
-// Rencana Kerja
-import { IndexProject } from "../Fragments/Services/RencanaKerja/CrudProject";
-import { IndexBaseProject } from "../Fragments/Services/RencanaKerja/CrudBaseProject";
-// Kegiatan Proses
-import { IndexJadwalCuti } from "../Fragments/Services/KegiatanProses/CrudJadwalCuti";
-import { IndexPerjalananDinas } from "../Fragments/Services/KegiatanProses/CrudPerjalananDinas";
-import { IndexRuangRapat } from "../Fragments/Services/KegiatanProses/CrudRuangRapat";
-// Data Informasi
-import { IndexSuratMasuk } from "../Fragments/Services/DataInformasi/CrudSuratMasuk";
-import { IndexSuratKeluar } from "../Fragments/Services/DataInformasi/CrudSuratKeluar";
 
 const App = (props) => {
   const { services, children } = props;
@@ -126,22 +111,7 @@ const App = (props) => {
               </Dropdown>
             </div>
           </div>
-          <div className="h-full m-4">
-            {/* Dashboard */}
-            {services === "dashboard" && <FeatureDashboard />}
-            {/* Dokumen */}
-            {services === "sag" && <IndexSag />}
-            {/* Rencana Kerja */}
-            {services === "project" && <IndexProject />}
-            {services === "base-project" && <IndexBaseProject />}
-            {/* Kegiatan dan Proses */}
-            {services === "ruang-rapat" && <IndexRuangRapat />}
-            {services === "perjalanan-dinas" && <IndexPerjalananDinas />}
-            {services === "jadwal-cuti" && <IndexJadwalCuti />}
-            {/* Data dan Inasi */}
-            {services === "surat-masuk" && <IndexSuratMasuk />}
-            {services === "surat-keluar" && <IndexSuratKeluar />}
-          </div>
+          <div className="h-full m-4">{children}</div>
         </div>
       </div>
     </Flowbite>
