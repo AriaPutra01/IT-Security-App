@@ -1,4 +1,3 @@
-"use client";
 import { Avatar, Label, Sidebar } from "flowbite-react";
 import {
   HiChartPie,

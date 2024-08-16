@@ -1,23 +1,47 @@
 import axios from "axios";
 
-export const getSags = (callback) => {
-  axios
-    .get("http://localhost:8080/sag")
-    .then((res) => {
-      callback(res.data.posts);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
+const API_URL = "http://localhost:8080/sag";
 
-export async function deleteSag(id) {
-  try {
-    const response = await axios.delete(`http://localhost:8080/sag/${id}`);
-    return response.data;
-  } catch (error) {
-    throw new Error(
-      `Gagal hapus SAG dengan id = ${id}. Alasan: ${error.message}`
-    );
-  }
+export function getSags(callback) {
+  return axios
+    .get(`${API_URL}`)
+    .then((response) => {
+      callback(response.data.posts);
+    })
+    .catch((error) => {
+      throw new Error(`Gagal mengambil data SAG. Alasan: ${error.message}`);
+    });
+}
+
+export function addSag(data) {
+  return axios
+    .post(`${API_URL}`, data)
+    .then((response) => {
+      return response.data.posts;
+    })
+    .catch((error) => {
+      throw new Error(`Gagal menambahkan data SAG. Alasan: ${error.message}`);
+    });
+}
+
+export function updateSag(id, data) {
+  return axios
+    .put(`${API_URL}/${id}`, data)
+    .then((response) => {
+      return response.data.post;
+    })
+    .catch((error) => {
+      throw new Error(`Gagal mengubah data SAG. Alasan: ${error.message}`);
+    });
+}
+
+export function deleteSag(id) {
+  return axios
+    .delete(`${API_URL}/${id}`)
+    .then((response) => {
+      return response.data.post;
+    })
+    .catch((error) => {
+      throw new Error(`Gagal menghapus data SAG. Alasan: ${error.message}`);
+    });
 }

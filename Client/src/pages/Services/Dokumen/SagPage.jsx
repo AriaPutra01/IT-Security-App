@@ -10,162 +10,123 @@ import {
   Pagination,
 } from "flowbite-react";
 import { FormatDate } from "../../../Utilities/FormatDate";
-import { getSags, deleteSag } from "../../../../services/sag.service";
-import { SagForm } from "../../../components/Fragments/Services/Dokumen/Sag/SagForm";
-import { HiOutlineExclamationCircle } from "react-icons/hi";
+import {
+  getSags,
+  addSag,
+  updateSag,
+  deleteSag,
+} from "../../../../services/sag.service";
 import { SearchInput } from "../../../components/Elements/SearchInput";
+import { ReusableForm } from "../../../components/Fragments/Form/ReusableForm";
 
 // mendefinisikan komponen utama Sag
 export function SagPage() {
   const [sags, setSagsState] = useState([]);
   const [formModalOpen, setFormModalOpen] = useState(false); // State for form modal
-  const [action, setAction] = useState("add");
-  const [Tanggal, setTanggal] = useState("");
-  const [NoMemo, setNoMemo] = useState("");
-  const [Perihal, setPerihal] = useState("");
-  const [Pic, setPic] = useState("");
-  const [sag, setSag] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [formConfig, setFormConfig] = useState({
+    fields: [
+      { name: "tanggal", label: "Tanggal", type: "date", required: true },
+      { name: "no_memo", label: "Nomor Memo", type: "text", required: true },
+      { name: "perihal", label: "Perihal", type: "text", required: true },
+      { name: "pic", label: "Pic", type: "text", required: true },
+    ],
+    services: "sag",
+  });
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  // UseEffect untuk mengambil data saat komponen dimount dan di balikan urutan
+  useEffect(() => {
+    getSags((data) => {
+      setSagsState(data.reverse());
+    });
+  }, []);
+
+  // Function untuk handle tutup form modal
+  const onCloseFormModal = () => {
+    setFormModalOpen(false);
+    setFormData({});
+  };
+
   // Function untuk fetch data sag dan update state
   const handleAdd = () => {
     setFormModalOpen(true);
-    setAction("add");
-    setTanggal("");
-    setNoMemo("");
-    setPerihal("");
-    setPic("");
+    setFormConfig((prevConfig) => ({
+      ...prevConfig,
+      action: "add",
+      onSubmit: (data) => AddSubmit(data),
+    }));
   };
 
   // Function untuk fetch data sag dan update state
   const handleEdit = (sag) => {
     setFormModalOpen(true);
-    setAction("edit");
-    const tanggal = new Date(sag.Tanggal);
-    setTanggal(tanggal.toISOString().split("T")[0]);
-    setNoMemo(sag.NoMemo);
-    setPerihal(sag.Perihal);
-    setPic(sag.Pic);
-    setSag(sag);
+    setFormConfig((prevConfig) => ({
+      ...prevConfig,
+      action: "edit",
+      onSubmit: (data) => EditSubmit(data),
+    }));
+    setFormData({ ...sag });
   };
 
-  // Function untuk meng handle inputan baik tambah maupun ubah
-  const handleSubmit = async (event) => {
-    event.preventDefault(); // Hentikan event default agar halaman tidak reload otomatis
-
-    if (action === "add") {
-      const newData = {
-        tanggal: Tanggal.trim(),
-        no_memo: NoMemo.trim(),
-        perihal: Perihal.trim(),
-        pic: Pic.trim(),
-      };
-
-      if (
-        !newData.tanggal ||
-        !newData.no_memo ||
-        !newData.perihal ||
-        !newData.pic
-      ) {
-        Swal.fire({
-          icon: "info",
-          title: "Gagal!",
-          text: "Mohon untuk mengisi semua kolom",
-        });
-        return;
-      }
-
-      try {
-        const response = await fetch("http://localhost:8080/sag", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newData),
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-
-        // Panggil SweetAlert setelah berhasil menambahkan data
-        Swal.fire({
-          icon: "success",
-          title: "Berhasil!",
-          text: "Data berhasil ditambahkan",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-
-        setSagsState([...sags, data]);
-        onCloseFormModal();
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Gagal!",
-          text: "error terjadi saat menyimpan data",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      }
-    } else if (action === "edit") {
-      const updatedData = {
-        id: sag.ID,
-        tanggal: Tanggal.trim(),
-        no_memo: NoMemo.trim(),
-        perihal: Perihal.trim(),
-        pic: Pic.trim(),
-      };
-
-      try {
-        const response = await fetch(`http://localhost:8080/sag/${sag.ID}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(updatedData),
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-
-        Swal.fire({
-          icon: "success",
-          title: "Berhasil!",
-          text: "Data berhasil diperbarui",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-
-        setSagsState(sags.map((sag) => (sag.ID === data.ID ? data : sag)));
-        onCloseFormModal();
-      } catch (error) {
-        console.error("Error updating data:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Gagal!",
-          text: "Gagal mengubah data",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      }
+  // tambah data
+  const AddSubmit = async (data) => {
+    try {
+      const response = addSag(data);
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Data berhasil ditambahkan",
+        showConfirmButton: false,
+        timer: 1000,
+      }).then(() => {
+        window.location.reload();
+        setSagsState([...sags, response]);
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Gagal!",
+        text: "Error saat menyimpan data",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } finally {
+      onCloseFormModal();
     }
   };
 
-  // Function untuk handle tutup form modal
-  const onCloseFormModal = () => {
-    setFormModalOpen(false);
-    setTanggal("");
-    setNoMemo("");
-    setPerihal("");
-    setPic("");
+  // ubah data
+  const EditSubmit = async (data) => {
+    try {
+      const response = await updateSag(data.ID, data);
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Data berhasil diperbarui",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        // window.location.reload();
+        setSagsState(
+          sags.map((sag) => {
+            return sag.ID === response.ID ? data : sag;
+          })
+        );
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Gagal!",
+        text: "Error saat mengubah data",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } finally {
+      onCloseFormModal();
+    }
   };
 
   // Function untuk hapus 1 data
@@ -181,8 +142,16 @@ export function SagPage() {
       if (result.isConfirmed) {
         try {
           await deleteSag(id);
-          setSagsState(sags.filter((sag) => sag.ID !== id));
-          Swal.fire("Berhasil!", "Data berhasil dihapus", "success");
+          setSagsState((prevSags) => prevSags.filter((sag) => sag.ID !== id));
+          Swal.fire({
+            icon: "info",
+            title: "Berhasil!",
+            text: "Data berhasil dihapus",
+            showConfirmButton: false,
+          });
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
         } catch (error) {
           Swal.fire("Gagal!", "Error saat hapus data:", "error");
         }
@@ -190,37 +159,24 @@ export function SagPage() {
     });
   };
 
-  // UseEffect untuk mengambil data saat komponen dimount dan di balikan urutan
-  useEffect(() => {
-    getSags((data) => {
-      setSagsState(data.reverse());
-    });
-  }, []);
-
-  // Function untuk menangani pagination
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  // Function untuk handle search
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value || "");
   };
 
   // Hitung indeks awal dan akhir untuk penomoran paginate
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
-  // Function untuk handle search
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value || "");
-  };
-
   // Get data paginate dan filter search
   const paginatedSags = sags
     .filter((sag) => {
       // Menggunakan optional chaining dan default value
-      const tanggal = FormatDate(sag.Tanggal)?.toLowerCase() || "";
-      const noMemo = sag.NoMemo?.toLowerCase() || "";
-      const perihal = sag.Perihal?.toLowerCase() || "";
-      const pic = sag.Pic?.toLowerCase() || "";
+      const tanggal = FormatDate(sag.tanggal)?.toLowerCase() || "";
+      const noMemo = sag.no_memo?.toLowerCase() || "";
+      const perihal = sag.perihal?.toLowerCase() || "";
+      const pic = sag.pic?.toLowerCase() || "";
       const search = searchTerm.toLowerCase();
-
       return (
         tanggal.includes(search) ||
         noMemo.includes(search) ||
@@ -230,8 +186,13 @@ export function SagPage() {
     })
     .slice(startIndex, endIndex);
 
+  // Function untuk menangani pagination
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
-    <App services="sag">
+    <App services={formConfig.services}>
       <div className="w-full h-full">
         {/* page title */}
         <div className="flex justify-between items-center mx-2 mb-2 ">
@@ -288,15 +249,17 @@ export function SagPage() {
                         {(currentPage - 1) * itemsPerPage + index + 1}
                       </Badge>
                     </Table.Cell>
-                    <Table.Cell>{FormatDate(sag.Tanggal)}</Table.Cell>
-                    <Table.Cell>{sag.NoMemo}</Table.Cell>
-                    <Table.Cell>{sag.Perihal}</Table.Cell>
-                    <Table.Cell>{sag.Pic}</Table.Cell>
+                    <Table.Cell>{FormatDate(sag.tanggal)}</Table.Cell>
+                    <Table.Cell>{sag.no_memo}</Table.Cell>
+                    <Table.Cell>{sag.perihal}</Table.Cell>
+                    <Table.Cell>{sag.pic}</Table.Cell>
                     <Table.Cell>
                       <div className="flex gap-2">
                         <a href="#" className="font-medium">
                           <Button
-                            onClick={() => handleEdit(sag)}
+                            onClick={() => {
+                              handleEdit(sag);
+                            }}
                             action="edit"
                             color="warning"
                           >
@@ -306,7 +269,7 @@ export function SagPage() {
                         <a href="#" className="font-medium">
                           <Button
                             onClick={() => {
-                              setSag(sag);
+                              setSagsState(sag);
                               handleDelete(sag.ID);
                             }}
                             color="failure"
@@ -348,18 +311,10 @@ export function SagPage() {
         <Modal show={formModalOpen} size="md" onClose={onCloseFormModal} popup>
           <Modal.Header />
           <Modal.Body>
-            <SagForm
-              onSubmit={handleSubmit}
-              action={action}
-              services="sag"
-              tanggal={Tanggal}
-              noMemo={NoMemo}
-              perihal={Perihal}
-              pic={Pic}
-              setTanggal={setTanggal}
-              setNoMemo={setNoMemo}
-              setPerihal={setPerihal}
-              setPic={setPic}
+            <ReusableForm
+              config={formConfig}
+              formData={formData}
+              setFormData={setFormData}
             />
           </Modal.Body>
         </Modal>

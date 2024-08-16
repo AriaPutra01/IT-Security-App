@@ -11,6 +11,7 @@ import ErrorPage from "./pages/Error/404";
 import DashboardPage from "./pages/Dashboard/Dashboard";
 // Dokumen
 import { SagPage } from "./pages/Services/Dokumen/SagPage";
+import { IsoPage } from "./pages/Services/Dokumen/IsoPage";
 
 const router = createBrowserRouter([
   // welcome
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
   { path: "/dashboard", element: <DashboardPage /> },
   // Dokumen
   { path: "/sag", element: <SagPage /> },
+  { path: "/iso", element: <IsoPage /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

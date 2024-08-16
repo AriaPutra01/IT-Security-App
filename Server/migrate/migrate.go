@@ -14,6 +14,19 @@ func init() {
 
 func main() {
 
-	initializers.DB.AutoMigrate(&models.Sag{}, &models.Memo{})
+	initializers.DB.AutoMigrate(
+		&models.Sag{},
+		&models.Memo{},
+		&models.Iso{},
+		&models.User{},
+		&models.Role{},
+		&models.Project{},
+		&models.Surat{},
+		&models.BeritaAcara{},
+		&models.SuratMasuk{},
+		&models.SuratKeluar{},
+		&models.Sk{},
+		&models.Perdin{},
+	)
 
 }
