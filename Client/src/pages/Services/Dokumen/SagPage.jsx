@@ -100,8 +100,18 @@ export function SagPage() {
 
   // ubah data
   const EditSubmit = async (data) => {
+    const sag = sags.find((s) => s.ID === data.ID);
+
+    if (!data.tanggal) {
+      data.tanggal = sag.tanggal;
+    }
+
+    // Log data untuk memeriksa sebelum dikirim
+    console.log('Data yang dikirim:', data);
+
     try {
       const response = await updateSag(data.ID, data);
+
       Swal.fire({
         icon: "success",
         title: "Berhasil!",
@@ -109,7 +119,6 @@ export function SagPage() {
         showConfirmButton: false,
         timer: 1500,
       }).then(() => {
-        // window.location.reload();
         setSagsState(
           sags.map((sag) => {
             return sag.ID === response.ID ? data : sag;
@@ -117,6 +126,8 @@ export function SagPage() {
         );
       });
     } catch (error) {
+      console.error('Error saat mengubah data:', error);
+
       Swal.fire({
         icon: "error",
         title: "Gagal!",
@@ -128,6 +139,7 @@ export function SagPage() {
       onCloseFormModal();
     }
   };
+
 
   // Function untuk hapus 1 data
   const handleDelete = async (id) => {

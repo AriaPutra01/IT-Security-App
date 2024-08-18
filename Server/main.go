@@ -4,10 +4,10 @@ import (
 	"project-gin/controllers"
 	"project-gin/initializers"
 
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-gonic/gin"
 )
 
 func init() {
@@ -36,8 +36,7 @@ func main() {
 	store := cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("mysession", store))
 
-	// Route for export and update ALL SHEETS
-	r.GET("/updateAll", controllers.UpdateAllExcelSheets)
+	r.GET("/updateAll", controllers.UpdateAllSheets)
 	r.GET("/exportAll", controllers.ExportAllSheets)
 
 	// Routes for SAG
@@ -57,7 +56,7 @@ func main() {
 	r.PUT("/memos/:id", controllers.MemoUpdate)
 	r.DELETE("/memos/:id", controllers.MemoDelete)
 	r.GET("/exportMemo", controllers.CreateExcelMemo)
-	// r.GET("/updateMemo", controllers.UpdateSheetMemo)
+	r.GET("/updateMemo", controllers.UpdateSheetMemo)
 	r.POST("/uploadMemo", controllers.ImportExcelMemo)
 
 	// Routes for ISO
@@ -67,7 +66,7 @@ func main() {
 	r.PUT("/iso/:id", controllers.PostsUpdate)
 	r.DELETE("/iso/:id", controllers.PostsDelete)
 	r.GET("/exportIso", controllers.CreateExcelIso)
-	// r.GET("/updateIso", controllers.UpdateSheetIso)
+	r.GET("/updateIso", controllers.UpdateSheetIso)
 	r.POST("/uploadIso", controllers.ImportExcelIso)
 
 	// Routes for Surat
@@ -76,9 +75,9 @@ func main() {
 	r.GET("/surat", controllers.SuratIndex)
 	r.DELETE("/surat/:id", controllers.SuratDelete)
 	r.GET("/surat/:id", controllers.SuratShow)
-	// r.GET("/exportSurat", controllers.CreateExcelSurat)
-	// r.GET("/updateSurat", controllers.UpdateSheetSurat)
-	// r.POST("/uploadSurat", controllers.ImportExcelSurat)
+	r.GET("/exportSurat", controllers.CreateExcelSurat)
+	r.GET("/updateSurat", controllers.UpdateSheetSurat)
+	r.POST("/uploadSurat", controllers.ImportExcelSurat)
 
 	//BeritaAcara routes
 	r.POST("/beritaAcara", controllers.BeritaAcaraCreate)
@@ -86,9 +85,9 @@ func main() {
 	r.GET("/beritaAcara", controllers.BeritaAcaraIndex)
 	r.DELETE("/beritaAcara/:id", controllers.BeritaAcaraDelete)
 	r.GET("/beritaAcara/:id", controllers.BeritaAcaraShow)
-	// r.GET("/exportBerita", controllers.CreateExcelBerita)
-	// r.GET("/updateBerita", controllers.UpdateSheetBerita)
-	// r.POST("/uploadBerita", controllers.ImportExcelBerita)
+	r.GET("/exportBerita", controllers.CreateExcelBerita)
+	r.GET("/updateBerita", controllers.UpdateSheetBerita)
+	r.POST("/uploadBerita", controllers.ImportExcelBerita)
 
 	//Sk routes
 	r.POST("/sk", controllers.SkCreate)
@@ -96,9 +95,9 @@ func main() {
 	r.GET("/sk", controllers.SkIndex)
 	r.DELETE("/sk/:id", controllers.SkDelete)
 	r.GET("/sk/:id", controllers.SkShow)
-	// r.GET("/exportSk", controllers.CreateExcelSk)
-	// r.GET("/updateSk", controllers.UpdateSheetSk)
-	// r.POST("/uploadSk", controllers.ImportExcelSk)
+	r.GET("/exportSk", controllers.CreateExcelSk)
+	r.GET("/updateSk", controllers.UpdateSheetSk)
+	r.POST("/uploadSk", controllers.ImportExcelSk)
 
 	//Project routes
 	r.POST("/Project", controllers.ProjectCreate)
@@ -106,9 +105,9 @@ func main() {
 	r.GET("/Project", controllers.ProjectIndex)
 	r.DELETE("/Project/:id", controllers.ProjectDelete)
 	r.GET("/Project/:id", controllers.ProjectShow)
-	// r.GET("/exportProject", controllers.CreateExcelProject)
-	// r.GET("/updateProject", controllers.UpdateSheetProject)
-	// r.POST("/uploadProject", controllers.ImportExcelProject)
+	r.GET("/exportProject", controllers.CreateExcelProject)
+	r.GET("/updateProject", controllers.UpdateSheetProject)
+	r.POST("/uploadProject", controllers.ImportExcelProject)
 
 	//Perdin routes
 	r.POST("/Perdin", controllers.PerdinCreate)
@@ -116,9 +115,9 @@ func main() {
 	r.GET("/Perdin", controllers.PerdinIndex)
 	r.DELETE("/Perdin/:id", controllers.PerdinDelete)
 	r.GET("/Perdin/:id", controllers.PerdinShow)
-	// r.GET("/exportPerdin", controllers.CreateExcelPerdin)
-	// r.GET("/updatePerdin", controllers.UpdateSheetPerdin)
-	// r.POST("/uploadPerdin", controllers.ImportExcelPerdin)
+	r.GET("/exportPerdin", controllers.CreateExcelPerdin)
+	r.GET("/updatePerdin", controllers.UpdateSheetPerdin)
+	r.POST("/uploadPerdin", controllers.ImportExcelPerdin)
 
 	//Surat  Masuk routes
 	r.POST("/SuratMasuk", controllers.SuratMasukCreate)
@@ -126,9 +125,9 @@ func main() {
 	r.GET("/SuratMasuk", controllers.SuratMasukIndex)
 	r.DELETE("/SuratMasuk/:id", controllers.SuratMasukDelete)
 	r.GET("/SuratMasuk/:id", controllers.SuratMasukShow)
-	// r.GET("/exportSuratMasuk", controllers.CreateExcelSuratMasuk)
-	// r.GET("/updateSuratMasuk", controllers.UpdateSheetSuratMasuk)
-	// r.POST("/uploadSuratMasuk", controllers.ImportExcelSuratMasuk)
+	r.GET("/exportSuratMasuk", controllers.CreateExcelSuratMasuk)
+	r.GET("/updateSuratMasuk", controllers.UpdateSheetSuratMasuk)
+	r.POST("/uploadSuratMasuk", controllers.ImportExcelSuratMasuk)
 
 	//Surat  Keluar routes
 	r.POST("/SuratKeluar", controllers.SuratKeluarCreate)
@@ -136,9 +135,9 @@ func main() {
 	r.GET("/SuratKeluar", controllers.SuratKeluarIndex)
 	r.DELETE("/SuratKeluar/:id", controllers.SuratKeluarDelete)
 	r.GET("/SuratKeluar/:id", controllers.SuratKeluarShow)
-	// r.GET("/exportSuratKeluar", controllers.CreateExcelSuratKeluar)
-	// r.GET("/updateSuratKeluar", controllers.UpdateSheetSuratKeluar)
-	// r.POST("/uploadSuratKeluar", controllers.ImportExcelSuratKeluar)
+	r.GET("/exportSuratKeluar", controllers.CreateExcelSuratKeluar)
+	r.GET("/updateSuratKeluar", controllers.UpdateSheetSuratKeluar)
+	r.POST("/uploadSuratKeluar", controllers.ImportExcelSuratKeluar)
 
 	r.Run()
 }

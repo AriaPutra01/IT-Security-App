@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -66,11 +67,23 @@ func CreateIso(c *gin.Context) {
 func IsoIndex(c *gin.Context) {
 
 	// Get the Posts
-	var posts []models.Iso
-	initializers.DB.Find(&posts)
+	var iso []models.Iso
+	initializers.DB.Find(&iso)
+
+	t, err := template.ParseFiles("views/iso.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = t.Execute(c.Writer, gin.H{
+		"Iso": iso,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	c.JSON(200, gin.H{
-		"posts": posts,
+		"posts": iso,
 	})
 
 }
@@ -92,48 +105,59 @@ func PostsShow(c *gin.Context) {
 }
 
 func IsoUpdate(c *gin.Context) {
+
 	var requestBody IsoRequestBody
 
-	// Bind the request body to the requestBody struct
-	if err := c.BindJSON(&requestBody); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid request body: " + err.Error()})
-		return
+    if err := c.BindJSON(&requestBody); err != nil {
+        c.Status(400)
+        c.Error(err) // log the error
+        return
+    }
+
+    id := c.Params.ByName("id")
+
+    var iso models.Iso
+    initializers.DB.First(&iso, id)
+
+    if err := initializers.DB.First(&iso, id).Error; err != nil {
+        c.JSON(404, gin.H{"error": "Iso tidak ditemukan"})
+        return
+    }
+
+    if requestBody.Tanggal != "" {
+        tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
+        if err != nil {
+            c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
+            return
+        }
+        iso.Tanggal = tanggal
+    }
+
+    if requestBody.NoMemo != "" {
+        iso.NoMemo = requestBody.NoMemo
+    } else {
+        iso.NoMemo = iso.NoMemo // gunakan nilai yang ada dari database
+    }
+
+	if requestBody.Perihal != "" {
+		iso.Perihal = requestBody.Perihal
+	} else {
+		iso.Perihal = iso.Perihal // gunakan nilai yang ada dari database
+	}
+	
+	if requestBody.Pic != "" {
+		iso.Pic = requestBody.Pic
+	} else {
+		iso.Pic = iso.Pic // gunakan nilai yang ada dari database
 	}
 
-	// Parse the date string from the request body
-	tanggalString := requestBody.Tanggal
-	tanggal, err := time.Parse("2006-01-02", tanggalString)
-	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid date format: " + err.Error()})
-		return
-	}
+    initializers.DB.Model(&iso).Updates(iso)
 
-	// Get the Id from the URL parameters
-	id := c.Param("id")
-
-	// Find the post we are updating
-	var post models.Iso
-	if err := initializers.DB.First(&post, id).Error; err != nil {
-		c.JSON(404, gin.H{"error": "Post not found"})
-		return
-	}
-
-	// Update the post
-	if err := initializers.DB.Model(&post).Updates(models.Iso{
-		Tanggal: tanggal,
-		NoMemo:  requestBody.NoMemo,
-		Perihal: requestBody.Perihal,
-		Pic:     requestBody.Pic,
-	}).Error; err != nil {
-		c.JSON(500, gin.H{"error": "Failed to update post: " + err.Error()})
-		return
-	}
-
-	// Respond with the updated post
-	c.JSON(200, gin.H{
-		"post": post,
-	})
+    c.JSON(200, gin.H{
+        "Iso": iso,
+    })
 }
+
 
 func IsoDelete(c *gin.Context) {
 	// Get id
@@ -160,15 +184,14 @@ func CreateExcelIso(c *gin.Context) {
 	}
 
 	fileName := baseFileName + ".xlsx"
-	filePath = filepath.Join(dir, fileName)
 
 	// File does not exist, create a new file
 	f := excelize.NewFile()
 
 	// Define sheet names
-	sheetNames := []string{"SAG", "MEMO", "ISO", "SURAT"}
+	sheetNames := []string{"SAG", "MEMO", "ISO", "SURAT", "BERITA ACARA", "SK", "PROJECT", "PERDIN", "SURAT MASUK", "SURAT KELUAR"}
 
-	// Create sheets and set headers for "ISO" only
+	// Create sheets and set headers for "SAG" only
 	for _, sheetName := range sheetNames {
 		if sheetName == "ISO" {
 			f.NewSheet(sheetName)
@@ -185,7 +208,7 @@ func CreateExcelIso(c *gin.Context) {
 	var isos []models.Iso
 	initializers.DB.Find(&isos)
 
-	// Write initial data to the "ISO" sheet
+	// Write initial data to the "SAG" sheet
 	isoSheetName := "ISO"
 	for i, iso := range isos {
 		tanggalString := iso.Tanggal.Format("2006-01-02")
@@ -214,44 +237,49 @@ func CreateExcelIso(c *gin.Context) {
     c.Writer.Write(buf.Bytes())
 }
 
-func UpdateExcelIso(c *gin.Context) {
+
+func UpdateSheetIso(c *gin.Context) {
 	dir := "D:\\excel"
 	fileName := "its_report.xlsx"
 	filePath := filepath.Join(dir, fileName)
 
 	// Check if the file exists
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		c.String(http.StatusBadRequest, "File does not exist")
+		c.String(http.StatusBadRequest, "File tidak ada")
 		return
 	}
 
 	// Open the existing Excel file
 	f, err := excelize.OpenFile(filePath)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Error opening file: %v", err)
+		c.String(http.StatusInternalServerError, "Error membuka file: %v", err)
 		return
 	}
 	defer f.Close()
 
+	// Define sheet name
 	sheetName := "ISO"
 
-	// Get the last row with data
-	rows, err := f.GetRows(sheetName)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Error getting rows: %v", err)
-		return
+	// Check if sheet exists and delete it if it does
+	if _, err := f.GetSheetIndex(sheetName); err == nil {
+		f.DeleteSheet(sheetName)
 	}
-	lastRow := len(rows) // The number of rows in the sheet
+	f.NewSheet(sheetName)
+
+	// Write header row
+	f.SetCellValue(sheetName, "A1", "Tanggal")
+	f.SetCellValue(sheetName, "B1", "No Memo")
+	f.SetCellValue(sheetName, "C1", "Perihal")
+	f.SetCellValue(sheetName, "D1", "PIC")
 
 	// Fetch updated data from the database
 	var isos []models.Iso
 	initializers.DB.Find(&isos)
 
-	// Write updated data to the Excel file
+	// Write data rows
 	for i, iso := range isos {
-		tanggalString := iso.Tanggal.Format("2006-01-02")
-		rowNum := lastRow + i + 1 // Start from the row after the last existing row
-		f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), tanggalString)
+		rowNum := i + 2 // Start from the second row (first row is header)
+		f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), iso.Tanggal.Format("2006-01-02"))
 		f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), iso.NoMemo)
 		f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), iso.Perihal)
 		f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), iso.Pic)
@@ -260,19 +288,20 @@ func UpdateExcelIso(c *gin.Context) {
 	// Save the file with updated data
 	file, err := os.OpenFile(filePath, os.O_RDWR, 0755)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Error opening file: %v", err)
+		c.String(http.StatusInternalServerError, "Error membuka file: %v", err)
 		return
 	}
 	defer file.Close()
 
 	if _, err := f.WriteTo(file); err != nil {
-		c.String(http.StatusInternalServerError, "Error saving file: %v", err)
+		c.String(http.StatusInternalServerError, "Error menyimpan file: %v", err)
 		return
 	}
 
 	c.Redirect(http.StatusFound, "/iso")
-
 }
+
+
 
 func ImportExcelIso(c *gin.Context) {
 	// Mengambil file dari form upload

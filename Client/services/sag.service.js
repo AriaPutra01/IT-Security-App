@@ -26,7 +26,7 @@ export function addSag(data) {
 
 export function updateSag(id, data) {
   return axios
-    .put(`${API_URL}/${id}`, data)
+    .put(`${API_URL}/${id}`, { ...data, id }) // pass id as a route parameter
     .then((response) => {
       return response.data.post;
     })
