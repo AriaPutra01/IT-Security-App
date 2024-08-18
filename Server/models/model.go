@@ -52,7 +52,7 @@ type Iso struct {
 type Surat struct {
 	gorm.Model
 	Tanggal time.Time `json:"tanggal" gorm:"type:date"`
-	NoMemo  string    `json:"no_memo"`
+	NoSurat  string    `json:"no_surat"`
 	Perihal string    `json:"perihal"`
 	Pic     string    `json:"pic"`
 }

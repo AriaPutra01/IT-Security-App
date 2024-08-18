@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -27,6 +28,18 @@ func MemoIndex(c *gin.Context) {
 	var memos []models.Memo
 
 	initializers.DB.Find(&memos)
+
+	t, err := template.ParseFiles("views/memo.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = t.Execute(c.Writer, gin.H{
+		"memo": memos,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	c.JSON(200, gin.H{
 		"posts": memos,
@@ -100,36 +113,47 @@ func MemoUpdate(c *gin.Context) {
 		return
 	}
 
-	tanggalString := requestBody.Tanggal
-	tanggal, err := time.Parse("2006-01-02", tanggalString)
-	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid date format: " + err.Error()})
-		return
-	}
-
 	id := c.Params.ByName("id")
 
 	var memo models.Memo
 
-	if err := initializers.DB.First(&memo, id); err.Error != nil {
+	if err := initializers.DB.First(&memo, id).Error; err != nil {
 		c.JSON(404, gin.H{"error": "Memo not found"})
 		return
 	}
 
-	if err := initializers.DB.Model(&memo).Updates(models.Memo{
-		Tanggal: tanggal,
-		NoMemo:  requestBody.NoMemo,
-		Perihal: requestBody.Perihal,
-		Pic:     requestBody.Pic,
-	}).Error; err != nil {
-		c.JSON(400, gin.H{"error": "Failed to update Memo: " + err.Error()})
-		return
+	if requestBody.Tanggal != "" {
+        tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
+        if err != nil {
+            c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
+            return
+        }
+        memo.Tanggal = tanggal
+    }
+
+	if requestBody.NoMemo != "" {
+		memo.NoMemo = requestBody.NoMemo
+	}else{
+		memo.NoMemo = memo.NoMemo
 	}
+
+	if requestBody.Perihal != "" {
+		memo.Perihal = requestBody.Perihal
+	}else{
+		memo.Perihal = memo.Perihal
+	}
+
+	if requestBody.Pic != "" {
+		memo.Pic = requestBody.Pic
+	}else{
+		memo.Pic = memo.Pic
+	}
+
+	initializers.DB.Save(&memo)
 
 	c.JSON(200, gin.H{
 		"memo": memo,
 	})
-
 }
 
 func MemoDelete(c *gin.Context) {
@@ -155,7 +179,7 @@ func MemoDelete(c *gin.Context) {
 func CreateExcelMemo(c *gin.Context) {
 	dir := "D:\\excel"
 	baseFileName := "its_report"
-	filePath := filepath.Join(dir, baseFileName+".xlsx")
+	filePath := filepath.Join(dir, baseFileName + ".xlsx")
 
 	// Check if the file already exists
 	if _, err := os.Stat(filePath); err == nil {
@@ -164,15 +188,14 @@ func CreateExcelMemo(c *gin.Context) {
 	}
 
 	fileName := baseFileName + ".xlsx"
-	filePath = filepath.Join(dir, fileName)
 
 	// File does not exist, create a new file
 	f := excelize.NewFile()
 
 	// Define sheet names
-	sheetNames := []string{"SAG", "MEMO", "ISO", "SURAT"}
+	sheetNames := []string{"SAG", "MEMO", "ISO", "SURAT", "BERITA ACARA", "SK", "PROJECT", "PERDIN", "SURAT MASUK", "SURAT KELUAR"}
 
-	// Create sheets and set headers for "MEMO" only
+	// Create sheets and set headers for "SAG" only
 	for _, sheetName := range sheetNames {
 		if sheetName == "MEMO" {
 			f.NewSheet(sheetName)
@@ -184,19 +207,20 @@ func CreateExcelMemo(c *gin.Context) {
 			f.NewSheet(sheetName)
 		}
 	}
-	
+
 	// Fetch initial data from the database
 	var memos []models.Memo
 	initializers.DB.Find(&memos)
-	
-	// Write initial data to the "MEMO" sheet
+
+	// Write initial data to the "SAG" sheet
+	memoSheetName := "MEMO"
 	for i, memo := range memos {
 		tanggalString := memo.Tanggal.Format("2006-01-02")
 		rowNum := i + 2 // Start from the second row (first row is header)
-		f.SetCellValue("MEMO", fmt.Sprintf("A%d", rowNum), tanggalString)
-		f.SetCellValue("MEMO", fmt.Sprintf("B%d", rowNum), memo.NoMemo)
-		f.SetCellValue("MEMO", fmt.Sprintf("C%d", rowNum), memo.Perihal)
-		f.SetCellValue("MEMO", fmt.Sprintf("D%d", rowNum), memo.Pic)
+		f.SetCellValue(memoSheetName, fmt.Sprintf("A%d", rowNum), tanggalString)
+		f.SetCellValue(memoSheetName, fmt.Sprintf("B%d", rowNum), memo.NoMemo)
+		f.SetCellValue(memoSheetName, fmt.Sprintf("C%d", rowNum), memo.Perihal)
+		f.SetCellValue(memoSheetName, fmt.Sprintf("D%d", rowNum), memo.Pic)
 	}
 
 	// Delete the default "Sheet1" sheet
@@ -205,68 +229,61 @@ func CreateExcelMemo(c *gin.Context) {
 	}
 
 	// Save the newly created file
-	if err := f.SaveAs(filePath); err != nil {
-		c.String(http.StatusInternalServerError, "Error saving file: %v", err)
-		return
-	}
+    buf, err := f.WriteToBuffer()
+    if err != nil {
+        c.String(http.StatusInternalServerError, "Error saving file: %v", err)
+        return
+    }
 
-	// Serve the file to the client
-	c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
-	c.File(filePath)
+    // Serve the file to the client
+    c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
+    c.Writer.Write(buf.Bytes())
 }
 
-func UpdateExcelMemo(c *gin.Context) {
-	/**
-	 * Update Excel Memo Report
-	 *
-	 * This function updates the existing Excel file with new data from the database.
-	 */
+
+func UpdateSheetMemo(c *gin.Context) {
 	dir := "D:\\excel"
 	fileName := "its_report.xlsx"
 	filePath := filepath.Join(dir, fileName)
 
 	// Check if the file exists
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		c.String(http.StatusBadRequest, "File does not exist")
+		c.String(http.StatusBadRequest, "File tidak ada")
 		return
 	}
 
 	// Open the existing Excel file
 	f, err := excelize.OpenFile(filePath)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Error opening file: %v", err)
+		c.String(http.StatusInternalServerError, "Error membuka file: %v", err)
 		return
 	}
 	defer f.Close()
 
+	// Define sheet name
 	sheetName := "MEMO"
 
-	if sheetName == "MEMO" {
-		f.NewSheet(sheetName)
-		f.SetCellValue(sheetName, "A1", "Tanggal")
-		f.SetCellValue(sheetName, "B1", "NoMemo")
-		f.SetCellValue(sheetName, "C1", "Perihal")
-		f.SetCellValue(sheetName, "D1", "Pic")
+	// Check if sheet exists and delete it if it does
+	if _, err := f.GetSheetIndex(sheetName); err == nil {
+		f.DeleteSheet(sheetName)
 	}
+	f.NewSheet(sheetName)
 
-	// Get the last row with data
-	rows, err := f.GetRows(sheetName)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Error getting rows: %v", err)
-		return
-	}
-	lastRow := len(rows) // The number of rows in the sheet
+	// Write header row
+	f.SetCellValue(sheetName, "A1", "Tanggal")
+	f.SetCellValue(sheetName, "B1", "No Memo")
+	f.SetCellValue(sheetName, "C1", "Perihal")
+	f.SetCellValue(sheetName, "D1", "PIC")
 
 	// Fetch updated data from the database
 	var memos []models.Memo
 	initializers.DB.Find(&memos)
 
-	// Write updated data to the Excel file
+	// Write data rows
 	for i, memo := range memos {
-		tanggalString := memo.Tanggal.Format("2006-01-02")
-		rowNum := lastRow + i + 1 // Start from the row after the last existing row
-		f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), tanggalString)
+		rowNum := i + 2 // Start from the second row (first row is header)
+		f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), memo.Tanggal.Format("2006-01-02"))
 		f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), memo.NoMemo)
 		f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), memo.Perihal)
 		f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), memo.Pic)
@@ -275,18 +292,19 @@ func UpdateExcelMemo(c *gin.Context) {
 	// Save the file with updated data
 	file, err := os.OpenFile(filePath, os.O_RDWR, 0755)
 	if err != nil {
-		c.String(http.StatusInternalServerError, "Error opening file: %v", err)
+		c.String(http.StatusInternalServerError, "Error membuka file: %v", err)
 		return
 	}
 	defer file.Close()
 
 	if _, err := f.WriteTo(file); err != nil {
-		c.String(http.StatusInternalServerError, "Error saving file: %v", err)
+		c.String(http.StatusInternalServerError, "Error menyimpan file: %v", err)
 		return
 	}
 
-	c.Redirect(http.StatusFound, "/memos")
 }
+
+
 
 func ImportExcelMemo(c *gin.Context) {
 	// Mengambil file dari form upload

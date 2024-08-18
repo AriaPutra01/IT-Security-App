@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -69,6 +70,18 @@ func SagIndex(c *gin.Context) {
 	var posts []models.Sag
 	initializers.DB.Find(&posts)
 
+	t, err := template.ParseFiles("views/index.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = t.Execute(c.Writer, gin.H{
+		"Sags": posts,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	c.JSON(200, gin.H{
 		"posts": posts,
 	})
@@ -84,39 +97,51 @@ func PostsUpdate(c *gin.Context) {
 		return
 	}
 
-	// Parse the date string from the request body
-	tanggalString := requestBody.Tanggal
-	tanggal, err := time.Parse("2006-01-02", tanggalString)
-	if err != nil {
-		c.JSON(400, gin.H{"error": "Invalid date format: " + err.Error()})
-		return
+	id := c.Params.ByName("id")
+
+    var sag models.Sag
+    initializers.DB.First(&sag, id)
+
+    if err := initializers.DB.First(&sag, id).Error; err != nil {
+        c.JSON(404, gin.H{"error": "SK tidak ditemukan"})
+        return
+    }
+
+	if requestBody.Tanggal != "" {
+		tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
+		if err != nil {
+			c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
+			return
+		}
+		sag.Tanggal = tanggal
+	} else {
+		sag.Tanggal = sag.Tanggal // don't update the date field if it's empty
 	}
 
-	// Get the Id from the URL parameters
-	id := c.Param("id")
-
-	// Find the post we are updating
-	var post models.Sag
-	if err := initializers.DB.First(&post, id).Error; err != nil {
-		c.JSON(404, gin.H{"error": "Post not found"})
-		return
+	if requestBody.NoMemo != "" {
+		sag.NoMemo = requestBody.NoMemo
+	}else {
+		sag.NoMemo = sag.NoMemo
 	}
 
-	// Update the post
-	if err := initializers.DB.Model(&post).Updates(models.Sag{
-		Tanggal: tanggal,
-		NoMemo:  requestBody.NoMemo,
-		Perihal: requestBody.Perihal,
-		Pic:     requestBody.Pic,
-	}).Error; err != nil {
-		c.JSON(500, gin.H{"error": "Failed to update post: " + err.Error()})
-		return
+	if requestBody.Perihal != "" {
+		sag.Perihal = requestBody.Perihal
+	}else {
+		sag.Perihal = sag.Perihal
 	}
 
-	// Respond with the updated post
+	if requestBody.Pic != "" {
+		sag.Pic = requestBody.Pic
+	}else {
+		sag.Pic = sag.Pic
+	}
+
+	initializers.DB.Save(&sag)
+
 	c.JSON(200, gin.H{
-		"post": post,
+		"post": sag,	
 	})
+	
 }
 
 func PostsDelete(c *gin.Context) {
@@ -144,13 +169,12 @@ func CreateExcelSag(c *gin.Context) {
 	}
 
 	fileName := baseFileName + ".xlsx"
-	filePath = filepath.Join(dir, fileName)
 
 	// File does not exist, create a new file
 	f := excelize.NewFile()
 
 	// Define sheet names
-	sheetNames := []string{"SAG", "MEMO", "ISO", "SURAT"}
+	sheetNames := []string{"SAG", "MEMO", "ISO", "SURAT", "BERITA ACARA", "SK", "PROJECT", "PERDIN", "SURAT MASUK", "SURAT KELUAR"}
 
 	// Create sheets and set headers for "SAG" only
 	for _, sheetName := range sheetNames {
