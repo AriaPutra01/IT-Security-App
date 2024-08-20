@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -73,18 +72,6 @@ func SkIndex(c *gin.Context) {
 	var sk []models.Sk
 	initializers.DB.Find(&sk)
 
-	t, err := template.ParseFiles("views/sk.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = t.Execute(c.Writer, gin.H{
-		"SK": sk,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	//Respond with them
 	c.JSON(200, gin.H{
 		"SK": sk,
@@ -115,48 +102,48 @@ func SkUpdate(c *gin.Context) {
 		return
 	}
 
-    id := c.Params.ByName("id")
+	id := c.Params.ByName("id")
 
-    var sk models.Sk
-    initializers.DB.First(&sk, id)
+	var sk models.Sk
+	initializers.DB.First(&sk, id)
 
-    if err := initializers.DB.First(&sk, id).Error; err != nil {
-        c.JSON(404, gin.H{"error": "SK tidak ditemukan"})
-        return
-    }
+	if err := initializers.DB.First(&sk, id).Error; err != nil {
+		c.JSON(404, gin.H{"error": "SK tidak ditemukan"})
+		return
+	}
 
-    if requestBody.Tanggal != "" {
-        tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
-        if err != nil {
-            c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
-            return
-        }
-        sk.Tanggal = tanggal
-    }
+	if requestBody.Tanggal != "" {
+		tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
+		if err != nil {
+			c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
+			return
+		}
+		sk.Tanggal = tanggal
+	}
 
-    if requestBody.NoSurat != "" {
-        sk.NoSurat = requestBody.NoSurat
-    } else {
+	if requestBody.NoSurat != "" {
+		sk.NoSurat = requestBody.NoSurat
+	} else {
 		sk.NoSurat = sk.NoSurat // gunakan nilai yang ada dari database
-    }
+	}
 
 	if requestBody.Perihal != "" {
 		sk.Perihal = requestBody.Perihal
 	} else {
-		sk.Perihal =sk .Perihal // gunakan nilai yang ada dari database
+		sk.Perihal = sk.Perihal // gunakan nilai yang ada dari database
 	}
-	
+
 	if requestBody.Pic != "" {
 		sk.Pic = requestBody.Pic
 	} else {
 		sk.Pic = sk.Pic // gunakan nilai yang ada dari database
 	}
 
-    initializers.DB.Model(&sk).Updates(sk)
+	initializers.DB.Model(&sk).Updates(sk)
 
-    c.JSON(200, gin.H{
-        "sk": sk,
-    })
+	c.JSON(200, gin.H{
+		"sk": sk,
+	})
 
 }
 

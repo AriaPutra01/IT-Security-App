@@ -10,7 +10,21 @@ module.exports = {
     flowbite.content(),
   ],
   theme: {
-    extend: {},
+    extend: {
+      gridTemplateRows: {
+        "1fr": "auto",
+        "2fr": "auto 1fr",
+        "3fr": "auto 1fr auto",
+        "3minmax": "auto minmax(0, 400px) auto",
+        "4fr": "auto 1fr auto auto",
+      },
+      gridTemplateColumns: {
+        "1fr": "auto",
+        "2fr": "auto 1fr",
+        "3fr": "auto 1fr auto",
+        "4fr": "auto 1fr auto auto",
+      },
+    },
   },
-  plugins: [flowbite.plugin()],
+  plugins: [flowbite.plugin(),],
 };

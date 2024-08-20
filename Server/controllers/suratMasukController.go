@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -75,21 +74,9 @@ func SuratMasukIndex(c *gin.Context) {
 	var surat_masuk []models.SuratMasuk
 	initializers.DB.Find(&surat_masuk)
 
-	t, err := template.ParseFiles("views/surat_masuk.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = t.Execute(c.Writer, gin.H{
-		"Surat_masuk": surat_masuk,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	//Respond with them
 	c.JSON(200, gin.H{
-		"Surat Masuk": surat_masuk,
+		"SuratMasuk": surat_masuk,
 	})
 }
 
@@ -116,37 +103,37 @@ func SuratMasukUpdate(c *gin.Context) {
 		c.Error(err) // log the error
 		return
 	}
-    id := c.Params.ByName("id")
+	id := c.Params.ByName("id")
 
-    var surat_masuk models.SuratMasuk
-    initializers.DB.First(&surat_masuk, id)
+	var surat_masuk models.SuratMasuk
+	initializers.DB.First(&surat_masuk, id)
 
-    if err := initializers.DB.First(&surat_masuk, id).Error; err != nil {
-        c.JSON(404, gin.H{"error": "surat_masuk tidak ditemukan"})
-        return
-    }
+	if err := initializers.DB.First(&surat_masuk, id).Error; err != nil {
+		c.JSON(404, gin.H{"error": "surat_masuk tidak ditemukan"})
+		return
+	}
 
-    if requestBody.Tanggal != "" {
-        tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
-        if err != nil {
-            c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
-            return
-        }
-        surat_masuk.Tanggal = tanggal
-    }
+	if requestBody.Tanggal != "" {
+		tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
+		if err != nil {
+			c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
+			return
+		}
+		surat_masuk.Tanggal = tanggal
+	}
 
-    if requestBody.NoSurat != "" {
-        surat_masuk.NoSurat = requestBody.NoSurat
-    } else {
-        surat_masuk.NoSurat = surat_masuk.NoSurat // gunakan nilai yang ada dari database
-    }
+	if requestBody.NoSurat != "" {
+		surat_masuk.NoSurat = requestBody.NoSurat
+	} else {
+		surat_masuk.NoSurat = surat_masuk.NoSurat // gunakan nilai yang ada dari database
+	}
 
 	if requestBody.Title != "" {
 		surat_masuk.Title = requestBody.Title
 	} else {
 		surat_masuk.Title = surat_masuk.Title // gunakan nilai yang ada dari database
 	}
-	
+
 	if requestBody.RelatedDiv != "" {
 		surat_masuk.RelatedDiv = requestBody.RelatedDiv
 	} else {
@@ -159,13 +146,11 @@ func SuratMasukUpdate(c *gin.Context) {
 		surat_masuk.DestinyDiv = surat_masuk.DestinyDiv // gunakan nilai yang ada dari database
 	}
 
-	
+	initializers.DB.Model(&surat_masuk).Updates(surat_masuk)
 
-    initializers.DB.Model(&surat_masuk).Updates(surat_masuk)
-
-    c.JSON(200, gin.H{
-        "surat_masuk": surat_masuk,
-    })
+	c.JSON(200, gin.H{
+		"SuratMasuk": surat_masuk,
+	})
 
 }
 

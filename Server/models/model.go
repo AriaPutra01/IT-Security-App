@@ -52,7 +52,7 @@ type Iso struct {
 type Surat struct {
 	gorm.Model
 	Tanggal time.Time `json:"tanggal" gorm:"type:date"`
-	NoSurat  string    `json:"no_surat"`
+	NoSurat string    `json:"no_surat"`
 	Perihal string    `json:"perihal"`
 	Pic     string    `json:"pic"`
 }
@@ -82,12 +82,12 @@ type Project struct {
 	JenisPengadaan  string    `json:"jenis_pengadaan"`
 	NamaPengadaan   string    `json:"nama_pengadaan"`
 	DivInisiasi     string    `json:"div_inisiasi"`
-	Bulan           time.Time `json:"bulan"`
+	Bulan           time.Time `json:"bulan" gorm:"type:date"`
 	SumberPendanaan string    `json:"sumber_pendanaan"`
 	Anggaran        int64     `json:"anggaran"`
 	NoIzin          string    `json:"no_izin"`
-	TanggalIzin     time.Time `json:"tanggal_izin"`
-	TanggalTor      time.Time `json:"tanggal_tor"`
+	TanggalIzin     time.Time `json:"tanggal_izin" gorm:"type:date"`
+	TanggalTor      time.Time `json:"tanggal_tor" gorm:"type:date"`
 	Pic             string    `json:"pic"`
 }
 

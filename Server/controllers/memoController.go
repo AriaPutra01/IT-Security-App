@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -28,18 +27,6 @@ func MemoIndex(c *gin.Context) {
 	var memos []models.Memo
 
 	initializers.DB.Find(&memos)
-
-	t, err := template.ParseFiles("views/memo.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = t.Execute(c.Writer, gin.H{
-		"memo": memos,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	c.JSON(200, gin.H{
 		"posts": memos,
@@ -123,29 +110,29 @@ func MemoUpdate(c *gin.Context) {
 	}
 
 	if requestBody.Tanggal != "" {
-        tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
-        if err != nil {
-            c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
-            return
-        }
-        memo.Tanggal = tanggal
-    }
+		tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
+		if err != nil {
+			c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
+			return
+		}
+		memo.Tanggal = tanggal
+	}
 
 	if requestBody.NoMemo != "" {
 		memo.NoMemo = requestBody.NoMemo
-	}else{
+	} else {
 		memo.NoMemo = memo.NoMemo
 	}
 
 	if requestBody.Perihal != "" {
 		memo.Perihal = requestBody.Perihal
-	}else{
+	} else {
 		memo.Perihal = memo.Perihal
 	}
 
 	if requestBody.Pic != "" {
 		memo.Pic = requestBody.Pic
-	}else{
+	} else {
 		memo.Pic = memo.Pic
 	}
 
@@ -179,7 +166,7 @@ func MemoDelete(c *gin.Context) {
 func CreateExcelMemo(c *gin.Context) {
 	dir := "D:\\excel"
 	baseFileName := "its_report"
-	filePath := filepath.Join(dir, baseFileName + ".xlsx")
+	filePath := filepath.Join(dir, baseFileName+".xlsx")
 
 	// Check if the file already exists
 	if _, err := os.Stat(filePath); err == nil {
@@ -229,18 +216,17 @@ func CreateExcelMemo(c *gin.Context) {
 	}
 
 	// Save the newly created file
-    buf, err := f.WriteToBuffer()
-    if err != nil {
-        c.String(http.StatusInternalServerError, "Error saving file: %v", err)
-        return
-    }
+	buf, err := f.WriteToBuffer()
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error saving file: %v", err)
+		return
+	}
 
-    // Serve the file to the client
-    c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
-    c.Writer.Write(buf.Bytes())
+	// Serve the file to the client
+	c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
+	c.Writer.Write(buf.Bytes())
 }
-
 
 func UpdateSheetMemo(c *gin.Context) {
 	dir := "D:\\excel"
@@ -303,8 +289,6 @@ func UpdateSheetMemo(c *gin.Context) {
 	}
 
 }
-
-
 
 func ImportExcelMemo(c *gin.Context) {
 	// Mengambil file dari form upload

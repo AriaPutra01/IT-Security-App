@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -18,7 +17,7 @@ import (
 
 type suratRequest struct {
 	Tanggal string `json:"tanggal"`
-	NoSurat  string `json:"no_surat"`
+	NoSurat string `json:"no_surat"`
 	Perihal string `json:"perihal"`
 	Pic     string `json:"pic"`
 }
@@ -48,7 +47,7 @@ func SuratCreate(c *gin.Context) {
 
 	surat := models.Surat{
 		Tanggal: tanggal,
-		NoSurat:  requestBody.NoSurat,
+		NoSurat: requestBody.NoSurat,
 		Perihal: requestBody.Perihal,
 		Pic:     requestBody.Pic,
 	}
@@ -72,18 +71,6 @@ func SuratIndex(c *gin.Context) {
 	// Get models from DB
 	var surat []models.Surat
 	initializers.DB.Find(&surat)
-
-	t, err := template.ParseFiles("views/surat.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = t.Execute(c.Writer, gin.H{
-		"Surat": surat,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	//Respond with them
 	c.JSON(200, gin.H{
@@ -115,48 +102,48 @@ func SuratUpdate(c *gin.Context) {
 		return
 	}
 
-    id := c.Params.ByName("id")
+	id := c.Params.ByName("id")
 
-    var surat models.Surat
-    initializers.DB.First(&surat, id)
+	var surat models.Surat
+	initializers.DB.First(&surat, id)
 
-    if err := initializers.DB.First(&surat, id).Error; err != nil {
-        c.JSON(404, gin.H{"error": "surat tidak ditemukan"})
-        return
-    }
+	if err := initializers.DB.First(&surat, id).Error; err != nil {
+		c.JSON(404, gin.H{"error": "surat tidak ditemukan"})
+		return
+	}
 
-    if requestBody.Tanggal != "" {
-        tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
-        if err != nil {
-            c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
-            return
-        }
-        surat.Tanggal = tanggal
-    }
+	if requestBody.Tanggal != "" {
+		tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
+		if err != nil {
+			c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
+			return
+		}
+		surat.Tanggal = tanggal
+	}
 
-    if requestBody.NoSurat != "" {
-        surat.NoSurat = requestBody.NoSurat
-    } else {
-        surat.NoSurat = surat.NoSurat // gunakan nilai yang ada dari database
-    }
+	if requestBody.NoSurat != "" {
+		surat.NoSurat = requestBody.NoSurat
+	} else {
+		surat.NoSurat = surat.NoSurat // gunakan nilai yang ada dari database
+	}
 
 	if requestBody.Perihal != "" {
 		surat.Perihal = requestBody.Perihal
 	} else {
 		surat.Perihal = surat.Perihal // gunakan nilai yang ada dari database
 	}
-	
+
 	if requestBody.Pic != "" {
 		surat.Pic = requestBody.Pic
 	} else {
 		surat.Pic = surat.Pic // gunakan nilai yang ada dari database
 	}
 
-    initializers.DB.Model(&surat).Updates(surat)
+	initializers.DB.Model(&surat).Updates(surat)
 
-    c.JSON(200, gin.H{
-        "surat": surat,
-    })
+	c.JSON(200, gin.H{
+		"surat": surat,
+	})
 
 }
 
@@ -379,7 +366,7 @@ func ImportExcelSurat(c *gin.Context) {
 
 		surat := models.Surat{
 			Tanggal: tanggal,
-			NoSurat:  noSurat,
+			NoSurat: noSurat,
 			Perihal: perihal,
 			Pic:     pic,
 		}

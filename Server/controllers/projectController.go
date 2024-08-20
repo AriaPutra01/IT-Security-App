@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -103,18 +102,6 @@ func ProjectIndex(c *gin.Context) {
 	// Get models from DB
 	var project []models.Project
 	initializers.DB.Find(&project)
-
-	t, err := template.ParseFiles("views/project.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = t.Execute(c.Writer, gin.H{
-		"Project": project,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	//Respond with them
 	c.JSON(200, gin.H{
@@ -347,85 +334,85 @@ func CreateExcelProject(c *gin.Context) {
 }
 
 func UpdateSheetProject(c *gin.Context) {
-    dir := "D:\\excel"
-    fileName := "its_report.xlsx"
-    filePath := filepath.Join(dir, fileName)
+	dir := "D:\\excel"
+	fileName := "its_report.xlsx"
+	filePath := filepath.Join(dir, fileName)
 
-    // Check if the file exists
-    if _, err := os.Stat(filePath); os.IsNotExist(err) {
-        c.String(http.StatusBadRequest, "File tidak ada")
-        return
-    }
+	// Check if the file exists
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		c.String(http.StatusBadRequest, "File tidak ada")
+		return
+	}
 
-    // Open the existing Excel file
-    f, err := excelize.OpenFile(filePath)
-    if err != nil {
-        c.String(http.StatusInternalServerError, "Error membuka file: %v", err)
-        return
-    }
-    defer f.Close()
+	// Open the existing Excel file
+	f, err := excelize.OpenFile(filePath)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error membuka file: %v", err)
+		return
+	}
+	defer f.Close()
 
-    // Define sheet name
-    sheetName := "PROJECT"
+	// Define sheet name
+	sheetName := "PROJECT"
 
-    // Check if sheet exists and delete it if it does
-    if _, err := f.GetSheetIndex(sheetName); err == nil {
-        f.DeleteSheet(sheetName)
-    }
-    f.NewSheet(sheetName)
+	// Check if sheet exists and delete it if it does
+	if _, err := f.GetSheetIndex(sheetName); err == nil {
+		f.DeleteSheet(sheetName)
+	}
+	f.NewSheet(sheetName)
 
-    // Write header row
-    f.SetCellValue(sheetName, "A1", "Kode Project")
-    f.SetCellValue(sheetName, "B1", "Jenis Pengadaan")
-    f.SetCellValue(sheetName, "C1", "Nama Pengadaan")
-    f.SetCellValue(sheetName, "D1", "Divisi Inisiasi")
-    f.SetCellValue(sheetName, "E1", "Bulan")
-    f.SetCellValue(sheetName, "F1", "Sumber Pendanaan")
-    f.SetCellValue(sheetName, "G1", "Anggaran")
-    f.SetCellValue(sheetName, "H1", "No Izin")
-    f.SetCellValue(sheetName, "I1", "Tgl Izin")
-    f.SetCellValue(sheetName, "J1", "Tgl TOR")
-    f.SetCellValue(sheetName, "K1", "Pic")
+	// Write header row
+	f.SetCellValue(sheetName, "A1", "Kode Project")
+	f.SetCellValue(sheetName, "B1", "Jenis Pengadaan")
+	f.SetCellValue(sheetName, "C1", "Nama Pengadaan")
+	f.SetCellValue(sheetName, "D1", "Divisi Inisiasi")
+	f.SetCellValue(sheetName, "E1", "Bulan")
+	f.SetCellValue(sheetName, "F1", "Sumber Pendanaan")
+	f.SetCellValue(sheetName, "G1", "Anggaran")
+	f.SetCellValue(sheetName, "H1", "No Izin")
+	f.SetCellValue(sheetName, "I1", "Tgl Izin")
+	f.SetCellValue(sheetName, "J1", "Tgl TOR")
+	f.SetCellValue(sheetName, "K1", "Pic")
 
-    // Fetch updated data from the database
-    var projects []models.Project
-    initializers.DB.Find(&projects)
+	// Fetch updated data from the database
+	var projects []models.Project
+	initializers.DB.Find(&projects)
 
-    // Write data rows
-    for i, project := range projects {
-        rowNum := i + 2 // Start from the second row (first row is header)
-        
-        // Convert date to string with specific format
-        bulanString := project.Bulan.Format("02-01-2006")
-        
-        f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), project.KodeProject)
-        f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), project.JenisPengadaan)
-        f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), project.NamaPengadaan)
-        f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), project.DivInisiasi)
-        f.SetCellValue(sheetName, fmt.Sprintf("E%d", rowNum), bulanString) // Write month as text
-        f.SetCellValue(sheetName, fmt.Sprintf("F%d", rowNum), project.SumberPendanaan)
-        f.SetCellValue(sheetName, fmt.Sprintf("G%d", rowNum), project.Anggaran)
-        f.SetCellValue(sheetName, fmt.Sprintf("H%d", rowNum), project.NoIzin)
-        f.SetCellValue(sheetName, fmt.Sprintf("I%d", rowNum), project.TanggalIzin.Format("02-01-2006"))
-        f.SetCellValue(sheetName, fmt.Sprintf("J%d", rowNum), project.TanggalTor.Format("02-01-2006"))
-        f.SetCellValue(sheetName, fmt.Sprintf("K%d", rowNum), project.Pic)
+	// Write data rows
+	for i, project := range projects {
+		rowNum := i + 2 // Start from the second row (first row is header)
 
-    }
+		// Convert date to string with specific format
+		bulanString := project.Bulan.Format("02-01-2006")
 
-    // Save the file with updated data
-    file, err := os.OpenFile(filePath, os.O_RDWR, 0755)
-    if err != nil {
-        c.String(http.StatusInternalServerError, "Error membuka file: %v", err)
-        return
-    }
-    defer file.Close()
+		f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), project.KodeProject)
+		f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), project.JenisPengadaan)
+		f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), project.NamaPengadaan)
+		f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), project.DivInisiasi)
+		f.SetCellValue(sheetName, fmt.Sprintf("E%d", rowNum), bulanString) // Write month as text
+		f.SetCellValue(sheetName, fmt.Sprintf("F%d", rowNum), project.SumberPendanaan)
+		f.SetCellValue(sheetName, fmt.Sprintf("G%d", rowNum), project.Anggaran)
+		f.SetCellValue(sheetName, fmt.Sprintf("H%d", rowNum), project.NoIzin)
+		f.SetCellValue(sheetName, fmt.Sprintf("I%d", rowNum), project.TanggalIzin.Format("02-01-2006"))
+		f.SetCellValue(sheetName, fmt.Sprintf("J%d", rowNum), project.TanggalTor.Format("02-01-2006"))
+		f.SetCellValue(sheetName, fmt.Sprintf("K%d", rowNum), project.Pic)
 
-    if _, err := f.WriteTo(file); err != nil {
-        c.String(http.StatusInternalServerError, "Error menyimpan file: %v", err)
-        return
-    }
+	}
 
-    c.Redirect(http.StatusFound, "/Project")
+	// Save the file with updated data
+	file, err := os.OpenFile(filePath, os.O_RDWR, 0755)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error membuka file: %v", err)
+		return
+	}
+	defer file.Close()
+
+	if _, err := f.WriteTo(file); err != nil {
+		c.String(http.StatusInternalServerError, "Error menyimpan file: %v", err)
+		return
+	}
+
+	c.Redirect(http.StatusFound, "/Project")
 }
 
 func ImportExcelProject(c *gin.Context) {

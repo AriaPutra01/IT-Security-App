@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -70,18 +69,6 @@ func IsoIndex(c *gin.Context) {
 	var iso []models.Iso
 	initializers.DB.Find(&iso)
 
-	t, err := template.ParseFiles("views/iso.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = t.Execute(c.Writer, gin.H{
-		"Iso": iso,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	c.JSON(200, gin.H{
 		"posts": iso,
 	})
@@ -108,56 +95,55 @@ func IsoUpdate(c *gin.Context) {
 
 	var requestBody IsoRequestBody
 
-    if err := c.BindJSON(&requestBody); err != nil {
-        c.Status(400)
-        c.Error(err) // log the error
-        return
-    }
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.Status(400)
+		c.Error(err) // log the error
+		return
+	}
 
-    id := c.Params.ByName("id")
+	id := c.Params.ByName("id")
 
-    var iso models.Iso
-    initializers.DB.First(&iso, id)
+	var iso models.Iso
+	initializers.DB.First(&iso, id)
 
-    if err := initializers.DB.First(&iso, id).Error; err != nil {
-        c.JSON(404, gin.H{"error": "Iso tidak ditemukan"})
-        return
-    }
+	if err := initializers.DB.First(&iso, id).Error; err != nil {
+		c.JSON(404, gin.H{"error": "Iso tidak ditemukan"})
+		return
+	}
 
-    if requestBody.Tanggal != "" {
-        tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
-        if err != nil {
-            c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
-            return
-        }
-        iso.Tanggal = tanggal
-    }
+	if requestBody.Tanggal != "" {
+		tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
+		if err != nil {
+			c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
+			return
+		}
+		iso.Tanggal = tanggal
+	}
 
-    if requestBody.NoMemo != "" {
-        iso.NoMemo = requestBody.NoMemo
-    } else {
-        iso.NoMemo = iso.NoMemo // gunakan nilai yang ada dari database
-    }
+	if requestBody.NoMemo != "" {
+		iso.NoMemo = requestBody.NoMemo
+	} else {
+		iso.NoMemo = iso.NoMemo // gunakan nilai yang ada dari database
+	}
 
 	if requestBody.Perihal != "" {
 		iso.Perihal = requestBody.Perihal
 	} else {
 		iso.Perihal = iso.Perihal // gunakan nilai yang ada dari database
 	}
-	
+
 	if requestBody.Pic != "" {
 		iso.Pic = requestBody.Pic
 	} else {
 		iso.Pic = iso.Pic // gunakan nilai yang ada dari database
 	}
 
-    initializers.DB.Model(&iso).Updates(iso)
+	initializers.DB.Model(&iso).Updates(iso)
 
-    c.JSON(200, gin.H{
-        "Iso": iso,
-    })
+	c.JSON(200, gin.H{
+		"Iso": iso,
+	})
 }
-
 
 func IsoDelete(c *gin.Context) {
 	// Get id
@@ -175,7 +161,7 @@ func IsoDelete(c *gin.Context) {
 func CreateExcelIso(c *gin.Context) {
 	dir := "D:\\excel"
 	baseFileName := "its_report"
-	filePath := filepath.Join(dir, baseFileName + ".xlsx")
+	filePath := filepath.Join(dir, baseFileName+".xlsx")
 
 	// Check if the file already exists
 	if _, err := os.Stat(filePath); err == nil {
@@ -225,18 +211,17 @@ func CreateExcelIso(c *gin.Context) {
 	}
 
 	// Save the newly created file
-    buf, err := f.WriteToBuffer()
-    if err != nil {
-        c.String(http.StatusInternalServerError, "Error saving file: %v", err)
-        return
-    }
+	buf, err := f.WriteToBuffer()
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error saving file: %v", err)
+		return
+	}
 
-    // Serve the file to the client
-    c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
-    c.Writer.Write(buf.Bytes())
+	// Serve the file to the client
+	c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
+	c.Writer.Write(buf.Bytes())
 }
-
 
 func UpdateSheetIso(c *gin.Context) {
 	dir := "D:\\excel"
@@ -300,8 +285,6 @@ func UpdateSheetIso(c *gin.Context) {
 
 	c.Redirect(http.StatusFound, "/iso")
 }
-
-
 
 func ImportExcelIso(c *gin.Context) {
 	// Mengambil file dari form upload

@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -70,18 +69,6 @@ func SagIndex(c *gin.Context) {
 	var posts []models.Sag
 	initializers.DB.Find(&posts)
 
-	t, err := template.ParseFiles("views/index.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = t.Execute(c.Writer, gin.H{
-		"Sags": posts,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	c.JSON(200, gin.H{
 		"posts": posts,
 	})
@@ -99,13 +86,13 @@ func PostsUpdate(c *gin.Context) {
 
 	id := c.Params.ByName("id")
 
-    var sag models.Sag
-    initializers.DB.First(&sag, id)
+	var sag models.Sag
+	initializers.DB.First(&sag, id)
 
-    if err := initializers.DB.First(&sag, id).Error; err != nil {
-        c.JSON(404, gin.H{"error": "SK tidak ditemukan"})
-        return
-    }
+	if err := initializers.DB.First(&sag, id).Error; err != nil {
+		c.JSON(404, gin.H{"error": "SK tidak ditemukan"})
+		return
+	}
 
 	if requestBody.Tanggal != "" {
 		tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
@@ -120,28 +107,28 @@ func PostsUpdate(c *gin.Context) {
 
 	if requestBody.NoMemo != "" {
 		sag.NoMemo = requestBody.NoMemo
-	}else {
+	} else {
 		sag.NoMemo = sag.NoMemo
 	}
 
 	if requestBody.Perihal != "" {
 		sag.Perihal = requestBody.Perihal
-	}else {
+	} else {
 		sag.Perihal = sag.Perihal
 	}
 
 	if requestBody.Pic != "" {
 		sag.Pic = requestBody.Pic
-	}else {
+	} else {
 		sag.Pic = sag.Pic
 	}
 
 	initializers.DB.Save(&sag)
 
 	c.JSON(200, gin.H{
-		"post": sag,	
+		"post": sag,
 	})
-	
+
 }
 
 func PostsDelete(c *gin.Context) {
@@ -160,7 +147,7 @@ func PostsDelete(c *gin.Context) {
 func CreateExcelSag(c *gin.Context) {
 	dir := "D:\\excel"
 	baseFileName := "its_report"
-	filePath := filepath.Join(dir, baseFileName + ".xlsx")
+	filePath := filepath.Join(dir, baseFileName+".xlsx")
 
 	// Check if the file already exists
 	if _, err := os.Stat(filePath); err == nil {
@@ -210,18 +197,17 @@ func CreateExcelSag(c *gin.Context) {
 	}
 
 	// Save the newly created file
-    buf, err := f.WriteToBuffer()
-    if err != nil {
-        c.String(http.StatusInternalServerError, "Error saving file: %v", err)
-        return
-    }
+	buf, err := f.WriteToBuffer()
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error saving file: %v", err)
+		return
+	}
 
-    // Serve the file to the client
-    c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
-    c.Writer.Write(buf.Bytes())
+	// Serve the file to the client
+	c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
+	c.Writer.Write(buf.Bytes())
 }
-
 
 func UpdateSheetSAG(c *gin.Context) {
 	dir := "D:\\excel"
@@ -285,8 +271,6 @@ func UpdateSheetSAG(c *gin.Context) {
 
 	c.Redirect(http.StatusFound, "/sag")
 }
-
-
 
 func ImportExcelSag(c *gin.Context) {
 	// Mengambil file dari form upload

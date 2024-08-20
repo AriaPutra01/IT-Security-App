@@ -3,7 +3,7 @@ import React from "react";
 export const SearchInput = (props) => {
   const { value, onChange } = props;
   return (
-    <form className="w-1/4">
+    <form className="w-auto">
       <div className="relative">
         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
           <svg

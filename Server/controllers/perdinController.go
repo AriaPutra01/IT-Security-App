@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -72,18 +71,6 @@ func PerdinIndex(c *gin.Context) {
 	// Get models from DB
 	var perdin []models.Perdin
 	initializers.DB.Find(&perdin)
-
-	t, err := template.ParseFiles("views/perdin.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = t.Execute(c.Writer, gin.H{
-		"Perdin": perdin,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	//Respond with them
 	c.JSON(200, gin.H{

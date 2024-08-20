@@ -61,7 +61,7 @@ func BeritaAcaraCreate(c *gin.Context) {
 
 	// Return it
 	c.JSON(200, gin.H{
-		"Berita Acara": berita_acara,
+		"BeritaAcara": berita_acara,
 	})
 
 }
@@ -74,7 +74,7 @@ func BeritaAcaraIndex(c *gin.Context) {
 
 	//Respond with them
 	c.JSON(200, gin.H{
-		"Berita Acara": berita_acara,
+		"BeritaAcara": berita_acara,
 	})
 }
 
@@ -88,7 +88,7 @@ func BeritaAcaraShow(c *gin.Context) {
 
 	//Respond with them
 	c.JSON(200, gin.H{
-		"Berita Acara": berita_acara,
+		"BeritaAcara": berita_acara,
 	})
 }
 
@@ -142,7 +142,7 @@ func BeritaAcaraUpdate(c *gin.Context) {
 	initializers.DB.Model(&berita_acara).Updates(berita_acara)
 
 	c.JSON(200, gin.H{
-		"sk": berita_acara,
+		"BeritaAcara": berita_acara,
 	})
 
 }

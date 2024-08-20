@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -75,21 +74,9 @@ func SuratKeluarIndex(c *gin.Context) {
 	var surat_keluar []models.SuratKeluar
 	initializers.DB.Find(&surat_keluar)
 
-	t, err := template.ParseFiles("views/surat_keluar.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = t.Execute(c.Writer, gin.H{
-		"SuratKeluar": surat_keluar,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	//Respond with them
 	c.JSON(200, gin.H{
-		"Surat Keluar": surat_keluar,
+		"SuratKeluar": surat_keluar,
 	})
 }
 
@@ -157,7 +144,7 @@ func SuratKeluarUpdate(c *gin.Context) {
     initializers.DB.Model(&surat_keluar).Updates(surat_keluar)
 
     c.JSON(200, gin.H{
-        "surat_keluar": surat_keluar,
+        "suratKeluar": surat_keluar,
     })
 }
 

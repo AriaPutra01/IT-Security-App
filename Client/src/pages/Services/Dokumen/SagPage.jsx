@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import App from "../../../components/Layouts/App";
 import Swal from "sweetalert2";
+import { SearchInput } from "../../../components/Elements/SearchInput";
+import { ReusableForm } from "../../../components/Fragments/Services/ReusableForm";
+import { FormatDate } from "../../../Utilities/FormatDate";
+import { usePagination } from "../../../Utilities/usePagination";
 import {
   Button,
   Dropdown,
@@ -8,21 +12,19 @@ import {
   Badge,
   Modal,
   Pagination,
+  Checkbox,
 } from "flowbite-react";
-import { FormatDate } from "../../../Utilities/FormatDate";
 import {
   getSags,
   addSag,
   updateSag,
   deleteSag,
-} from "../../../../services/sag.service";
-import { SearchInput } from "../../../components/Elements/SearchInput";
-import { ReusableForm } from "../../../components/Fragments/Form/ReusableForm";
+} from "../../../../API/Dokumen/sag.service";
 
-// mendefinisikan komponen utama Sag
 export function SagPage() {
-  const [sags, setSagsState] = useState([]);
-  const [formModalOpen, setFormModalOpen] = useState(false); // State for form modal
+  const [MainData, setMainData] = useState([]);
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({});
   const [formConfig, setFormConfig] = useState({
     fields: [
@@ -33,24 +35,18 @@ export function SagPage() {
     ],
     services: "sag",
   });
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const { currentPage, paginate, getTotalPages } = usePagination(1, 10);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   // UseEffect untuk mengambil data saat komponen dimount dan di balikan urutan
   useEffect(() => {
     getSags((data) => {
-      setSagsState(data.reverse());
+      // ambil dari API
+      setMainData(data.reverse());
     });
   }, []);
 
-  // Function untuk handle tutup form modal
-  const onCloseFormModal = () => {
-    setFormModalOpen(false);
-    setFormData({});
-  };
-
-  // Function untuk fetch data sag dan update state
+  // Function untuk fetch data dan update state
   const handleAdd = () => {
     setFormModalOpen(true);
     setFormConfig((prevConfig) => ({
@@ -60,21 +56,27 @@ export function SagPage() {
     }));
   };
 
-  // Function untuk fetch data sag dan update state
-  const handleEdit = (sag) => {
+  // Function untuk handle tutup form modal
+  const onCloseFormModal = () => {
+    setFormModalOpen(false);
+    setFormData({});
+  };
+
+  // Function untuk fetch data dan update state
+  const handleEdit = (MainData) => {
     setFormModalOpen(true);
     setFormConfig((prevConfig) => ({
       ...prevConfig,
       action: "edit",
       onSubmit: (data) => EditSubmit(data),
     }));
-    setFormData({ ...sag });
+    setFormData({ ...MainData });
   };
 
   // tambah data
   const AddSubmit = async (data) => {
     try {
-      const response = addSag(data);
+      await addSag(data); // tambah data ke API
       Swal.fire({
         icon: "success",
         title: "Berhasil!",
@@ -82,8 +84,7 @@ export function SagPage() {
         showConfirmButton: false,
         timer: 1000,
       }).then(() => {
-        window.location.reload();
-        setSagsState([...sags, response]);
+        setMainData([...MainData, data]);
       });
     } catch (error) {
       Swal.fire({
@@ -100,18 +101,8 @@ export function SagPage() {
 
   // ubah data
   const EditSubmit = async (data) => {
-    const sag = sags.find((s) => s.ID === data.ID);
-
-    if (!data.tanggal) {
-      data.tanggal = sag.tanggal;
-    }
-
-    // Log data untuk memeriksa sebelum dikirim
-    console.log('Data yang dikirim:', data);
-
     try {
-      const response = await updateSag(data.ID, data);
-
+      await updateSag(data.ID, data); // edit data ke API
       Swal.fire({
         icon: "success",
         title: "Berhasil!",
@@ -119,15 +110,13 @@ export function SagPage() {
         showConfirmButton: false,
         timer: 1500,
       }).then(() => {
-        setSagsState(
-          sags.map((sag) => {
-            return sag.ID === response.ID ? data : sag;
+        setMainData(
+          MainData.map((item) => {
+            return item.ID === data.ID ? data : item;
           })
         );
       });
     } catch (error) {
-      console.error('Error saat mengubah data:', error);
-
       Swal.fire({
         icon: "error",
         title: "Gagal!",
@@ -139,7 +128,6 @@ export function SagPage() {
       onCloseFormModal();
     }
   };
-
 
   // Function untuk hapus 1 data
   const handleDelete = async (id) => {
@@ -153,17 +141,46 @@ export function SagPage() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteSag(id);
-          setSagsState((prevSags) => prevSags.filter((sag) => sag.ID !== id));
+          await deleteSag(id); // hapus data di API
+          setMainData((prevData) => prevData.filter((data) => data.ID !== id));
           Swal.fire({
             icon: "info",
             title: "Berhasil!",
             text: "Data berhasil dihapus",
             showConfirmButton: false,
+            timer: 1500,
           });
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+        } catch (error) {
+          Swal.fire("Gagal!", "Error saat hapus data:", "error");
+        }
+      }
+    });
+  };
+
+  // Function untuk hapus multi select checkbox
+  const handleBulkDelete = async () => {
+    Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Anda akan menghapus data yang dipilih!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, saya yakin",
+      cancelButtonText: "Batal",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await Promise.all(selectedIds.map((id) => deleteSag(id))); // hapus data di API
+          setMainData((prevData) =>
+            prevData.filter((data) => !selectedIds.includes(data.ID))
+          );
+          setSelectedIds([]);
+          Swal.fire({
+            icon: "info",
+            title: "Berhasil!",
+            text: "Data berhasil dihapus",
+            showConfirmButton: false,
+            timer: 1500,
+          });
         } catch (error) {
           Swal.fire("Gagal!", "Error saat hapus data:", "error");
         }
@@ -176,38 +193,33 @@ export function SagPage() {
     setSearchTerm(event.target.value || "");
   };
 
+  // Function to handle checkbox changes
+  const handleCheckboxChange = (id) => {
+    setSelectedIds((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((item) => item !== id)
+        : [...prevSelected, id]
+    );
+  };
+
   // Hitung indeks awal dan akhir untuk penomoran paginate
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+  const startIndex = (currentPage - 1) * 10;
+  const endIndex = startIndex + 10;
 
   // Get data paginate dan filter search
-  const paginatedSags = sags
-    .filter((sag) => {
-      // Menggunakan optional chaining dan default value
-      const tanggal = FormatDate(sag.tanggal)?.toLowerCase() || "";
-      const noMemo = sag.no_memo?.toLowerCase() || "";
-      const perihal = sag.perihal?.toLowerCase() || "";
-      const pic = sag.pic?.toLowerCase() || "";
-      const search = searchTerm.toLowerCase();
-      return (
-        tanggal.includes(search) ||
-        noMemo.includes(search) ||
-        perihal.includes(search) ||
-        pic.includes(search)
-      );
-    })
-    .slice(startIndex, endIndex);
-
-  // Function untuk menangani pagination
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+  const searchProps = formConfig.fields.map((field) => field.name);
+  const Paginated = MainData.filter((data) => {
+    const search = searchTerm.toLowerCase();
+    return searchProps.some((prop) =>
+      (data[prop]?.toLowerCase() || "").includes(search)
+    );
+  }).slice(startIndex, endIndex);
 
   return (
     <App services={formConfig.services}>
-      <div className="w-full h-full">
+      <div className="grid grid-rows-3minmax">
         {/* page title */}
-        <div className="flex justify-between items-center mx-2 mb-2 ">
+        <div className="flex justify-between gap-1.5 items-center mx-2 mb-2">
           <div className="flex gap-1.5 items-center justify-center">
             <Button
               className="flex justify-center items-center"
@@ -233,62 +245,61 @@ export function SagPage() {
               <Dropdown.Item>This Sheet</Dropdown.Item>
               <Dropdown.Item>All Sheet</Dropdown.Item>
             </Dropdown>
-            <Button color="warning">Import Excel</Button>
+            <Button color="success">Import Excel</Button>
+            <Button
+              color="failure"
+              onClick={handleBulkDelete}
+              disabled={selectedIds.length === 0}
+            >
+              Hapus Data dipilih
+            </Button>
           </div>
           <SearchInput value={searchTerm} onChange={handleSearchChange} />
         </div>
         {/* End page title */}
 
         {/* table */}
-        <div className="h-2/3 overflow-y-auto p-2">
+        <div className="overflow-auto p-2">
           <Table hoverable>
             <Table.Head>
-              <Table.HeadCell>No.</Table.HeadCell>
-              <Table.HeadCell>Tanggal</Table.HeadCell>
-              <Table.HeadCell>No Memo</Table.HeadCell>
-              <Table.HeadCell>Perihal</Table.HeadCell>
-              <Table.HeadCell>Pic</Table.HeadCell>
+              <Table.HeadCell className="text-center">
+                <span>select</span>
+              </Table.HeadCell>
+              {formConfig.fields.map((field, index) => (
+                <Table.HeadCell key={index}>{field.label}</Table.HeadCell>
+              ))}
               <Table.HeadCell>
                 <span>Action</span>
               </Table.HeadCell>
             </Table.Head>
-            {paginatedSags.length > 0 ? (
+            {Paginated.length > 0 ? (
               <Table.Body className="divide-y">
-                {paginatedSags.map((sag, index) => (
-                  <Table.Row key={sag.ID}>
-                    <Table.Cell>
-                      <Badge className="flex justify-center">
-                        {(currentPage - 1) * itemsPerPage + index + 1}
-                      </Badge>
+                {Paginated.map((data) => (
+                  <Table.Row key={data.ID}>
+                    <Table.Cell className="text-center">
+                      <Checkbox
+                        checked={selectedIds.includes(data.ID)}
+                        onChange={() => handleCheckboxChange(data.ID)}
+                      />
                     </Table.Cell>
-                    <Table.Cell>{FormatDate(sag.tanggal)}</Table.Cell>
-                    <Table.Cell>{sag.no_memo}</Table.Cell>
-                    <Table.Cell>{sag.perihal}</Table.Cell>
-                    <Table.Cell>{sag.pic}</Table.Cell>
+                    {formConfig.fields.map((field, index) => (
+                      <Table.Cell key={index}>{data[field.name]}</Table.Cell>
+                    ))}
                     <Table.Cell>
                       <div className="flex gap-2">
-                        <a href="#" className="font-medium">
-                          <Button
-                            onClick={() => {
-                              handleEdit(sag);
-                            }}
-                            action="edit"
-                            color="warning"
-                          >
-                            Ubah
-                          </Button>
-                        </a>
-                        <a href="#" className="font-medium">
-                          <Button
-                            onClick={() => {
-                              setSagsState(sag);
-                              handleDelete(sag.ID);
-                            }}
-                            color="failure"
-                          >
-                            Hapus
-                          </Button>
-                        </a>
+                        <Button
+                          onClick={() => handleEdit(data)}
+                          action="edit"
+                          color="warning"
+                        >
+                          Ubah
+                        </Button>
+                        <Button
+                          onClick={() => handleDelete(data.ID)}
+                          color="failure"
+                        >
+                          Hapus
+                        </Button>
                       </div>
                     </Table.Cell>
                   </Table.Row>
@@ -297,7 +308,10 @@ export function SagPage() {
             ) : (
               <Table.Body className="divide-y">
                 <Table.Row>
-                  <Table.Cell colSpan={6} className="text-center">
+                  <Table.Cell
+                    colSpan={formConfig.fields.length + 2}
+                    className="text-center"
+                  >
                     <Badge className="p-4 font-bold" color="red">
                       Belum Ada Data yang Tersedia
                     </Badge>
@@ -310,17 +324,18 @@ export function SagPage() {
         {/* End Table */}
 
         {/* Pagination */}
-        <div className="flex overflow-x-auto m-2">
+        <div className="flex justify-between items-end overflow-x-auto m-2 dark:text-white">
+          <h1>© 2024 IT Security / Team IT </h1>
           <Pagination
             currentPage={currentPage}
-            totalPages={Math.ceil(sags.length / itemsPerPage)}
-            onPageChange={(newPage) => paginate(newPage)}
+            totalPages={getTotalPages(MainData.length)}
+            onPageChange={paginate}
           />
         </div>
         {/* End Pagination */}
 
         {/* ModalForm */}
-        <Modal show={formModalOpen} size="md" onClose={onCloseFormModal} popup>
+        <Modal show={formModalOpen} size="xl" onClose={onCloseFormModal} popup>
           <Modal.Header />
           <Modal.Body>
             <ReusableForm
