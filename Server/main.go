@@ -23,7 +23,11 @@ func main() {
 
 	// Enable CORS
 
-	r.Use(cors.Default())
+	r.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"http://localhost:8000"},
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization"},
+	}))
 
 	// Routes for User
 
@@ -36,8 +40,19 @@ func main() {
 	store := cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("mysession", store))
 
+	// Routes for UPDATE and EXPORT ALL
 	r.GET("/updateAll", controllers.UpdateAllSheets)
 	r.GET("/exportAll", controllers.ExportAllSheets)
+
+	// Routes for CALENDER
+	// Setup session store
+	store = cookie.NewStore([]byte("secret"))
+	r.Use(sessions.Sessions("mysession", store))
+
+	// Routes for Calendar
+	r.GET("/ruang-rapat", controllers.GetEvents)
+	r.POST("/ruang-rapat", controllers.CreateEvent)
+	r.DELETE("/ruang-rapat/:id", controllers.DeleteEvent)
 
 	// Routes for SAG
 	r.GET("/sag", controllers.SagIndex)

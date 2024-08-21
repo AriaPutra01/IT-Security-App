@@ -36,6 +36,7 @@ export function SagPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [updateModalOpen, setUpdateModalOpen] = useState(false); // State for update modal
 
   // UseEffect untuk mengambil data saat komponen dimount dan di balikan urutan
   useEffect(() => {
@@ -48,6 +49,11 @@ export function SagPage() {
   const onCloseFormModal = () => {
     setFormModalOpen(false);
     setFormData({});
+  };
+
+  // Function untuk handle tutup update modal
+  const onCloseUpdateModal = () => {
+    setUpdateModalOpen(false);
   };
 
   // Function untuk fetch data sag dan update state
@@ -74,7 +80,7 @@ export function SagPage() {
   // tambah data
   const AddSubmit = async (data) => {
     try {
-      const response = addSag(data);
+      await addSag(data);
       Swal.fire({
         icon: "success",
         title: "Berhasil!",
@@ -82,8 +88,7 @@ export function SagPage() {
         showConfirmButton: false,
         timer: 1000,
       }).then(() => {
-        window.location.reload();
-        setSagsState([...sags, response]);
+        setSagsState([...sags, data]);
       });
     } catch (error) {
       Swal.fire({
@@ -162,7 +167,6 @@ export function SagPage() {
             showConfirmButton: false,
           });
           setTimeout(() => {
-            window.location.reload();
           }, 1000);
         } catch (error) {
           Swal.fire("Gagal!", "Error saat hapus data:", "error");
@@ -203,6 +207,29 @@ export function SagPage() {
     setCurrentPage(pageNumber);
   };
 
+  const handleExport = () => {
+    window.location.href = "http://localhost:8080/exportSag";
+  };
+
+  const handleExportAll = () => {
+    window.location.href = "http://localhost:8080/exportAll";
+  };
+
+  const handleUpdate = () => {
+    setUpdateModalOpen(true);
+  };
+
+  const handleUpdateSubmit = () => {
+    // Logic untuk submit update
+    console.log("Update submitted");
+    window.location.href = "http://localhost:8080/updateSag"; // Ganti dengan endpoint yang sesuai
+    onCloseUpdateModal();
+  };
+
+  const handleUpdateAll = () => {
+    window.location.href = "http://localhost:8080/updateAll";
+  };
+
   return (
     <App services={formConfig.services}>
       <div className="w-full h-full">
@@ -222,16 +249,16 @@ export function SagPage() {
               label="Export Excel"
               dismissOnClick={false}
             >
-              <Dropdown.Item>This Sheet</Dropdown.Item>
-              <Dropdown.Item>All Sheet</Dropdown.Item>
+              <Dropdown.Item onClick={handleExport}><a href="http://localhost:8080/exportSag">Export This Sheet</a></Dropdown.Item>
+              <Dropdown.Item onClick={handleExportAll}><a href="http://localhost:8080/exportAll"> All Sheet</a></Dropdown.Item>
             </Dropdown>
             <Dropdown
               color="success"
               label="Update Excel"
               dismissOnClick={false}
             >
-              <Dropdown.Item>This Sheet</Dropdown.Item>
-              <Dropdown.Item>All Sheet</Dropdown.Item>
+              <Dropdown.Item onClick={handleUpdate}>This Sheet</Dropdown.Item>
+              <Dropdown.Item onClick={handleUpdateAll}><a href="http://localhost:8080/updateAll">All Sheet</a></Dropdown.Item>
             </Dropdown>
             <Button color="warning">Import Excel</Button>
           </div>
@@ -331,6 +358,18 @@ export function SagPage() {
           </Modal.Body>
         </Modal>
         {/* endModalForm */}
+
+        {/* Update Modal */}
+        <Modal show={updateModalOpen} size="md" onClose={onCloseUpdateModal} popup>
+          <Modal.Header />
+          <Modal.Body>
+            <div className="flex flex-col gap-4">
+              <h3 className="text-lg font-medium text-gray-900">Update This Sheet</h3>
+              <Button color="success" onClick={handleUpdateSubmit}>Submit</Button>
+            </div>
+          </Modal.Body>
+        </Modal>
+        {/* endUpdateModal */}
       </div>
     </App>
   );

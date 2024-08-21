@@ -283,7 +283,7 @@ func UpdateSheetSAG(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusFound, "/sag")
+	c.Redirect(http.StatusFound, "http://localhost:8000/sag")
 }
 
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"project-gin/controllers"
 	"project-gin/initializers"
 	"project-gin/models"
 )
@@ -27,6 +28,7 @@ func main() {
 		&models.SuratKeluar{},
 		&models.Sk{},
 		&models.Perdin{},
+		&controllers.RuangRapat{},
 	)
 
 }

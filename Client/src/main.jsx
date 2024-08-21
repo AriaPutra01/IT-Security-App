@@ -12,6 +12,7 @@ import DashboardPage from "./pages/Dashboard/Dashboard";
 // Dokumen
 import { SagPage } from "./pages/Services/Dokumen/SagPage";
 import { IsoPage } from "./pages/Services/Dokumen/IsoPage";
+import { RuangRapatPage } from "./pages/Services/KegiatanProses/RuangRapatPage";
 
 const router = createBrowserRouter([
   // welcome
@@ -24,6 +25,8 @@ const router = createBrowserRouter([
   // Dokumen
   { path: "/sag", element: <SagPage /> },
   { path: "/iso", element: <IsoPage /> },
+  // Kegiatan Proses
+  { path: "/ruang-rapat", element: <RuangRapatPage /> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
