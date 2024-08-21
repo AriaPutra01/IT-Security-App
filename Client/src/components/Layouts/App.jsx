@@ -18,8 +18,8 @@ const App = (props) => {
   return (
     <div
       className={`grid h-screen grid-cols-${
-        isSidebarOpen ? "2" : "1"
-      }fr gap-6 p-4 dark:bg-gray-900`}
+        isSidebarOpen ? "2fr" : "1fr"
+      } gap-6 p-4 dark:bg-gray-900`}
     >
       {isSidebarOpen ? (
         <Sidebar className="rounded-xl h-full overflow-auto">
