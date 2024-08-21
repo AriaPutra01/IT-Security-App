@@ -5,11 +5,7 @@ import { SearchInput } from "../../../components/Elements/SearchInput";
 import { ReusableForm } from "../../../components/Fragments/Services/ReusableForm";
 import { ReusableTable } from "../../../components/Fragments/Services/ReusableTable";
 import { usePagination } from "../../../Utilities/usePagination";
-import {
-  Button,
-  Modal,
-  Pagination,
-} from "flowbite-react";
+import { Button, Modal, Pagination } from "flowbite-react";
 import {
   getSags,
   addSag,

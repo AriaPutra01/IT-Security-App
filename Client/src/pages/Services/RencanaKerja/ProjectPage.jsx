@@ -6,11 +6,7 @@ import { ReusableForm } from "../../../components/Fragments/Services/ReusableFor
 import { ReusableTable } from "../../../components/Fragments/Services/ReusableTable";
 import { usePagination } from "../../../Utilities/usePagination";
 import { Excel } from "../../../Utilities/Excel";
-import {
-  Button,
-  Modal,
-  Pagination,
-} from "flowbite-react";
+import { Button, Modal, Pagination } from "flowbite-react";
 import {
   getProjects,
   addProject,

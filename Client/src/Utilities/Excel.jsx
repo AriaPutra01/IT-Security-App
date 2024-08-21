@@ -1,7 +1,7 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useState } from "react";
-import { Button, Dropdown, FileInput } from "flowbite-react";
+import { Badge, Button, Dropdown, FileInput } from "flowbite-react";
 
 export const Excel = (props) => {
   const { linkExportThis, linkUpdateThis, importExcel } = props;
@@ -72,36 +72,49 @@ export const Excel = (props) => {
       alert("Mohon Untuk Menambahkan File.");
       return;
     }
-    const formData = new FormData();
-    formData.append("file", file);
-    try {
-      await axios
-        .post(importExcel, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then(() => {
-          Swal.fire({
-            icon: "success",
-            title: "Berhasil!",
-            text: "Data berhasil dimport",
-            showConfirmButton: false,
-            timer: 1500,
+
+    const fileReader = new FileReader();
+    fileReader.readAsBinaryString(file);
+    fileReader.onload = async (event) => {
+      try {
+        const data = event.target.result;
+        const fileExtension = file.name.split(".").pop().toLowerCase();
+        if (fileExtension !== "xlsx") {
+          throw new Error("File format harus berupa .xlsx");
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        await axios
+          .post(importExcel, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then(() => {
+            Swal.fire({
+              icon: "success",
+              title: "Berhasil!",
+              text: "Data berhasil dimport",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
           });
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "gagal!",
+          text: "Mohon untuk memasukkan file.xlsx",
+          showConfirmButton: false,
+          timer: 1500,
         });
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "gagal!",
-        text: "gagal upload data",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    }
+      }
+    };
   };
 
   return (
@@ -139,13 +152,11 @@ export const Excel = (props) => {
             </Dropdown.Item>
           </Dropdown>
         </Dropdown.Item>
-        <Dropdown.Item>
-          <form onSubmit={handleImport} className="flex flex-col gap-2">
-            <FileInput onChange={handleFileChange} />
-            <Button type="submit" color="success">
-              Import
-            </Button>
-          </form>
+        <Dropdown.Item className="flex flex-col gap-2">
+          <FileInput onChange={handleFileChange} />
+          <Button onClick={handleImport} color="success" className="w-full">
+            Import
+          </Button>
         </Dropdown.Item>
       </Dropdown>
     </div>
