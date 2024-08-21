@@ -220,20 +220,16 @@ export function PerdinPage() {
 
   return (
     <App services={formConfig.services}>
-      <div className="grid grid-rows-3minmax">
+      <div className="grid grid-rows-3fr overflow-auto">
         {/* page title */}
         <div className="flex justify-between">
           <div className="flex gap-1.5 items-center mx-2 mb-2">
-            <Button
-              className="flex justify-center items-center"
-              onClick={handleAdd}
-              action="add"
-              color="info"
-            >
+            <Button onClick={handleAdd} action="add" color="info">
               Tambah
             </Button>
             <Excel linkExportThis="" linkUpdateThis="" importExcel="" />
             <Button
+              className="w-max"
               color="failure"
               onClick={handleBulkDelete}
               disabled={selectedIds.length === 0}
