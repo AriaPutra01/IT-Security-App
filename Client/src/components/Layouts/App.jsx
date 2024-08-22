@@ -17,9 +17,11 @@ const App = (props) => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   return (
     <div
-      className={`grid h-screen grid-cols-${
-        isSidebarOpen ? "2fr" : "1fr"
-      } gap-6 p-4 dark:bg-gray-900`}
+      className={
+        isSidebarOpen
+          ? "grid h-screen grid-cols-2fr gap-6 p-4 dark:bg-gray-900"
+          : "grid h-screen grid-cols-1fr gap-6 p-4 dark:bg-gray-900"
+      }
     >
       {isSidebarOpen ? (
         <Sidebar className="rounded-xl h-full overflow-auto">
@@ -33,7 +35,7 @@ const App = (props) => {
             </Sidebar.Logo>
             <svg
               onClick={toggleSidebar}
-              class="w-[30px] h-[30px] text-gray-800 dark:text-white cursor-pointer"
+              className="w-[30px] h-[30px] text-gray-800 dark:text-white cursor-pointer"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -43,9 +45,9 @@ const App = (props) => {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M6 18 17.94 6M18 18 6.06 6"
               />
             </svg>
@@ -115,7 +117,7 @@ const App = (props) => {
             {isSidebarOpen ? null : (
               <svg
                 onClick={toggleSidebar}
-                class="w-[40px] h-[40px] text-gray-800 dark:text-white cursor-pointer"
+                className="w-[40px] h-[40px] text-gray-800 dark:text-white cursor-pointer"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
