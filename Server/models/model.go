@@ -224,6 +224,23 @@ func (RuangRapat) TableName() string {
 	return "ruang_rapats"
 }
 
+type JadwalCuti struct {
+	ID     uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	Title  string    `json:"title"`
+	Start  string    `json:"start"`
+	End    string    `json:"end"`
+	AllDay bool      `json:"allDay"`
+}
+
+func (r *JadwalCuti) BeforeCreate(tx *gorm.DB) error {
+	r.ID = generateUUID()
+	return nil
+}
+
+func (JadwalCuti) TableName() string {
+	return "jadwal_cuti"
+}
+
 // model for suratMasuk
 type SuratMasuk struct {
 	ID         uint      `gorm:"primaryKey"`

@@ -117,6 +117,11 @@ func main() {
 	r.POST("/ruang-rapat", controllers.CreateEvent)
 	r.DELETE("/ruang-rapat/:id", controllers.DeleteEvent)
 
+	// Jadwal Cuti routes
+	r.GET("/jadwal-cuti", controllers.GetEventsCuti)
+	r.POST("/jadwal-cuti", controllers.CreateEventCuti)
+	r.DELETE("/jadwal-cuti/:id", controllers.DeleteEventCuti)
+
 	//Perdin routes
 	r.POST("/Perdin", controllers.PerdinCreate)
 	r.PUT("/Perdin/:id", controllers.PerdinUpdate)
