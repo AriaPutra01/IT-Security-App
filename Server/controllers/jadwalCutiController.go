@@ -3,8 +3,8 @@ package controllers
 import (
 	"log"
 	"net/http"
-	"project-gin/initializers"
-	"project-gin/models"
+	"project-its/initializers"
+	"project-its/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -20,7 +20,7 @@ type JadwalCuti struct {
 
 // Create a new event
 func GetEventsCuti(c *gin.Context) {
-	var events []models.RuangRapat
+	var events []models.JadwalCuti
 	if err := initializers.DB.Find(&events).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -30,7 +30,7 @@ func GetEventsCuti(c *gin.Context) {
 
 // Example of using generated UUID
 func CreateEventCuti(c *gin.Context) {
-	var event RuangRapat
+	var event JadwalCuti
 	if err := c.ShouldBindJSON(&event); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -62,7 +62,7 @@ func DeleteEventCuti(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
 		return
 	}
-	if err := initializers.DB.Where("id = ?", id).Delete(&RuangRapat{}).Error; err != nil {
+	if err := initializers.DB.Where("id = ?", id).Delete(&JadwalCuti{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

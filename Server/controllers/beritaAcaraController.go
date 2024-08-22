@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"project-gin/initializers"
-	"project-gin/models"
+	"project-its/initializers"
+	"project-its/models"
 	"time"
 
 	"github.com/gin-gonic/gin"

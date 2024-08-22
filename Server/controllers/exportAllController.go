@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"project-gin/initializers"
-	"project-gin/models"
+	"project-its/initializers"
+	"project-its/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xuri/excelize/v2"

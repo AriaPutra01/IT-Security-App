@@ -8,17 +8,15 @@ import listPlugin from "@fullcalendar/list";
 import { v4 as uuidv4 } from "uuid"; // Import UUID
 import "../../../calender.css";
 import Swal from "sweetalert2";
+import App from "../../../components/Layouts/App";
 import {
   getEvents,
   addEvent,
   deleteEvent,
-} from "../../../../API/KegiatanProses/rapat.service";
-import App from "../../../components/Layouts/App";
+} from "../../../../API/KegiatanProses/RuangRapat.service";
 
 export function RuangRapatPage() {
   const [currentEvents, setCurrentEvents] = useState([]);
-  console.log("🚀 ~ RuangRapatPage ~ currentEvents:", currentEvents);
-
   // Fetch events
   useEffect(() => {
     getEvents((data) => {
@@ -56,7 +54,6 @@ export function RuangRapatPage() {
       calendarApi.unselect();
     }
   };
-
   // Handle event click to delete event
   const handleEventClick = async (selected) => {
     Swal.fire({
@@ -80,7 +77,8 @@ export function RuangRapatPage() {
             showConfirmButton: false,
             timer: 1500,
           });
-        } catch (error) { // Perbaikan di sini
+        } catch (error) {
+          // Perbaikan di sini
           Swal.fire({
             icon: "error",
             title: "Gagal!",
@@ -113,7 +111,6 @@ export function RuangRapatPage() {
               ))}
             </ul>
           </div>
-
           <div className="calendar">
             <FullCalendar
               height="75vh"

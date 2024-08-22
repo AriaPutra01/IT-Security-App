@@ -1,8 +1,8 @@
 package main
 
 import (
-	"project-gin/initializers"
-	"project-gin/models"
+	"project-its/initializers"
+	"project-its/models"
 )
 
 func init() {

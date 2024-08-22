@@ -1,4 +1,4 @@
-module project-gin
+module project-its
 
 go 1.22.5
 

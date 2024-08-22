@@ -3,8 +3,8 @@ package controllers
 import (
 	"log"
 	"net/http"
-	"project-gin/initializers"
-	"project-gin/models"
+	"project-its/initializers"
+	"project-its/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

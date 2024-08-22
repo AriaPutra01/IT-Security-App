@@ -20,8 +20,9 @@ import { SkPage } from "./pages/Services/Dokumen/SkPage";
 import { ProjectPage } from "./pages/Services/RencanaKerja/ProjectPage";
 import { BaseProjectPage } from "./pages/Services/RencanaKerja/BaseProjectPage";
 // Kegiatan Proses
-import { PerdinPage } from "./pages/Services/KegiatanProses/PerjalananDinasPage";
 import { RuangRapatPage } from "./pages/Services/KegiatanProses/RuangRapatPage";
+import { PerdinPage } from "./pages/Services/KegiatanProses/PerjalananDinasPage";
+import { JadwalCutiPage } from "./pages/Services/KegiatanProses/JadwalCutiPage";
 // Data Informasi
 import { SuratMasukPage } from "./pages/Services/DataInformasi/SuratMasukPage";
 import { SuratKeluarPage } from "./pages/Services/DataInformasi/SuratKeluarPage";
@@ -45,8 +46,9 @@ const router = createBrowserRouter([
   { path: "/project", element: <ProjectPage /> },
   { path: "/base-project", element: <BaseProjectPage /> },
   // Kegiatan Proses
-  { path: "/perjalanan-dinas", element: <PerdinPage /> },
   { path: "/ruang-rapat", element: <RuangRapatPage /> },
+  { path: "/perjalanan-dinas", element: <PerdinPage /> },
+  { path: "/jadwal-cuti", element: <JadwalCutiPage /> },
   // Data Informasi
   { path: "/surat-masuk", element: <SuratMasukPage /> },
   { path: "/surat-keluar", element: <SuratKeluarPage /> },
