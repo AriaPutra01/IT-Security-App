@@ -5,62 +5,32 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
-import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid'; // Import UUID
+import axios from "axios";
+import { v4 as uuidv4 } from "uuid"; // Import UUID
 import "../../../calender.css";
+import Swal from "sweetalert2";
+import {
+  getEvents,
+  addEvent,
+  updateEvent,
+  deleteEvent,
+} from "../../../../services/rapat.service";
 
 export function RuangRapatPage() {
   const [currentEvents, setCurrentEvents] = useState([]);
-
-  // Fetch events from API
-
-  function getEvents(callback) {
-    return axios
-      .get("http://localhost:8080/ruang-rapat")
-      .then((response) => {
-        callback(response.data);
-      })
-      .catch((error) => {
-        throw new Error(`Gagal mengambil data. Alasan: ${error.message}`);
-      });
-  }
+  console.log("🚀 ~ RuangRapatPage ~ currentEvents:", currentEvents);
 
   // Fetch events
   useEffect(() => {
     getEvents((data) => {
-      setCurrentEvents(data);
+      setCurrentEvents(data.reverse());
     });
   }, []);
-
-  // Save event to backend
-  const saveEvent = async (event) => {
-    try {
-      await axios.post('http://localhost:8080/ruang-rapat', event)
-        .then((response) => {
-          return response.data
-        })
-      setCurrentEvents([...currentEvents, event])
-    } catch (error) {
-      console.error("Error saving event:", error);
-    }
-  };
-
-  // Delete event from backend
-  const deleteEvent = async (eventId) => {
-    try {
-      await axios.delete(`http://localhost:8080/ruang-rapat?id=${eventId}`);
-      getEvents(); // Fetch events again to update the UI
-    } catch (error) {
-      console.error("Error deleting event:", error);
-    }
-  };
 
   // Handle date click to add new event
   const handleDateClick = async (selected) => {
     const title = prompt("Please enter a new title for your event");
     const calendarApi = selected.view.calendar;
-    calendarApi.unselect();
-
     if (title) {
       const newEvent = {
         id: uuidv4(),
@@ -69,38 +39,65 @@ export function RuangRapatPage() {
         end: selected.endStr,
         allDay: selected.allDay,
       };
-
-      setCurrentEvents((prevEvents) => {
-        const updatedEvents = [...prevEvents, newEvent];
-        saveEvent(newEvent); // Save event to backend
-        return updatedEvents;
-      });
-      calendarApi.addEvent(newEvent); // Add event to calendar UI
+      try {
+        await addEvent(newEvent);
+        setCurrentEvents([...currentEvents, newEvent]);
+      } catch {
+        (error) => {
+          Swal.fire({
+            icon: error.message,
+            title: "Gagal!",
+            text: "Error saat menyimpan data",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        };
+      }
+    } else {
+      calendarApi.unselect();
     }
   };
 
   // Handle event click to delete event
   const handleEventClick = async (selected) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the event '${selected.event.title}'`
-      )
-    ) {
-      selected.event.remove();
-      setCurrentEvents((prevEvents) => {
-        const updatedEvents = prevEvents.filter(event => event.id !== selected.event.id);
-        deleteEvent(selected.event.id); // Delete event from backend
-        return updatedEvents;
-      });
-    }
+    Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: `Anda akan menghapus data ${selected.event.title}?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, saya yakin",
+      cancelButtonText: "Batal",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteEvent(selected.event.id);
+          setCurrentEvents((prevEvents) =>
+            prevEvents.filter((event) => event.id !== selected.event.id)
+          );
+          Swal.fire({
+            icon: "info",
+            title: "Berhasil!",
+            text: "Data berhasil dihapus",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } catch {
+          Swal.fire({
+            icon: "error",
+            title: "Gagal!",
+            text: "Error saat menghapus data",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      }
+    });
   };
-
   return (
     <div className="calendar-container">
       <header>
         <h1>Ruang Rapat</h1>
       </header>
-
       <div className="calendar-content">
         <div className="events-list">
           <h2>Events</h2>
@@ -123,7 +120,12 @@ export function RuangRapatPage() {
         <div className="calendar">
           <FullCalendar
             height="75vh"
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+            plugins={[
+              dayGridPlugin,
+              timeGridPlugin,
+              interactionPlugin,
+              listPlugin,
+            ]}
             headerToolbar={{
               left: "prev,next today",
               center: "title",
@@ -136,7 +138,7 @@ export function RuangRapatPage() {
             dayMaxEvents={true}
             select={handleDateClick}
             eventClick={handleEventClick}
-            events={currentEvents} // Ensure events are set correctly
+            events={currentEvents}
           />
         </div>
       </div>

@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	uuid "github.com/jackc/pgx/pgtype/ext/gofrs-uuid"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -101,12 +101,21 @@ type Perdin struct {
 	Transport string    `json:"transport"`
 }
 
+func generateUUID() uuid.UUID {
+	return uuid.New()
+}
+
 type RuangRapat struct {
-	ID     uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4();primaryKey"`
+	ID     uuid.UUID `gorm:"type:uuid;primaryKey"`
 	Title  string
 	Start  string
 	End    string
 	AllDay bool
+}
+
+func (r *RuangRapat) BeforeCreate(tx *gorm.DB) error {
+	r.ID = generateUUID()
+	return nil
 }
 
 func (RuangRapat) TableName() string {

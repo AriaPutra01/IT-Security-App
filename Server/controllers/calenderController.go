@@ -1,20 +1,20 @@
 package controllers
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"log"
 	"net/http"
 	"project-gin/initializers"
 	"project-gin/models"
-	"log"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type RuangRapat struct {
-	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
-	Title  string
-	Start  string
-	End    string
-	AllDay bool
+	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()";json:"id"`
+	Title  string `json:"title"`
+	Start  string `json:"start"`
+	End    string `json:"end"`
+	AllDay bool   `json:"allDay"`
 }
 
 func generateUUID() string {
