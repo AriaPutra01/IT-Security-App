@@ -3,6 +3,9 @@ package models
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 // model for sag
@@ -154,7 +157,7 @@ type Project struct {
 	DivInisiasi     string    `json:"div_inisiasi"`
 	Bulan           time.Time `json:"-"`
 	SumberPendanaan string    `json:"sumber_pendanaan"`
-	Anggaran        string     `json:"anggaran"`
+	Anggaran        string    `json:"anggaran"`
 	NoIzin          string    `json:"no_izin"`
 	TanggalIzin     time.Time `json:"-"`
 	TanggalTor      time.Time `json:"-"`
@@ -196,6 +199,29 @@ func (i Perdin) MarshalJSON() ([]byte, error) {
 		Tanggal: i.Tanggal.Format("2006-01-02"), // Format tanggal YYYY-MM-DD
 		Alias:   (*Alias)(&i),
 	})
+}
+
+// model ruang-rapat
+
+func generateUUID() uuid.UUID {
+	return uuid.New()
+}
+
+type RuangRapat struct {
+	ID     uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	Title  string    `json:"title"`
+	Start  string    `json:"start"`
+	End    string    `json:"end"`
+	AllDay bool      `json:"allDay"`
+}
+
+func (r *RuangRapat) BeforeCreate(tx *gorm.DB) error {
+	r.ID = generateUUID()
+	return nil
+}
+
+func (RuangRapat) TableName() string {
+	return "ruang_rapats"
 }
 
 // model for suratMasuk

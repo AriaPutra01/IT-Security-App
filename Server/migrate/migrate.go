@@ -25,6 +25,7 @@ func main() {
 		&models.SuratKeluar{},
 		&models.Sk{},
 		&models.Perdin{},
+		&models.RuangRapat{},
 	)
 
 }

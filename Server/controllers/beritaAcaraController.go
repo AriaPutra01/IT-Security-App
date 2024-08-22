@@ -283,18 +283,10 @@ func UpdateSheetBerita(c *gin.Context) {
 	}
 
 	// Save the file with updated data
-	file, err := os.OpenFile(filePath, os.O_RDWR, 0755)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Error membuka file: %v", err)
-		return
-	}
-	defer file.Close()
-
-	if _, err := f.WriteTo(file); err != nil {
+	if err := f.SaveAs(filePath); err != nil {
 		c.String(http.StatusInternalServerError, "Error menyimpan file: %v", err)
 		return
 	}
-
 }
 
 func ImportExcelBerita(c *gin.Context) {
