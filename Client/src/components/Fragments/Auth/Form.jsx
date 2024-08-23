@@ -17,7 +17,6 @@ export function LoginForm() {
       });
       localStorage.setItem('token', response.data.token);
       const decoded = jwtDecode(response.data.token);
-      console.log('Role:', decoded.role); // Log role ke console
       
       // Redirect ke dashboard
       window.location.href = '/dashboard';

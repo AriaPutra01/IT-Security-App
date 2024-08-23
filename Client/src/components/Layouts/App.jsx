@@ -10,32 +10,29 @@ import {
 import { Dropdown } from "flowbite-react";
 import { DarkThemeToggle } from "flowbite-react";
 import { useState, useEffect } from "react";
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 
 const App = (props) => {
   const { services, children } = props;
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [userDetails, setUserDetails] = useState({ username: '', email: '' });
-  console.log(`userDetail`,userDetails)
+  const [userDetails, setUserDetails] = useState({ username: "", email: "" });
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       const decoded = jwtDecode(token);
-      console.log(`decode`,decoded)
       setUserDetails({ username: decoded.username, email: decoded.email });
     }
   }, []);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-  
 
   const handleSignOut = () => {
     // Menghapus token dari localStorage
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
 
     // Redirect ke halaman login
-    window.location.href = '/login';
+    window.location.href = "/login";
   };
 
   return (
@@ -176,9 +173,7 @@ const App = (props) => {
                   {userDetails.email}
                 </span>
               </Dropdown.Header>
-              <Dropdown.Item onClick={handleSignOut}>
-                Sign out
-              </Dropdown.Item>
+              <Dropdown.Item onClick={handleSignOut}>Sign out</Dropdown.Item>
             </Dropdown>
           </div>
         </div>

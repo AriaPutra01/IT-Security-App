@@ -1,13 +1,14 @@
 package controllers
 
 import (
+	"net/http"
+	"project-its/initializers"
+	"project-its/models"
+	"time"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
-	"project-gin/initializers"
-	"project-gin/models"
-	"time"
 )
 
 func Login(c *gin.Context) {

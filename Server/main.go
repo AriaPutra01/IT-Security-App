@@ -2,7 +2,7 @@ package main
 
 import (
 	"time"
-	"project-gin/middleware"
+	"project-its/middleware"
 	"project-its/controllers"
 	"project-its/initializers"
 
