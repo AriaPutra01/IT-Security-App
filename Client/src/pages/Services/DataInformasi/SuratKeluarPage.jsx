@@ -224,7 +224,7 @@ export function SuratKeluarPage() {
 
   return (
     <App services={formConfig.services}>
-      <div className="grid grid-rows-3minmax">
+      <div className="grid grid-rows-3fr overflow-auto">
         <div className="flex justify-between">
           <div className="flex gap-1.5 items-center mx-2 mb-2">
             {userRole === 'user' ? (
@@ -274,6 +274,9 @@ export function SuratKeluarPage() {
             onPageChange={paginate}
           />
         </div>
+        {/* End Pagination */}
+
+        {/* ModalForm */}
         <Modal show={formModalOpen} size="xl" onClose={onCloseFormModal} popup>
           <Modal.Header />
           <Modal.Body>
@@ -284,6 +287,7 @@ export function SuratKeluarPage() {
             />
           </Modal.Body>
         </Modal>
+        {/* endModalForm */}
       </div>
     </App>
   );

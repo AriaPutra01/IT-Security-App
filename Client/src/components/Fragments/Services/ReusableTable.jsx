@@ -70,6 +70,7 @@ export const ReusableTable = (props) => {
                     {userRole === 'admin' && (
                     <div className="flex gap-2">
                       <Button
+                        className="w-full"
                         onClick={() => handleEdit(data)}
                         action="edit"
                         color="warning"
@@ -93,6 +94,7 @@ export const ReusableTable = (props) => {
                         </svg>
                       </Button>
                       <Button
+                        className="w-full"
                         onClick={() => handleDelete(data.ID)}
                         color="failure"
                       >

@@ -4,7 +4,6 @@ import { Button, Label, TextInput } from "flowbite-react";
 import axios from 'axios';
 import React, { useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
-
 export function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,7 +27,7 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleLogin}>
+    <form onSubmit={handleLogin} className="flex w-full flex-col gap-4">
       <div>
         <div className="mb-2 block">
           <Label className="text-white" htmlFor="email" value="Email" />

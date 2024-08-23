@@ -3,7 +3,7 @@ package models
 import (
 	"encoding/json"
 	"time"
-
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +15,6 @@ type User struct {
 	Password string
 	Role     string
 }
-
 // model for sag
 type Sag struct {
 	ID        uint      `gorm:"primaryKey"`
@@ -207,6 +206,45 @@ func (i Perdin) MarshalJSON() ([]byte, error) {
 		Tanggal: i.Tanggal.Format("2006-01-02"), // Format tanggal YYYY-MM-DD
 		Alias:   (*Alias)(&i),
 	})
+}
+
+// model ruang-rapat
+func generateUUID() uuid.UUID {
+	return uuid.New()
+}
+
+type RuangRapat struct {
+	ID     uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	Title  string    `json:"title"`
+	Start  string    `json:"start"`
+	End    string    `json:"end"`
+	AllDay bool      `json:"allDay"`
+}
+
+func (r *RuangRapat) BeforeCreate(tx *gorm.DB) error {
+	r.ID = generateUUID()
+	return nil
+}
+
+func (RuangRapat) TableName() string {
+	return "ruang_rapats"
+}
+
+type JadwalCuti struct {
+	ID     uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	Title  string    `json:"title"`
+	Start  string    `json:"start"`
+	End    string    `json:"end"`
+	AllDay bool      `json:"allDay"`
+}
+
+func (r *JadwalCuti) BeforeCreate(tx *gorm.DB) error {
+	r.ID = generateUUID()
+	return nil
+}
+
+func (JadwalCuti) TableName() string {
+	return "jadwal_cutis"
 }
 
 // model for suratMasuk

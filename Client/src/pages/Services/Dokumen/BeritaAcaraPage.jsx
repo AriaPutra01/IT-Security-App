@@ -223,7 +223,7 @@ export function BeritaAcaraPage() {
 
   return (
     <App services={formConfig.services}>
-      <div className="grid grid-rows-3minmax">
+      <div className="grid grid-rows-3fr overflow-auto">
         {/* page title */}
         <div className="flex justify-between">
           <div className="flex gap-1.5 items-center mx-2 mb-2">

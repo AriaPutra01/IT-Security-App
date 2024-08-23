@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"project-gin/initializers"
-	"project-gin/models"
+	"project-its/initializers"
+	"project-its/models"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -244,17 +244,22 @@ func UpdateSheetSAG(c *gin.Context) {
 	// Define sheet name
 	sheetName := "SAG"
 
-	// Check if sheet exists and delete it if it does
-	if _, err := f.GetSheetIndex(sheetName); err == nil {
-		f.DeleteSheet(sheetName)
+	// Check if the sheet exists
+	sheetIndex, err := f.GetSheetIndex(sheetName)
+	if err != nil || sheetIndex == -1 {
+		c.String(http.StatusBadRequest, "Lembar kerja SAG tidak ditemukan")
+		return
 	}
-	f.NewSheet(sheetName)
 
-	// Write header row
-	f.SetCellValue(sheetName, "A1", "Tanggal")
-	f.SetCellValue(sheetName, "B1", "No Memo")
-	f.SetCellValue(sheetName, "C1", "Perihal")
-	f.SetCellValue(sheetName, "D1", "PIC")
+	// Clear existing data except the header by deleting rows
+	rows, err := f.GetRows(sheetName)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error getting rows: %v", err)
+		return
+	}
+	for i := 1; i < len(rows); i++ { // Start from 1 to keep the header
+		f.RemoveRow(sheetName, 2) // Always remove the second row since the sheet compresses up
+	}
 
 	// Fetch updated data from the database
 	var sags []models.Sag
@@ -270,19 +275,12 @@ func UpdateSheetSAG(c *gin.Context) {
 	}
 
 	// Save the file with updated data
-	file, err := os.OpenFile(filePath, os.O_RDWR, 0755)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Error membuka file: %v", err)
-		return
-	}
-	defer file.Close()
-
-	if _, err := f.WriteTo(file); err != nil {
+	if err := f.SaveAs(filePath); err != nil {
 		c.String(http.StatusInternalServerError, "Error menyimpan file: %v", err)
 		return
 	}
 
-	c.Redirect(http.StatusFound, "/sag")
+	c.Redirect(http.StatusFound, "http://localhost:8000/sag")
 }
 
 func ImportExcelSag(c *gin.Context) {

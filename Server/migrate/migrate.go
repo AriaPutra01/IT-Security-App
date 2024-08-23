@@ -1,8 +1,8 @@
 package main
 
 import (
-	"project-gin/initializers"
-	"project-gin/models"
+	"project-its/initializers"
+	"project-its/models"
 )
 
 func init() {
@@ -15,6 +15,7 @@ func init() {
 func main() {
 
 	initializers.DB.AutoMigrate(
+		&models.User{},
 		&models.Sag{},
 		&models.Memo{},
 		&models.Iso{},
@@ -25,7 +26,8 @@ func main() {
 		&models.SuratKeluar{},
 		&models.Sk{},
 		&models.Perdin{},
-		&models.User{},
+		&models.RuangRapat{},
+		&models.JadwalCuti{},
 	)
 
 }
