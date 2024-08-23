@@ -1,27 +1,28 @@
 "use client";
 
 import { Button, Label, TextInput } from "flowbite-react";
-import axios from 'axios';
-import React, { useState } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import Swal from "sweetalert2";
+import axios from "axios";
+import React, { useState } from "react";
+import { jwtDecode } from "jwt-decode";
 export function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8080/login', {
-        email, 
-        password
+      const response = await axios.post("http://localhost:8080/login", {
+        email,
+        password,
       });
-      localStorage.setItem('token', response.data.token);
+      localStorage.setItem("token", response.data.token);
       const decoded = jwtDecode(response.data.token);
-      
+
       // Redirect ke dashboard
-      window.location.href = '/dashboard';
+      window.location.href = "/dashboard";
     } catch (error) {
-      alert('Login gagal: ' + error.response.data.error);
+      alert("Login gagal: " + error.response.data.error);
     }
   };
 
@@ -64,17 +65,27 @@ export function RegisterForm() {
   const handleRegister = async (e) => {
     e.preventDefault();
     const userData = {
-      username: document.getElementById('username').value,
-      email: document.getElementById('email').value,
-      password: document.getElementById('passsword').value,
-      role: document.getElementById('role').value
+      username: document.getElementById("username").value,
+      email: document.getElementById("email").value,
+      password: document.getElementById("passsword").value,
+      role: document.getElementById("role").value,
     };
 
     try {
-      const response = await axios.post('http://localhost:8080/register', userData);
-      alert('Registrasi berhasil!');
+      await axios.post("http://localhost:8080/register", userData);
+      Swal.fire({
+        icon: "success",
+        title: "Registrasi Berhasil",
+        text: "Silahkan Login",
+      }).then(() => {
+        window.location.href = "/dashboard";
+      });
     } catch (error) {
-      alert('Registrasi gagal: ' + error.response.data.error);
+      Swal.fire({
+        icon: "error",
+        title: "Registrasi Gagal" + error,
+        text: "Silahkan Coba Lagi",
+      });
     }
   };
 
@@ -112,7 +123,11 @@ export function RegisterForm() {
         <div className="mb-2 block">
           <Label className="text-white" htmlFor="role" value="Role" />
         </div>
-        <select id="role" className="form-select block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none" required>
+        <select
+          id="role"
+          className="form-select block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
+          required
+        >
           <option value="user">User</option>
           <option value="admin">Admin</option>
         </select>

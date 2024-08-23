@@ -11,6 +11,7 @@ import { Dropdown } from "flowbite-react";
 import { DarkThemeToggle } from "flowbite-react";
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import { AiOutlineUsergroupAdd } from "react-icons/ai";
 
 const App = (props) => {
   const { services, children } = props;
@@ -21,39 +22,38 @@ const App = (props) => {
     const token = localStorage.getItem("token");
     if (token) {
       const decoded = jwtDecode(token);
-      setUserDetails({ username: decoded.username, email: decoded.email });
+      setUserDetails({ username: decoded.username, email: decoded.email, role: decoded.role });
     }
   }, []);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-  
+
   const handleSignOut = async () => {
     try {
-        // Panggil endpoint logout
-        const response = await fetch('http://localhost:8080/logout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
+      // Panggil endpoint logout
+      const response = await fetch("http://localhost:8080/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
-        // Cek status respons
-        if (response.ok) {
-            console.log("Logout berhasil");
-            // Menghapus token dari localStorage
-            localStorage.removeItem('token');
-            // Redirect ke halaman login
-            window.location.href = '/login';
-        } else {
-            const errorData = await response.json();
-            console.error("Logout gagal:", errorData);
-        }
+      // Cek status respons
+      if (response.ok) {
+        console.log("Logout berhasil");
+        // Menghapus token dari localStorage
+        localStorage.removeItem("token");
+        // Redirect ke halaman login
+        window.location.href = "/login";
+      } else {
+        const errorData = await response.json();
+        console.error("Logout gagal:", errorData);
+      }
     } catch (error) {
-        console.error("Terjadi kesalahan saat melakukan logout:", error);
+      console.error("Terjadi kesalahan saat melakukan logout:", error);
     }
-};
-  
+  };
 
   return (
     <div
@@ -147,6 +147,11 @@ const App = (props) => {
                   Surat Keluar
                 </Sidebar.Item>
               </Sidebar.Collapse>
+              {userDetails.role === "admin" ? (
+                <Sidebar.Item icon={AiOutlineUsergroupAdd} href="/register">
+                  Register
+                </Sidebar.Item>
+              ) : null}
             </Sidebar.ItemGroup>
           </Sidebar.Items>
         </Sidebar>
