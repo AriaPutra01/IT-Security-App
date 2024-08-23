@@ -46,7 +46,6 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return <Navigate to="/login" />;
   }
   const decoded = jwtDecode(token);
-  console.log('Current User Role:', decoded.role); // Log role saat ini
   if (requiredRole && decoded.role !== requiredRole) {
     return <Navigate to="/unauthorized" />;
   }
@@ -80,9 +79,6 @@ const router = createBrowserRouter([
   { path: "/surat-masuk", element: <ProtectedRoute><SuratMasukPage /></ProtectedRoute> },
   { path: "/surat-keluar", element: <ProtectedRoute><SuratKeluarPage /></ProtectedRoute> },
 ]);
-
-// const decoded = jwtDecode(token);
-// console.log('Current User Role:', decoded.role); // Log role saat ini
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

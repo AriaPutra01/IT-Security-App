@@ -11,7 +11,6 @@ export function getSags(callback) {
     return; // Hentikan fungsi lebih lanjut
   }
 
-  console.log("Token sent:", token);
   return axios
     .get(`${API_URL}`, {
       headers: {
