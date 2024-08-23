@@ -15,6 +15,8 @@ func init() {
 func main() {
 
 	initializers.DB.AutoMigrate(
+		&models.User{},
+		&models.UserToken{},
 		&models.Sag{},
 		&models.Memo{},
 		&models.Iso{},

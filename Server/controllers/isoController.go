@@ -124,7 +124,6 @@ func IsoUpdate(c *gin.Context) {
 	} else {
 		iso.Perihal = iso.Perihal // gunakan nilai yang ada dari database
 	}
-
 	if requestBody.Pic != "" {
 		iso.Pic = requestBody.Pic
 	} else {

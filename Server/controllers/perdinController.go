@@ -130,7 +130,6 @@ func PerdinUpdate(c *gin.Context) {
 	} else {
 		perdin.Transport = perdin.Transport // gunakan nilai yang ada dari database
 	}
-
 	if requestBody.Hotel != "" {
 		perdin.Hotel = requestBody.Hotel
 	} else {

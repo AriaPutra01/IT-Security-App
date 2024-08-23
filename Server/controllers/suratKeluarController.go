@@ -133,7 +133,6 @@ func SuratKeluarUpdate(c *gin.Context) {
 	} else {
 		surat_keluar.Title = surat_keluar.Title // gunakan nilai yang ada dari database
 	}
-
 	if requestBody.Pic != "" {
 		surat_keluar.Pic = requestBody.Pic
 	} else {

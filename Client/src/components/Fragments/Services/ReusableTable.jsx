@@ -1,6 +1,7 @@
 import { Badge, Button, Checkbox, Table } from "flowbite-react";
 import { FormatDate } from "../../../Utilities/FormatDate";
 import React from "react";
+import { jwtDecode } from "jwt-decode";
 
 export const ReusableTable = (props) => {
   const {
@@ -11,6 +12,13 @@ export const ReusableTable = (props) => {
     selectedIds,
     handleCheckboxChange,
   } = props;
+  const token = localStorage.getItem('token');
+  let userRole = '';
+
+  if (token) {
+    const decoded = jwtDecode(token);
+    userRole = decoded.role;
+  }
 
   const renderCellContent = (field, value) => {
     switch (field.type) {
@@ -34,9 +42,14 @@ export const ReusableTable = (props) => {
             {formConfig.fields.map((field, index) => (
               <Table.HeadCell key={index}>{field.label}</Table.HeadCell>
             ))}
+            {userRole === 'admin' && (
             <Table.HeadCell>
               <span>Action</span>
             </Table.HeadCell>
+            )}
+            {userRole === 'user' && (
+            null
+            )}
           </Table.Head>
           {Paginated.length > 0 ? (
             <Table.Body className="divide-y">
@@ -54,6 +67,7 @@ export const ReusableTable = (props) => {
                     </Table.Cell>
                   ))}
                   <Table.Cell>
+                    {userRole === 'admin' && (
                     <div className="flex gap-2">
                       <Button
                         className="w-full"
@@ -63,6 +77,7 @@ export const ReusableTable = (props) => {
                       >
                         <svg
                           className="w-6 h-6"
+                          aria-hidden="true"
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
                           height="24"
@@ -100,6 +115,10 @@ export const ReusableTable = (props) => {
                         </svg>
                       </Button>
                     </div>
+                    )}
+                    {userRole === 'user' && (
+                    null
+                    )}
                   </Table.Cell>
                 </Table.Row>
               ))}

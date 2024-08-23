@@ -10,7 +10,6 @@ import (
 	"project-its/initializers"
 	"project-its/models"
 	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/xuri/excelize/v2"
 )
@@ -131,7 +130,6 @@ func BeritaAcaraUpdate(c *gin.Context) {
 	} else {
 		berita_acara.Perihal = berita_acara.Perihal // gunakan nilai yang ada dari database
 	}
-
 	if requestBody.Pic != "" {
 		berita_acara.Pic = requestBody.Pic
 	} else {

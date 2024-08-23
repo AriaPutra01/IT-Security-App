@@ -3,8 +3,20 @@ import axios from "axios";
 const API_URL = "http://localhost:8080/sag";
 
 export function getSags(callback) {
+  const token = localStorage.getItem('token'); // Ambil token dari localStorage
+
+  if (!token) {
+    // Jika tidak ada token, langsung callback dengan null atau tampilkan layar putih
+    callback(null);
+    return; // Hentikan fungsi lebih lanjut
+  }
+
   return axios
-    .get(`${API_URL}`)
+    .get(`${API_URL}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
     .then((response) => {
       callback(response.data.posts);
     })

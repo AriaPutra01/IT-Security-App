@@ -6,6 +6,7 @@ import { ReusableForm } from "../../../components/Fragments/Services/ReusableFor
 import { ReusableTable } from "../../../components/Fragments/Services/ReusableTable";
 import { usePagination } from "../../../Utilities/usePagination";
 import { Excel } from "../../../Utilities/Excel";
+import { jwtDecode } from "jwt-decode";
 import {
   Button,
   Modal,
@@ -34,6 +35,13 @@ export function BeritaAcaraPage() {
   });
   const { currentPage, paginate, getTotalPages } = usePagination(1, 10);
   const [selectedIds, setSelectedIds] = useState([]);
+  const token = localStorage.getItem('token');
+  let userRole = '';
+
+  if (token) {
+    const decoded = jwtDecode(token);
+    userRole = decoded.role;
+  }
 
   // UseEffect untuk mengambil data saat komponen dimount dan di balikan urutan
   useEffect(() => {
@@ -219,18 +227,35 @@ export function BeritaAcaraPage() {
         {/* page title */}
         <div className="flex justify-between">
           <div className="flex gap-1.5 items-center mx-2 mb-2">
-            <Button onClick={handleAdd} action="add" color="info">
-              Tambah
-            </Button>
-            <Excel linkExportThis="" linkUpdateThis="" importExcel="" />
-            <Button
-              className="w-max"
-              color="failure"
-              onClick={handleBulkDelete}
-              disabled={selectedIds.length === 0}
-            >
-              Hapus Data dipilih
-            </Button>
+          {userRole === 'user' ? (
+              <Button
+                className="flex justify-center items-center"
+                onClick={handleAdd}
+                action="add"
+                color="info"
+              >
+                Tambah
+              </Button>
+            ) : (
+              <>
+                <Button
+                  className="flex justify-center items-center"
+                  onClick={handleAdd}
+                  action="add"
+                  color="info"
+                >
+                  Tambah
+                </Button>
+                <Excel linkExportThis="" linkUpdateThis="" importExcel="" />
+                <Button
+                  color="failure"
+                  onClick={handleBulkDelete}
+                  disabled={selectedIds.length === 0}
+                >
+                  Hapus Data dipilih
+                </Button>
+              </>
+            )}
           </div>
           <SearchInput value={searchTerm} onChange={handleSearchChange} />
         </div>

@@ -8,6 +8,22 @@ import (
 	"gorm.io/gorm"
 )
 
+// model for user
+type User struct {
+	gorm.Model
+	Username string
+	Email    string
+	Password string
+	Role     string
+}
+
+type UserToken struct {
+	ID     uint   `gorm:"primaryKey"`
+	UserID uint   `gorm:"not null"`
+	Token  string `gorm:"not null"`
+	Expiry time.Time
+}
+
 // model for sag
 type Sag struct {
 	ID        uint      `gorm:"primaryKey"`
@@ -202,7 +218,6 @@ func (i Perdin) MarshalJSON() ([]byte, error) {
 }
 
 // model ruang-rapat
-
 func generateUUID() uuid.UUID {
 	return uuid.New()
 }

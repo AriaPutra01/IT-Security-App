@@ -27,31 +27,57 @@ import { JadwalCutiPage } from "./pages/Services/KegiatanProses/JadwalCutiPage";
 import { SuratMasukPage } from "./pages/Services/DataInformasi/SuratMasukPage";
 import { SuratKeluarPage } from "./pages/Services/DataInformasi/SuratKeluarPage";
 
+import axios from 'axios';
+import {jwtDecode} from 'jwt-decode';
+
+axios.interceptors.request.use(function (config) {
+  const token = localStorage.getItem('token');
+  config.headers.Authorization =  token ? `Bearer ${token}` : '';
+  return config;
+});
+
+import { Navigate } from 'react-router-dom';
+
+
+const ProtectedRoute = ({ children, requiredRole }) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    // Redirect ke halaman login jika tidak ada token
+    return <Navigate to="/login" />;
+  }
+  const decoded = jwtDecode(token);
+  if (requiredRole && decoded.role !== requiredRole) {
+    return <Navigate to="/unauthorized" />;
+  }
+  return children;
+};
+
+
 const router = createBrowserRouter([
   // welcome
   { path: "/", element: <WelcomePage />, errorElement: <ErrorPage /> },
   // auth
   { path: "/login", element: <LoginPage /> },
-  { path: "/register", element: <RegisterPage /> },
+  { path: "/register", element: <ProtectedRoute> <RegisterPage /></ProtectedRoute> },
   // dashboard
-  { path: "/dashboard", element: <DashboardPage /> },
+  { path: "/dashboard", element: <ProtectedRoute><DashboardPage /></ProtectedRoute> },
   // Dokumen
-  { path: "/sag", element: <SagPage /> },
-  { path: "/iso", element: <IsoPage /> },
-  { path: "/memo", element: <MemoPage /> },
-  { path: "/surat", element: <SuratPage /> },
-  { path: "/berita-acara", element: <BeritaAcaraPage /> },
-  { path: "/sk", element: <SkPage /> },
+  { path: "/sag", element: <ProtectedRoute><SagPage /></ProtectedRoute> },
+  { path: "/iso", element: <ProtectedRoute><IsoPage /></ProtectedRoute> },
+  { path: "/memo", element: <ProtectedRoute><MemoPage /></ProtectedRoute> },
+  { path: "/surat", element: <ProtectedRoute><SuratPage /></ProtectedRoute> },
+  { path: "/berita-acara", element: <ProtectedRoute><BeritaAcaraPage /></ProtectedRoute> },
+  { path: "/sk", element: <ProtectedRoute><SkPage /></ProtectedRoute> },
   // Rencana Kerja
-  { path: "/project", element: <ProjectPage /> },
-  { path: "/base-project", element: <BaseProjectPage /> },
+  { path: "/project", element: <ProtectedRoute><ProjectPage /></ProtectedRoute> },
+  { path: "/base-project", element: <ProtectedRoute><BaseProjectPage /></ProtectedRoute> },
   // Kegiatan Proses
-  { path: "/ruang-rapat", element: <RuangRapatPage /> },
-  { path: "/perjalanan-dinas", element: <PerdinPage /> },
-  { path: "/jadwal-cuti", element: <JadwalCutiPage /> },
+  { path: "/ruang-rapat", element: <ProtectedRoute> <RuangRapatPage /> </ProtectedRoute> },
+  { path: "/jadwal-cuti", element: <ProtectedRoute><JadwalCutiPage /> </ProtectedRoute> },
+  { path: "/perjalanan-dinas", element: <ProtectedRoute><PerdinPage /></ProtectedRoute> },
   // Data Informasi
-  { path: "/surat-masuk", element: <SuratMasukPage /> },
-  { path: "/surat-keluar", element: <SuratKeluarPage /> },
+  { path: "/surat-masuk", element: <ProtectedRoute><SuratMasukPage /></ProtectedRoute> },
+  { path: "/surat-keluar", element: <ProtectedRoute><SuratKeluarPage /></ProtectedRoute> },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

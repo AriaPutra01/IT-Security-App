@@ -9,12 +9,52 @@ import {
 } from "react-icons/hi";
 import { Dropdown } from "flowbite-react";
 import { DarkThemeToggle } from "flowbite-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
+import { AiOutlineUsergroupAdd } from "react-icons/ai";
 
 const App = (props) => {
   const { services, children } = props;
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [userDetails, setUserDetails] = useState({ username: "", email: "" });
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      setUserDetails({ username: decoded.username, email: decoded.email, role: decoded.role });
+    }
+  }, []);
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  const handleSignOut = async () => {
+    try {
+      // Panggil endpoint logout
+      const response = await fetch("http://localhost:8080/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      // Cek status respons
+      if (response.ok) {
+        console.log("Logout berhasil");
+        // Menghapus token dari localStorage
+        localStorage.removeItem("token");
+        // Redirect ke halaman login
+        window.location.href = "/login";
+      } else {
+        const errorData = await response.json();
+        console.error("Logout gagal:", errorData);
+      }
+    } catch (error) {
+      console.error("Terjadi kesalahan saat melakukan logout:", error);
+    }
+  };
+
   return (
     <div
       className={
@@ -107,6 +147,11 @@ const App = (props) => {
                   Surat Keluar
                 </Sidebar.Item>
               </Sidebar.Collapse>
+              {userDetails.role === "admin" ? (
+                <Sidebar.Item icon={AiOutlineUsergroupAdd} href="/register">
+                  Register
+                </Sidebar.Item>
+              ) : null}
             </Sidebar.ItemGroup>
           </Sidebar.Items>
         </Sidebar>
@@ -148,16 +193,12 @@ const App = (props) => {
               label={<Avatar status="online" rounded />}
             >
               <Dropdown.Header>
-                <span className="block text-sm">Username</span>
+                <span className="block text-sm">{userDetails.username}</span>
                 <span className="block truncate text-sm font-medium">
-                  example@mail.com
+                  {userDetails.email}
                 </span>
               </Dropdown.Header>
-              <Dropdown.Item>
-                <a className="block w-full" href="#">
-                  Sign out
-                </a>
-              </Dropdown.Item>
+              <Dropdown.Item onClick={handleSignOut}>Sign out</Dropdown.Item>
             </Dropdown>
           </div>
         </div>

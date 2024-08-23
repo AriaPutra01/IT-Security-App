@@ -3,6 +3,8 @@ package main
 import (
 	"project-its/controllers"
 	"project-its/initializers"
+	"project-its/middleware"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
@@ -22,25 +24,40 @@ func main() {
 	r := gin.Default()
 
 	// Enable CORS
-
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:8000"},
-		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
-		AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		AllowOrigins:     []string{"http://localhost:8000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		AllowOriginFunc: func(origin string) bool {
+			return origin == "http://localhost:8000"
+		},
+		MaxAge: 12 * time.Hour,
 	}))
 
+	// Middleware untuk autentikasi token
+	authMiddleware := middleware.TokenAuthMiddleware()
+
+	// Route yang tidak memerlukan autentikasi
+	r.POST("/register", controllers.Register)
+	r.POST("/login", controllers.Login)
+	
+	// Terapkan middleware autentikasi ke semua route selanjutnya
+	r.Use(authMiddleware)
 	// Routes for User
 	store := cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("mysession", store))
-
-	// Routes for UPDATE and EXPORT ALL
+	
 	r.GET("/updateAll", controllers.UpdateAllSheets)
 	r.GET("/exportAll", controllers.ExportAllSheets)
-
-	// Routes for CALENDER
+	
 	// Setup session store
 	store = cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("mysession", store))
+
+	//logout must be after middleware
+	r.POST("/logout", controllers.Logout)
 
 	// Routes for SAG
 	r.GET("/sag", controllers.SagIndex)
@@ -107,7 +124,6 @@ func main() {
 	r.PUT("/Project/:id", controllers.ProjectUpdate)
 	r.GET("/Project", controllers.ProjectIndex)
 	r.DELETE("/Project/:id", controllers.ProjectDelete)
-	r.GET("/Project/:id", controllers.ProjectShow)
 	r.GET("/exportProject", controllers.CreateExcelProject)
 	r.GET("/updateProject", controllers.UpdateSheetProject)
 	r.POST("/uploadProject", controllers.ImportExcelProject)
