@@ -22,7 +22,7 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("Metode penandatanganan tidak sesuai")
+				return nil, fmt.Errorf("metode penandatanganan tidak sesuai")
 			}
 			return []byte("rahasia"), nil
 		})
