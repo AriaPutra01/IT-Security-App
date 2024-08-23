@@ -35,6 +35,7 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			c.Set("username", claims["username"])
+			c.Set("email", claims["email"])
 			c.Set("role", claims["role"])
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token tidak valid"})

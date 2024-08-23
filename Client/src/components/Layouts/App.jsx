@@ -9,12 +9,26 @@ import {
 } from "react-icons/hi";
 import { Dropdown } from "flowbite-react";
 import { DarkThemeToggle } from "flowbite-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { jwtDecode } from 'jwt-decode'; // Pastikan untuk mengimpor jwt-decode
 
 const App = (props) => {
   const { services, children } = props;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [userDetails, setUserDetails] = useState({ username: '', email: '' });
+  console.log(`userDetail`,userDetails)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded = jwtDecode(token);
+      console.log(`decode`,decoded)
+      setUserDetails({ username: decoded.username, email: decoded.email });
+    }
+  }, []);
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  
 
   const handleSignOut = () => {
     // Menghapus token dari localStorage
@@ -157,9 +171,9 @@ const App = (props) => {
               label={<Avatar status="online" rounded />}
             >
               <Dropdown.Header>
-                <span className="block text-sm">Username</span>
+                <span className="block text-sm">{userDetails.username}</span>
                 <span className="block truncate text-sm font-medium">
-                  example@mail.com
+                  {userDetails.email}
                 </span>
               </Dropdown.Header>
               <Dropdown.Item onClick={handleSignOut}>
