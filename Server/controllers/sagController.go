@@ -16,7 +16,7 @@ import (
 )
 
 type SagRequestBody struct {
-	Tanggal string `json:"Date"`
+	Tanggal string `json:"tanggal"`
 	NoMemo  string `json:"no_memo"`
 	Perihal string `json:"perihal"`
 	Pic     string `json:"pic"`

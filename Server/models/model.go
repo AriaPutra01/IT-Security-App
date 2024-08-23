@@ -238,7 +238,7 @@ func (r *JadwalCuti) BeforeCreate(tx *gorm.DB) error {
 }
 
 func (JadwalCuti) TableName() string {
-	return "jadwal_cuti"
+	return "jadwal_cutis"
 }
 
 // model for suratMasuk

@@ -1,14 +1,8 @@
 import { useState, useEffect } from "react";
-import FullCalendar from "@fullcalendar/react";
-import { formatDate } from "@fullcalendar/core";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import listPlugin from "@fullcalendar/list";
 import { v4 as uuidv4 } from "uuid"; // Import UUID
-import "../../../calender.css";
 import Swal from "sweetalert2";
 import App from "../../../components/Layouts/App";
+import { ReusableCalendar } from "../../../components/Fragments/Services/ReusableCalendar";
 import {
   getEvents,
   addEvent,
@@ -26,34 +20,44 @@ export function RuangRapatPage() {
 
   // Handle date click to add new event
   const handleDateClick = async (selected) => {
-    const title = prompt("Please enter a new title for your event");
     const calendarApi = selected.view.calendar;
-    if (title) {
-      const newEvent = {
-        id: uuidv4(),
-        title,
-        start: selected.startStr,
-        end: selected.endStr,
-        allDay: selected.allDay,
-      };
-      try {
-        await addEvent(newEvent);
-        setCurrentEvents([...currentEvents, newEvent]);
-      } catch {
-        (error) => {
-          Swal.fire({
-            icon: error.message,
-            title: "Gagal!",
-            text: "Error saat menyimpan data",
-            showConfirmButton: false,
-            timer: 1500,
-          });
+    const { value: title } = await Swal.fire({
+      title: "Masukan Event!",
+      input: "text",
+      inputAttributes: {
+        autocapitalize: "off",
+      },
+      showCancelButton: true,
+      confirmButtonText: "Simpan",
+      showLoaderOnConfirm: true,
+      preConfirm: (e) => {
+        return {
+          id: uuidv4(),
+          title: e,
+          start: selected.startStr,
+          end: selected.endStr,
+          allDay: selected.allDay,
         };
+      },
+    });
+    if (title) {
+      try {
+        await addEvent(title);
+        setCurrentEvents((prevEvents) => [...prevEvents, title]);
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal!",
+          text: "Error saat menyimpan data: " + error.message,
+          showConfirmButton: false,
+          timer: 1500,
+        });
       }
     } else {
       calendarApi.unselect();
     }
   };
+
   // Handle event click to delete event
   const handleEventClick = async (selected) => {
     Swal.fire({
@@ -92,51 +96,11 @@ export function RuangRapatPage() {
   };
   return (
     <App services="Ruang Rapat">
-      <div className="calendar-container">
-        <div className="calendar-content">
-          <div className="events-list">
-            <h2>Events</h2>
-            <ul>
-              {currentEvents.map((event, index) => (
-                <li key={index} className="event-item">
-                  <div className="event-title">{event.title}</div>
-                  <div className="event-date">
-                    {formatDate(event.start, {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="calendar">
-            <FullCalendar
-              height="75vh"
-              plugins={[
-                dayGridPlugin,
-                timeGridPlugin,
-                interactionPlugin,
-                listPlugin,
-              ]}
-              headerToolbar={{
-                left: "prev,next today",
-                center: "title",
-                right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
-              }}
-              initialView="dayGridMonth"
-              editable={true}
-              selectable={true}
-              selectMirror={true}
-              dayMaxEvents={true}
-              select={handleDateClick}
-              eventClick={handleEventClick}
-              events={currentEvents}
-            />
-          </div>
-        </div>
-      </div>
+      <ReusableCalendar
+        currentEvents={currentEvents}
+        handleDateClick={handleDateClick}
+        handleEventClick={handleEventClick}
+      />
     </App>
   );
 }
