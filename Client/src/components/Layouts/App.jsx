@@ -29,14 +29,33 @@ const App = (props) => {
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   
+  const handleSignOut = async () => {
+    try {
+        // Panggil endpoint logout
+        const response = await fetch('http://localhost:8080/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+        });
 
-  const handleSignOut = () => {
-    // Menghapus token dari localStorage
-    localStorage.removeItem('token');
-
-    // Redirect ke halaman login
-    window.location.href = '/login';
-  };
+        // Cek status respons
+        if (response.ok) {
+            console.log("Logout berhasil");
+            // Menghapus token dari localStorage
+            localStorage.removeItem('token');
+            // Redirect ke halaman login
+            window.location.href = '/login';
+        } else {
+            const errorData = await response.json();
+            console.error("Logout gagal:", errorData);
+        }
+    } catch (error) {
+        console.error("Terjadi kesalahan saat melakukan logout:", error);
+    }
+};
+  
 
   return (
     <div

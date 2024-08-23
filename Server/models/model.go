@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"time"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -15,6 +16,14 @@ type User struct {
 	Password string
 	Role     string
 }
+
+type UserToken struct {
+	ID     uint   `gorm:"primaryKey"`
+	UserID uint   `gorm:"not null"`
+	Token  string `gorm:"not null"`
+	Expiry time.Time
+}
+
 // model for sag
 type Sag struct {
 	ID        uint      `gorm:"primaryKey"`

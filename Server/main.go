@@ -1,10 +1,10 @@
 package main
 
 import (
-	"time"
-	"project-gin/middleware"
 	"project-its/controllers"
 	"project-its/initializers"
+	"project-its/middleware"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
@@ -42,19 +42,23 @@ func main() {
 	// Route yang tidak memerlukan autentikasi
 	r.POST("/register", controllers.Register)
 	r.POST("/login", controllers.Login)
-
+	
 	// Terapkan middleware autentikasi ke semua route selanjutnya
 	r.Use(authMiddleware)
 	// Routes for User
 	store := cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("mysession", store))
-
+	
 	r.GET("/updateAll", controllers.UpdateAllSheets)
 	r.GET("/exportAll", controllers.ExportAllSheets)
-
+	
 	// Setup session store
 	store = cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("mysession", store))
+
+	//logout must be after middleware
+	r.POST("/logout", controllers.Logout)
+
 	// Routes for SAG
 	r.GET("/sag", controllers.SagIndex)
 	r.POST("/sag", controllers.CreateSag)
