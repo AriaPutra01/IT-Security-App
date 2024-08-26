@@ -37,7 +37,7 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 			c.Set("username", claims["username"])
 			c.Set("email", claims["email"])
 			c.Set("role", claims["role"])
-			c.Set("userID", uint(claims["sub"].(float64))) // Menyimpan userID di klaim
+			c.Set("userID", uint(claims["sub"].(float64)))
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token tidak valid"})
 			c.Abort()

@@ -60,7 +60,7 @@ export const ReusableForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <h3 className="flex gap-1 justify-center text-xl font-medium text-gray-900 dark:text-white">
+      <h3 className="flex gap-1 justify-center text-xl font-medium text-gray-900">
         {config.action === "add" ? "Tambah Data" : `Ubah Data`}
         <div className="uppercase">{config.services}</div>
       </h3>

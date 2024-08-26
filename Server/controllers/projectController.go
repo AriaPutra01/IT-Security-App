@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -46,7 +45,7 @@ func ProjectCreate(c *gin.Context) {
 
 	// Parse the date string
 	bulanString := requestBody.Bulan
-	bulan, err := time.Parse("01-02-2006", bulanString)
+	bulan, err := time.Parse("2006-01-02", bulanString)
 	if err != nil {
 		c.Status(400)
 		c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
@@ -54,7 +53,7 @@ func ProjectCreate(c *gin.Context) {
 	}
 	// Parse the date string
 	izinString := requestBody.TanggalIzin
-	tanggal_izin, err := time.Parse("02-01-2006", izinString)
+	tanggal_izin, err := time.Parse("2006-01-02", izinString)
 	if err != nil {
 		c.Status(400)
 		c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
@@ -62,7 +61,7 @@ func ProjectCreate(c *gin.Context) {
 	}
 	// Parse the date string
 	torString := requestBody.TanggalTor
-	tanggal_tor, err := time.Parse("01-02-2006", torString)
+	tanggal_tor, err := time.Parse("2006-01-02", torString)
 	if err != nil {
 		c.Status(400)
 		c.JSON(400, gin.H{"error": "Format tanggal tidak valid: " + err.Error()})
@@ -102,18 +101,6 @@ func ProjectIndex(c *gin.Context) {
 	// Get models from DB
 	var project []models.Project
 	initializers.DB.Find(&project)
-
-	t, err := template.ParseFiles("views/project.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = t.Execute(c.Writer, gin.H{
-		"Project": project,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	//Respond with them
 	c.JSON(200, gin.H{

@@ -1,4 +1,4 @@
-import { Avatar, Button, Label, Sidebar } from "flowbite-react";
+import { Avatar, Label, Sidebar } from "flowbite-react";
 import {
   HiChartPie,
   HiDocumentDuplicate,
@@ -8,21 +8,26 @@ import {
   HiArrowSmRight,
 } from "react-icons/hi";
 import { Dropdown } from "flowbite-react";
-import { DarkThemeToggle } from "flowbite-react";
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
 
 const App = (props) => {
   const { services, children } = props;
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(
+    services === "Ruang Rapat" || services === "Jadwal Cuti" ? false : true
+  );
   const [userDetails, setUserDetails] = useState({ username: "", email: "" });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       const decoded = jwtDecode(token);
-      setUserDetails({ username: decoded.username, email: decoded.email, role: decoded.role });
+      setUserDetails({
+        username: decoded.username,
+        email: decoded.email,
+        role: decoded.role,
+      });
     }
   }, []);
 
@@ -59,8 +64,8 @@ const App = (props) => {
     <div
       className={
         isSidebarOpen
-          ? "grid h-screen grid-cols-2fr gap-6 p-4 dark:bg-gray-900"
-          : "grid h-screen grid-cols-1fr gap-6 p-4 dark:bg-gray-900"
+          ? "grid h-screen grid-cols-2fr gap-6 p-4"
+          : "grid h-screen grid-cols-1 gap-6 p-4"
       }
     >
       {isSidebarOpen ? (
@@ -75,7 +80,7 @@ const App = (props) => {
             </Sidebar.Logo>
             <svg
               onClick={toggleSidebar}
-              className="w-[30px] h-[30px] text-gray-800 dark:text-white cursor-pointer"
+              className="w-[30px] h-[30px] text-gray-800 cursor-pointer"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -149,20 +154,20 @@ const App = (props) => {
               </Sidebar.Collapse>
               {userDetails.role === "admin" ? (
                 <Sidebar.Item icon={AiOutlineUsergroupAdd} href="/register">
-                  Register
+                  Tambah User
                 </Sidebar.Item>
               ) : null}
             </Sidebar.ItemGroup>
           </Sidebar.Items>
         </Sidebar>
       ) : null}
-      <div className="grid overflow-auto grid-rows-2fr w-full space-y-4">
-        <div className="h-14 pb-2 flex justify-between border-b-2 border-gray-100 dark:border-gray-800">
+      <div className="grid overflow-auto grid-rows-2fr w-full h-full space-y-4">
+        <div className="h-14 pb-2 flex justify-between border-b-2 border-gray-100">
           <div className="flex gap-2 items-end m-2">
             {isSidebarOpen ? null : (
               <svg
                 onClick={toggleSidebar}
-                className="w-[40px] h-[40px] text-gray-800 dark:text-white cursor-pointer"
+                className="w-[40px] h-[40px] text-gray-800 cursor-pointer"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -172,8 +177,8 @@ const App = (props) => {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeWidth="2"
                   d="M5 7h14M5 12h14M5 17h14"
                 />
               </svg>
@@ -186,7 +191,6 @@ const App = (props) => {
             </div>
           </div>
           <div className="flex items-center gap-4 ">
-            <DarkThemeToggle />
             <Dropdown
               arrowIcon={false}
               inline
@@ -202,7 +206,7 @@ const App = (props) => {
             </Dropdown>
           </div>
         </div>
-        {children}
+        <div>{children}</div>
       </div>
     </div>
   );

@@ -4,16 +4,16 @@ import Swal from "sweetalert2";
 import App from "../../../components/Layouts/App";
 import { ReusableCalendar } from "../../../components/Fragments/Services/ReusableCalendar";
 import {
-  getEvents,
-  addEvent,
-  deleteEvent,
+  getCutis,
+  addCuti,
+  deleteCuti,
 } from "../../../../API/KegiatanProses/JadwalCuti.service";
 
 export function JadwalCutiPage() {
   const [currentEvents, setCurrentEvents] = useState([]);
   // Fetch events
   useEffect(() => {
-    getEvents((data) => {
+    getCutis((data) => {
       setCurrentEvents(data.reverse());
     });
   }, []);
@@ -42,7 +42,7 @@ export function JadwalCutiPage() {
     });
     if (title) {
       try {
-        await addEvent(title);
+        await addCuti(title);
         setCurrentEvents((prevEvents) => [...prevEvents, title]);
       } catch (error) {
         Swal.fire({
@@ -70,7 +70,7 @@ export function JadwalCutiPage() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteEvent(selected.event.id);
+          await deleteCuti(selected.event.id);
           setCurrentEvents((prevEvents) =>
             prevEvents.filter((event) => event.id !== selected.event.id)
           );

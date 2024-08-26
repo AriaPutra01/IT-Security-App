@@ -3,12 +3,13 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 // Auth
-import { LoginPage, RegisterPage } from "./pages/Auth/AuthPage";
+import { LoginPage } from "./pages/Auth/LoginPage";
+import { RegisterPage } from "./pages/Auth/RegisterPage";
 // Welcome
 import { WelcomePage } from "./pages/Welcome/Welcome";
 // Dashboard
 import ErrorPage from "./pages/Error/404";
-import DashboardPage from "./pages/Dashboard/Dashboard";
+import { DashboardPage } from "./pages/Dashboard/Dashboard";
 // Dokumen
 import { SagPage } from "./pages/Services/Dokumen/SagPage";
 import { IsoPage } from "./pages/Services/Dokumen/IsoPage";
@@ -27,23 +28,22 @@ import { JadwalCutiPage } from "./pages/Services/KegiatanProses/JadwalCutiPage";
 import { SuratMasukPage } from "./pages/Services/DataInformasi/SuratMasukPage";
 import { SuratKeluarPage } from "./pages/Services/DataInformasi/SuratKeluarPage";
 
-import axios from 'axios';
-import {jwtDecode} from 'jwt-decode';
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 axios.interceptors.request.use(function (config) {
-  const token = localStorage.getItem('token');
-  config.headers.Authorization =  token ? `Bearer ${token}` : '';
+  const token = localStorage.getItem("token");
+  config.headers.Authorization = token ? `Bearer ${token}` : "";
   return config;
 });
 
-import { Navigate } from 'react-router-dom';
-
+import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
   if (!token) {
     // Redirect ke halaman login jika tidak ada token
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
   const decoded = jwtDecode(token);
   if (requiredRole && decoded.role !== requiredRole) {
@@ -52,32 +52,137 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   return children;
 };
 
-
 const router = createBrowserRouter([
   // welcome
   { path: "/", element: <WelcomePage />, errorElement: <ErrorPage /> },
   // auth
   { path: "/login", element: <LoginPage /> },
-  { path: "/register", element: <ProtectedRoute> <RegisterPage /></ProtectedRoute> },
+  {
+    path: "/register",
+    element: (
+      <ProtectedRoute>
+        <RegisterPage />
+      </ProtectedRoute>
+    ),
+  },
   // dashboard
-  { path: "/dashboard", element: <ProtectedRoute><DashboardPage /></ProtectedRoute> },
+  {
+    path: "/dashboard",
+    element: (
+      <ProtectedRoute>
+        <DashboardPage />
+      </ProtectedRoute>
+    ),
+  },
   // Dokumen
-  { path: "/sag", element: <ProtectedRoute><SagPage /></ProtectedRoute> },
-  { path: "/iso", element: <ProtectedRoute><IsoPage /></ProtectedRoute> },
-  { path: "/memo", element: <ProtectedRoute><MemoPage /></ProtectedRoute> },
-  { path: "/surat", element: <ProtectedRoute><SuratPage /></ProtectedRoute> },
-  { path: "/berita-acara", element: <ProtectedRoute><BeritaAcaraPage /></ProtectedRoute> },
-  { path: "/sk", element: <ProtectedRoute><SkPage /></ProtectedRoute> },
+  {
+    path: "/sag",
+    element: (
+      <ProtectedRoute>
+        <SagPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/iso",
+    element: (
+      <ProtectedRoute>
+        <IsoPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/memo",
+    element: (
+      <ProtectedRoute>
+        <MemoPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/surat",
+    element: (
+      <ProtectedRoute>
+        <SuratPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/berita-acara",
+    element: (
+      <ProtectedRoute>
+        <BeritaAcaraPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/sk",
+    element: (
+      <ProtectedRoute>
+        <SkPage />
+      </ProtectedRoute>
+    ),
+  },
   // Rencana Kerja
-  { path: "/project", element: <ProtectedRoute><ProjectPage /></ProtectedRoute> },
-  { path: "/base-project", element: <ProtectedRoute><BaseProjectPage /></ProtectedRoute> },
+  {
+    path: "/project",
+    element: (
+      <ProtectedRoute>
+        <ProjectPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/base-project",
+    element: (
+      <ProtectedRoute>
+        <BaseProjectPage />
+      </ProtectedRoute>
+    ),
+  },
   // Kegiatan Proses
-  { path: "/ruang-rapat", element: <ProtectedRoute> <RuangRapatPage /> </ProtectedRoute> },
-  { path: "/jadwal-cuti", element: <ProtectedRoute><JadwalCutiPage /> </ProtectedRoute> },
-  { path: "/perjalanan-dinas", element: <ProtectedRoute><PerdinPage /></ProtectedRoute> },
+  {
+    path: "/ruang-rapat",
+    element: (
+      <ProtectedRoute>
+        {" "}
+        <RuangRapatPage />{" "}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/jadwal-cuti",
+    element: (
+      <ProtectedRoute>
+        <JadwalCutiPage />{" "}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/perjalanan-dinas",
+    element: (
+      <ProtectedRoute>
+        <PerdinPage />
+      </ProtectedRoute>
+    ),
+  },
   // Data Informasi
-  { path: "/surat-masuk", element: <ProtectedRoute><SuratMasukPage /></ProtectedRoute> },
-  { path: "/surat-keluar", element: <ProtectedRoute><SuratKeluarPage /></ProtectedRoute> },
+  {
+    path: "/surat-masuk",
+    element: (
+      <ProtectedRoute>
+        <SuratMasukPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/surat-keluar",
+    element: (
+      <ProtectedRoute>
+        <SuratKeluarPage />
+      </ProtectedRoute>
+    ),
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

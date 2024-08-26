@@ -1,23 +1,24 @@
+import "../../welcome.css";
 export function WelcomePage() {
   return (
-    <section className="h-screen ">
-      <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12">
+    <section className="h-screen flex items-center">
+      <div className="items-center text-center">
         <img
           className="mx-auto mb-8 w-28"
-          src="/public/images/logobjb.png"
+          src="/public/images/logobjbputih.png"
           alt="bjb"
         />
-        <h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-gray-900 md:text-4xl lg:text-5xl dark:text-blue-600">
+        <h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-none text-slate-100 md:text-4xl lg:text-5xl ">
           Selamat Datang di Dashboard ITS
         </h1>
-        <p className="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
+        <p className="mb-8 text-lg font-normal text-slate-100 lg:text-xl sm:px-16 xl:px-48 ">
           Aplikasi ini digunakan untuk Mempermudah dalam Mengelola Proyek dan
           Control Data untuk Keamanan IT Security
         </p>
         <div className="flex flex-col items-center mb-8 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
           <a
             href="/login"
-            className="w-1/4 inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-all text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:focus:ring-primary-900"
+            className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center bg-transparent border-2 hover:text-sky-400 hover:border-sky-400 hover:scale-105 transition-all text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300"
           >
             Mulai Gunakan
             <svg
@@ -30,14 +31,14 @@ export function WelcomePage() {
             </svg>
           </a>
         </div>
-        <div className="px-4 mx-auto text-center md:max-w-screen-md lg:max-w-screen-lg lg:px-36">
-          <span className="font-semibold text-gray-500 uppercase">
-            Dibuat Oleh
+        {/* <div className="px-4 mx-auto text-center md:max-w-screen-md lg:max-w-screen-lg lg:px-36">
+          <span className="font-semibold text-slate-100 uppercase">
+            Pengembang
           </span>
           <div className="flex flex-wrap justify-center items-center mt-8 text-gray-500 sm:justify-between">
             <a
               href="https://www.instagram.com/kacaumennz/"
-              className="flex gap-1 p-2.5 rounded-full shadow-lg items-center mr-5 mb-5 lg:mb-0 bg-blue-950 text-white hover:text-purple-600 hover:bg-gray-200 hover:-translate-y-2 transition-all dark:hover:text-gray-400"
+              className="flex gap-1 p-2.5 rounded-full shadow-lg items-center mr-5 mb-5 lg:mb-0 bg-blue-950 text-white hover:text-purple-600 hover:bg-gray-200 hover:-translate-y-2 transition-all"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +52,7 @@ export function WelcomePage() {
             </a>
             <a
               href="https://www.instagram.com/sumanto_vegetarian/"
-              className="flex gap-1 p-2.5 rounded-full shadow-lg items-center mr-5 mb-5 lg:mb-0 bg-blue-950 text-white hover:text-purple-600 hover:bg-gray-200 hover:-translate-y-2 transition-all dark:hover:text-gray-400"
+              className="flex gap-1 p-2.5 rounded-full shadow-lg items-center mr-5 mb-5 lg:mb-0 bg-blue-950 text-white hover:text-purple-600 hover:bg-gray-200 hover:-translate-y-2 transition-all"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -65,7 +66,7 @@ export function WelcomePage() {
             </a>
             <a
               href="https://www.instagram.com/chnxzc_/"
-              className="flex gap-1 p-2.5 rounded-full shadow-lg items-center mr-5 mb-5 lg:mb-0 bg-blue-950 text-white hover:text-purple-600 hover:bg-gray-200 hover:-translate-y-2 transition-all dark:hover:text-gray-400"
+              className="flex gap-1 p-2.5 rounded-full shadow-lg items-center mr-5 mb-5 lg:mb-0 bg-blue-950 text-white hover:text-purple-600 hover:bg-gray-200 hover:-translate-y-2 transition-all"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -79,7 +80,7 @@ export function WelcomePage() {
             </a>
             <a
               href="https://www.instagram.com/fasyaal_/"
-              className="flex gap-1 p-2.5 rounded-full shadow-lg items-center mr-5 mb-5 lg:mb-0 bg-blue-950 text-white hover:text-purple-600 hover:bg-gray-200 hover:-translate-y-2 transition-all dark:hover:text-gray-400"
+              className="flex gap-1 p-2.5 rounded-full shadow-lg items-center mr-5 mb-5 lg:mb-0 bg-blue-950 text-white hover:text-purple-600 hover:bg-gray-200 hover:-translate-y-2 transition-all"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -92,7 +93,7 @@ export function WelcomePage() {
               <h1>M. Fasya Alghifari</h1>
             </a>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );

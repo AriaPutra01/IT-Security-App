@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_URL = "http://localhost:8080/jadwal-cuti";
 
-export function getEvents(callback) {
+export function getCutis(callback) {
   return axios
     .get(`${API_URL}`)
     .then((response) => {
@@ -13,7 +13,7 @@ export function getEvents(callback) {
     });
 }
 
-export function addEvent(data) {
+export function addCuti(data) {
   return axios
     .post(`${API_URL}`, data)
     .then((response) => {
@@ -24,7 +24,7 @@ export function addEvent(data) {
     });
 }
 
-export function deleteEvent(id) {
+export function deleteCuti(id) {
   if (!id) {
     throw new Error("ID harus disertakan untuk menghapus data.");
   }

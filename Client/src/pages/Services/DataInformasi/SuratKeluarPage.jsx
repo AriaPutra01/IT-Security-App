@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from "react";
 import App from "../../../components/Layouts/App";
 import Swal from "sweetalert2";
-import { SearchInput } from "../../../components/Elements/SearchInput";
 import { ReusableForm } from "../../../components/Fragments/Services/ReusableForm";
 import { ReusableTable } from "../../../components/Fragments/Services/ReusableTable";
-import { usePagination } from "../../../Utilities/usePagination";
-import { Excel } from "../../../Utilities/Excel";
 import { jwtDecode } from "jwt-decode";
-import {
-  Button,
-  Modal,
-  Pagination, 
-} from "flowbite-react";
+import { Modal } from "flowbite-react";
 import {
   getSuratKeluars,
   addSuratKeluar,
@@ -22,7 +15,6 @@ import {
 export function SuratKeluarPage() {
   const [MainData, setMainData] = useState([]);
   const [formModalOpen, setFormModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({});
   const [formConfig, setFormConfig] = useState({
     fields: [
@@ -34,11 +26,9 @@ export function SuratKeluarPage() {
     ],
     services: "Surat Keluar",
   });
-  const { currentPage, paginate, getTotalPages } = usePagination(1, 10);
   const [selectedIds, setSelectedIds] = useState([]);
-  const token = localStorage.getItem('token');
-  let userRole = '';
-
+  const token = localStorage.getItem("token");
+  let userRole = "";
   if (token) {
     const decoded = jwtDecode(token);
     userRole = decoded.role;
@@ -52,6 +42,12 @@ export function SuratKeluarPage() {
     });
   }, []);
 
+  // Function untuk handle tutup form modal
+  const onCloseFormModal = () => {
+    setFormModalOpen(false);
+    setFormData({});
+  };
+
   // Function untuk fetch data dan update state
   const handleAdd = () => {
     setFormModalOpen(true);
@@ -60,12 +56,6 @@ export function SuratKeluarPage() {
       action: "add",
       onSubmit: (data) => AddSubmit(data),
     }));
-  };
-
-  // Function untuk handle tutup form modal
-  const onCloseFormModal = () => {
-    setFormModalOpen(false);
-    setFormData({});
   };
 
   // Function untuk fetch data dan update state
@@ -88,7 +78,7 @@ export function SuratKeluarPage() {
         title: "Berhasil!",
         text: "Data berhasil ditambahkan",
         showConfirmButton: false,
-        timer: 1000,
+        timer: 1500,
       }).then(() => {
         window.location.reload();
         setMainData([...MainData, data]);
@@ -164,6 +154,12 @@ export function SuratKeluarPage() {
     });
   };
 
+  // handle select
+  const handleSelect = ({ selectedRows }) => {
+    const id = selectedRows.map((data) => data.ID);
+    setSelectedIds(id);
+  };
+
   // Function untuk hapus multi select checkbox
   const handleBulkDelete = async () => {
     Swal.fire({
@@ -195,86 +191,24 @@ export function SuratKeluarPage() {
     });
   };
 
-  // Function untuk handle search
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value || "");
-  };
-
-  // Function to handle checkbox changes
-  const handleCheckboxChange = (id) => {
-    setSelectedIds((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((item) => item !== id)
-        : [...prevSelected, id]
-    );
-  };
-
-  // Hitung indeks awal dan akhir untuk penomoran paginate
-  const startIndex = (currentPage - 1) * 10;
-  const endIndex = startIndex + 10;
-
-  // Get data paginate dan filter search
-  const searchProps = formConfig.fields.map((field) => field.name);
-  const Paginated = MainData.filter((data) => {
-    const search = searchTerm.toLowerCase();
-    return searchProps.some((prop) =>
-      (data[prop]?.toLowerCase() || "").includes(search)
-    );
-  }).slice(startIndex, endIndex);
-
   return (
     <App services={formConfig.services}>
-      <div className="grid grid-rows-3fr overflow-auto">
-        <div className="flex justify-between">
-          <div className="flex gap-1.5 items-center mx-2 mb-2">
-            {userRole === 'user' ? (
-              <Button
-                className="flex justify-center items-center"
-                onClick={handleAdd}
-                action="add"
-                color="info"
-              >
-                Tambah
-              </Button>
-            ) : (
-              <>
-                <Button
-                  className="flex justify-center items-center"
-                  onClick={handleAdd}
-                  action="add"
-                  color="info"
-                >
-                  Tambah
-                </Button>
-                <Excel linkExportThis="" linkUpdateThis="" importExcel="" />
-                <Button
-                  color="failure"
-                  onClick={handleBulkDelete}
-                  disabled={selectedIds.length === 0}
-                >
-                  Hapus Data dipilih
-                </Button>
-              </>
-            )}
-          </div>
-          <SearchInput value={searchTerm} onChange={handleSearchChange} />
-        </div>
+      <div className="overflow-auto">
+        {/* Table */}
         <ReusableTable
+          MainData={MainData}
           formConfig={formConfig}
-          Paginated={Paginated}
+          handleAdd={handleAdd}
+          handleEdit={handleEdit}
+          handleDelete={handleDelete}
+          handleSelect={handleSelect}
           selectedIds={selectedIds}
-          handleCheckboxChange={handleCheckboxChange}
-          {...(userRole === 'admin' ? { handleEdit, handleDelete } : {})}
+          handleBulkDelete={handleBulkDelete}
+          linkExportThis=""
+          linkUpdateThis=""
+          importExcel=""
         />
-        <div className="flex justify-between items-end overflow-x-auto m-2 dark:text-white">
-          <h1>© 2024 IT Security / Team IT</h1>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={getTotalPages(MainData.length)}
-            onPageChange={paginate}
-          />
-        </div>
-        {/* End Pagination */}
+        {/* End Table */}
 
         {/* ModalForm */}
         <Modal show={formModalOpen} size="xl" onClose={onCloseFormModal} popup>

@@ -4,16 +4,16 @@ import Swal from "sweetalert2";
 import App from "../../../components/Layouts/App";
 import { ReusableCalendar } from "../../../components/Fragments/Services/ReusableCalendar";
 import {
-  getEvents,
-  addEvent,
-  deleteEvent,
+  getRapats,
+  addRapat,
+  deleteRapat,
 } from "../../../../API/KegiatanProses/RuangRapat.service";
 
 export function RuangRapatPage() {
   const [currentEvents, setCurrentEvents] = useState([]);
   // Fetch events
   useEffect(() => {
-    getEvents((data) => {
+    getRapats((data) => {
       setCurrentEvents(data.reverse());
     });
   }, []);
@@ -42,7 +42,7 @@ export function RuangRapatPage() {
     });
     if (title) {
       try {
-        await addEvent(title);
+        await addRapat(title);
         setCurrentEvents((prevEvents) => [...prevEvents, title]);
       } catch (error) {
         Swal.fire({
@@ -70,7 +70,7 @@ export function RuangRapatPage() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteEvent(selected.event.id);
+          await deleteRapat(selected.event.id);
           setCurrentEvents((prevEvents) =>
             prevEvents.filter((event) => event.id !== selected.event.id)
           );
