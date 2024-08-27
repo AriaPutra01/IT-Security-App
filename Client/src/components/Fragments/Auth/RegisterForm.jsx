@@ -1,16 +1,20 @@
 "use client";
-
+import { useRef } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
 
 export function RegisterForm() {
+  const usernameRef = useRef();
+  const emailRef = useRef();
+  const passwordRef = useRef();
+
   const handleRegister = async (e) => {
     e.preventDefault();
     const userData = {
-      username: document.getElementById("username").value,
-      email: document.getElementById("email").value,
-      password: document.getElementById("password").value,
-      role: document.getElementById("role").value,
+      username: usernameRef.current.value,
+      email: emailRef.current.value,
+      password: passwordRef.current.value,
+      role: document.querySelector('input[name="role"]:checked').value,
     };
 
     try {
@@ -35,6 +39,7 @@ export function RegisterForm() {
       <form onSubmit={handleRegister} className="mx-auto">
         <div className="relative z-0 w-full mb-5 group">
           <input
+            ref={usernameRef}
             id="username"
             type="username"
             className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none  focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -50,6 +55,7 @@ export function RegisterForm() {
         </div>
         <div className="relative z-0 w-full mb-5 group">
           <input
+            ref={emailRef}
             id="email"
             type="email"
             className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none  focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -65,6 +71,7 @@ export function RegisterForm() {
         </div>
         <div className="relative z-0 w-full mb-5 group">
           <input
+            ref={passwordRef}
             id="password"
             type="password"
             className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none  focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -81,7 +88,7 @@ export function RegisterForm() {
         <div className="flex gap-10 my-6">
           <div>
             <input
-              id="role"
+              id="role-user"
               type="radio"
               value="user"
               name="role"
@@ -89,7 +96,7 @@ export function RegisterForm() {
               className="w-4 h-4 text-blue-600 bg-slate-200 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />
             <label
-              htmlFor="role"
+              htmlFor="role-user"
               className="ms-2 text-sm font-medium text-gray-500 dark:text-gray-300"
             >
               User
@@ -97,7 +104,7 @@ export function RegisterForm() {
           </div>
           <div>
             <input
-              id="role"
+              id="role-admin"
               type="radio"
               value="admin"
               name="role"
@@ -105,7 +112,7 @@ export function RegisterForm() {
               className="w-4 h-4 text-blue-600 bg-slate-200 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />
             <label
-              htmlFor="role"
+              htmlFor="role-admin"
               className="ms-2 text-sm font-medium text-gray-500 dark:text-gray-300"
             >
               Admin
