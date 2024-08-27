@@ -161,7 +161,7 @@ const App = (props) => {
           </Sidebar.Items>
         </Sidebar>
       ) : null}
-      <div className="grid overflow-auto grid-rows-2fr w-full h-full space-y-4">
+      <div className="grid grid-rows-2fr w-full space-y-4">
         <div className="h-14 pb-2 flex justify-between border-b-2 border-gray-100">
           <div className="flex gap-2 items-end m-2">
             {isSidebarOpen ? null : (
@@ -206,7 +206,7 @@ const App = (props) => {
             </Dropdown>
           </div>
         </div>
-        <div>{children}</div>
+        {children}
       </div>
     </div>
   );

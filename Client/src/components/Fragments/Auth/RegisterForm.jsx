@@ -120,7 +120,7 @@ export function RegisterForm() {
             type="button"
             className="col-span-2 text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center"
           >
-            Cancel
+            Kembali
           </button>
           <button
             type="submit"

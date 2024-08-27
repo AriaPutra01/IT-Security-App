@@ -110,11 +110,20 @@ export const ReusableTable = (props) => {
   });
 
   return (
-    <div className="overflow-auto w-full rounded-lg p-2">
-      <div className="w-full rounded-lg">
-        <div className="flex justify-between">
-          <div className="flex gap-1.5 items-center mx-2 mb-2">
-            {userRole === "user" ? (
+    <div className="w-full rounded-lg p-2 overflow-auto">
+      <div className="flex justify-between">
+        <div className="flex gap-1.5 items-center mx-2 mb-2">
+          {userRole === "user" ? (
+            <Button
+              className="flex justify-center items-center"
+              onClick={handleAdd}
+              action="add"
+              color="info"
+            >
+              Tambah
+            </Button>
+          ) : (
+            <>
               <Button
                 className="flex justify-center items-center"
                 onClick={handleAdd}
@@ -123,40 +132,31 @@ export const ReusableTable = (props) => {
               >
                 Tambah
               </Button>
-            ) : (
-              <>
-                <Button
-                  className="flex justify-center items-center"
-                  onClick={handleAdd}
-                  action="add"
-                  color="info"
-                >
-                  Tambah
-                </Button>
-                <Excel
-                  linkExportThis={linkExportThis}
-                  linkUpdateThis={linkUpdateThis}
-                  importExcel={importExcel}
-                />
-                <Button
-                  color="failure"
-                  onClick={handleBulkDelete}
-                  disabled={selectedIds.length === 0}
-                >
-                  Hapus Data dipilih
-                </Button>
-              </>
-            )}
-          </div>
-          <SearchInput
-            type="text"
-            value={globalFilterText}
-            onChange={(e) => setGlobalFilterText(e.target.value || "")}
-            placeholder="Search..."
-          />
+              <Excel
+                linkExportThis={linkExportThis}
+                linkUpdateThis={linkUpdateThis}
+                importExcel={importExcel}
+              />
+              <Button
+                className="w-max"
+                color="failure"
+                onClick={handleBulkDelete}
+                disabled={selectedIds.length === 0}
+              >
+                Hapus Data dipilih
+              </Button>
+            </>
+          )}
         </div>
+        <SearchInput
+          type="text"
+          value={globalFilterText}
+          onChange={(e) => setGlobalFilterText(e.target.value || "")}
+          placeholder="Search..."
+        />
+      </div>
+      <div className="overflow-auto">
         <DataTable
-          className="border-2 border-gray-100"
           title={`Tabel ${formConfig.services}`}
           columns={columns}
           data={filteredData}
