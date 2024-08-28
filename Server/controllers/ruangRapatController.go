@@ -97,6 +97,31 @@ func DeleteEvent(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+// Mendapatkan semua notifikasi
+func GetAllNotifications(c *gin.Context) {
+	var notifications []models.Notification
+
+	if err := initializers.DB.Find(&notifications).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch notifications"})
+			return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"notifications": notifications})
+}
+
+// Mendapatkan semua notifikasi untuk pengguna tertentu
+func GetNotifications(c *gin.Context) {
+	userID := c.Param("user_id") // asumsikan user_id dikirim sebagai parameter URL
+	var notifications []models.Notification
+
+	if err := initializers.DB.Where("user_id = ?", userID).Find(&notifications).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch notifications"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"notifications": notifications})
+}
+
 func addNotification(userID uuid.UUID, eventID uuid.UUID, notifyAt time.Time, message string) {
 	notification := models.Notification{
 		UserID:   userID,

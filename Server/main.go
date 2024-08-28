@@ -42,16 +42,16 @@ func main() {
 	// Route yang tidak memerlukan autentikasi
 	r.POST("/register", controllers.Register)
 	r.POST("/login", controllers.Login)
-	
+
 	// Terapkan middleware autentikasi ke semua route selanjutnya
 	r.Use(authMiddleware)
 	// Routes for User
 	store := cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("mysession", store))
-	
+
 	r.GET("/updateAll", controllers.UpdateAllSheets)
 	r.GET("/exportAll", controllers.ExportAllSheets)
-	
+
 	// Setup session store
 	store = cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("mysession", store))
@@ -131,6 +131,8 @@ func main() {
 	// Ruang Rapat routes
 	r.GET("/ruang-rapat", controllers.GetEvents)
 	r.POST("/ruang-rapat", controllers.CreateEvent)
+	r.GET("/notifications", controllers.GetAllNotifications)
+	r.GET("/notifications/:user_id", controllers.GetNotifications)
 	r.DELETE("/ruang-rapat/:id", controllers.DeleteEvent)
 
 	// Jadwal Cuti routes
