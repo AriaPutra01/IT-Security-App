@@ -28,6 +28,7 @@ func main() {
 		&models.Sk{},
 		&models.Perdin{},
 		&models.RuangRapat{},
+		&models.Notification{},
 		&models.JadwalCuti{},
 	)
 

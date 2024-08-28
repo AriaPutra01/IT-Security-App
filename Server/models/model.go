@@ -239,17 +239,21 @@ func (RuangRapat) TableName() string {
 	return "ruang_rapats"
 }
 
-type JadwalCuti struct {
-	ID     uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
-	Title  string    `json:"title"`
-	Start  string    `json:"start"`
-	End    string    `json:"end"`
-	AllDay bool      `json:"allDay"`
+type Notification struct {
+	ID       uint      `gorm:"primaryKey"`
+	UserID   uuid.UUID `gorm:"type:uuid;not null"` // Changed from uint to uuid.UUID
+	EventID  uuid.UUID `gorm:"type:uuid;not null"` // Pastikan field ini ada
+	Message  string    `gorm:"not null"`
+	NotifyAt time.Time `gorm:"index"`         // Index untuk mempercepat query berdasarkan waktu
+	Sent     bool      `gorm:"default:false"` // Status pengiriman notifikasi
 }
 
-func (r *JadwalCuti) BeforeCreate(tx *gorm.DB) error {
-	r.ID = generateUUID()
-	return nil
+type JadwalCuti struct {
+	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
+	Title  string
+	Start  string
+	End    string
+	AllDay bool
 }
 
 func (JadwalCuti) TableName() string {
