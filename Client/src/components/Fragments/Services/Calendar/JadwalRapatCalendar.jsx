@@ -5,9 +5,8 @@ import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 
 export const RapatCalendar = (props) => {
-  const { currentEvents, handleDateClick, handleEventClick, onColorChange } = props; // Pastikan onColorChange diterima di sini
-
-  console.log(props.onColorChange); // Tambahkan ini di dalam komponen RapatCalendar untuk memeriksa
+  const { currentEvents, handleDateClick, handleEventClick, onColorChange } =
+    props; // Pastikan onColorChange diterima di sini
 
   return (
     <div className="m-5 grid grid-cols-2fr">
@@ -73,7 +72,12 @@ export const RapatCalendar = (props) => {
 
 function renderEventContent(eventInfo) {
   return (
-    <div style={{ backgroundColor: eventInfo.event.backgroundColor || eventInfo.event.color }}>
+    <div
+      style={{
+        backgroundColor:
+          eventInfo.event.backgroundColor || eventInfo.event.color,
+      }}
+    >
       <b>{eventInfo.event.title}</b>
       <i>{eventInfo.timeText}</i>
     </div>

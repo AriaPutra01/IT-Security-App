@@ -13,7 +13,7 @@ export const CutiCalendar = ({ currentEvents, handleDateClick, handleEventClick,
         </h2>
         <div className="flex flex-col gap-2">
           {currentEvents.map((event) => (
-            <div key={event.id} className="overflow-auto grow border-b-2 border-l-2 border-sky-500 shadow p-2 rounded">
+            <div key={event.ID} className="overflow-auto grow border-b-2 border-l-2 border-sky-500 shadow p-2 rounded">
               <div className="text-sky-500 font-bold">{event.title}</div>
               <div>{formatDate(event.start, { year: "numeric", month: "short", day: "numeric" })}</div>
             </div>

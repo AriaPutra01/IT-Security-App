@@ -19,7 +19,7 @@ export const BookingRapatCalendar = ({
         <div className="flex flex-col gap-2">
           {currentEvents.map((event) => (
             <div
-              key={event.id}
+              key={event.ID}
               className="overflow-auto grow border-b-2 border-l-2 border-sky-500 shadow p-2 rounded"
             >
               <div className="text-sky-500 font-bold">{event.title}</div>

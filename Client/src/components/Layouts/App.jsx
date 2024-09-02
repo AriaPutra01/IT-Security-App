@@ -161,7 +161,7 @@ const App = (props) => {
               </Sidebar.Collapse>
               <Sidebar.Collapse icon={HiOutlineMenuAlt2} label="Kegiatan">
                 <Sidebar.Item icon={HiArrowSmRight} href="/timeline">
-                  Timeline
+                  Timeline Desktop
                 </Sidebar.Item>
                 <Sidebar.Item icon={HiArrowSmRight} href="/booking-rapat">
                   Booking Rapat

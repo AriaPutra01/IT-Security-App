@@ -1,40 +1,44 @@
-import FullCalendar from "@fullcalendar/react";
 import { formatDate } from "@fullcalendar/core";
+import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
-  
+
 export const TimelineCalendar = ({
+  children,
   currentEvents,
   handleDateClick,
   handleEventClick,
-  onColorChange,
 }) => {
   return (
     <div className="m-5 grid grid-cols-2fr">
       <div className="bg-gray-50 p-[15px] rounded w-[200px] max-h-[80vh] overflow-auto">
-        <h2 className="text-xl mt-0 mb-2 font-bold">
+        <div className="flex gap-1 justify-between ">{children}</div>
+        <h2 className="text-lg my-2 font-bold">
           {currentEvents.length} Jadwal
         </h2>
         <div className="flex flex-col gap-2">
           {currentEvents.map((event) => (
             <div
               key={event.id}
-              className="overflow-auto grow border-b-2 border-l-2 border-sky-500 shadow p-2 rounded"
+              className={`border-b-2 border-s-2 flex gap-3 items-center overflow-auto grow p-2 rounded`}
             >
-              <div className="text-sky-500 font-bold">{event.title}</div>
+              <div className={`size-4 rounded shadow bg-[${event.color}]`} />
               <div>
-                {formatDate(event.start, {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
+                <div className="font-bold">{event.title}</div>
+                <div>
+                  {formatDate(event.start, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </div>
               </div>
             </div>
           ))}
         </div>
       </div>
-      <div className="mx-4">
+      <div className="mx-4 max-h-[80vh] overflow-auto border-b-2">
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin, listPlugin]}
           headerToolbar={{
@@ -51,11 +55,6 @@ export const TimelineCalendar = ({
           select={handleDateClick}
           eventClick={handleEventClick}
         />
-      </div>
-      <div>
-        <button onClick={() => onColorChange("red")}>Merah</button>
-        <button onClick={() => onColorChange("green")}>Hijau</button>
-        <button onClick={() => onColorChange("yellow")}>Kuning</button>
       </div>
     </div>
   );

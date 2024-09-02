@@ -223,7 +223,7 @@ func generateUUID() uuid.UUID {
 }
 
 type RuangRapat struct {
-	ID     uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	ID     uuid.UUID `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
 	Title  string    `json:"title"`
 	Start  string    `json:"start"`
 	End    string    `json:"end"`
@@ -247,21 +247,21 @@ type Notification struct {
 }
 
 type JadwalCuti struct {
-	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
-	Title  string
-	Start  string
-	End    string
-	AllDay bool
-	Color  string    `json:"color"` // Tambahkan field ini untuk warna
+	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
+	Title  string `json:"title"`
+	Start  string `json:"start"`
+	End    string `json:"end"`
+	AllDay bool   `json:"allday"`
+	Color  string `json:"color"` // Tambahkan field ini untuk warna
 }
 
 type Timeline struct {
-	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
-	Title  string
-	Start  string
-	End    string
-	AllDay bool
-	Color  string    `json:"color"` // Tambahkan field ini untuk warna
+	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
+	Title  string `json:"title"`
+	Start  string `json:"start"`
+	End    string `json:"end"`
+	AllDay bool   `json:"allday"`
+	Color  string `json:"color"` // Tambahkan field ini untuk warna
 }
 
 func (Timeline) TableName() string {
@@ -269,12 +269,12 @@ func (Timeline) TableName() string {
 }
 
 type BookingRapat struct {
-	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
+	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
 	Title  string
 	Start  string
 	End    string
 	AllDay bool
-	Color  string    `json:"color"` // Tambahkan field ini untuk warna
+	Color  string `json:"color"` // Tambahkan field ini untuk warna
 }
 
 func (BookingRapat) TableName() string {

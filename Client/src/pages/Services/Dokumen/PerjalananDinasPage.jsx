@@ -10,7 +10,7 @@ import {
   addPerdin,
   deletePerdin,
   updatePerdin,
-} from "../../../../API/KegiatanProses/PerjalananDinas.service";
+} from "../../../../API/Dokumen/PerjalananDinas.service";
 
 export function PerdinPage() {
   const [MainData, setMainData] = useState([]);

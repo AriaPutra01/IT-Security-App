@@ -12,10 +12,9 @@ import { set } from "date-fns";
 
 export function JadwalRapatPage() {
   const [currentEvents, setCurrentEvents] = useState([]);
-  const [eventColor, setEventColor] = useState(''); // Menambahkan state untuk warna
+  const [eventColor, setEventColor] = useState(""); // Menambahkan state untuk warna
   const handleColorChange = (color) => {
     setEventColor(color);
-    console.log("Warna event diubah menjadi:", color); // Log untuk memeriksa perubahan warna
   };
   // Fetch events
   useEffect(() => {

@@ -3,20 +3,21 @@ import { v4 as uuidv4 } from "uuid"; // Import UUID
 import Swal from "sweetalert2";
 import App from "../../../components/Layouts/App";
 import { TimelineCalendar } from "../../../components/Fragments/Services/Calendar/TimelineCalendar";
+import { ColorPick } from "../../../Utilities/ColorPick";
 import {
   getTimelines,
   addTimeline,
   deleteTimeline,
 } from "../../../../API/KegiatanProses/Timeline.service";
-import { set } from "date-fns";
 
 export function TimelinePage() {
   const [currentEvents, setCurrentEvents] = useState([]);
-  const [eventColor, setEventColor] = useState(""); // Menambahkan state untuk warna
+  const [eventColor, setEventColor] = useState("#039BE5"); // Menambahkan state untuk warna
+
   const handleColorChange = (color) => {
     setEventColor(color);
-    console.log("Warna event diubah menjadi:", color); // Log untuk memeriksa perubahan warna
   };
+
   // Fetch events
   useEffect(() => {
     getTimelines((data) => {
@@ -35,10 +36,10 @@ export function TimelinePage() {
       showCancelButton: true,
       confirmButtonText: "Simpan",
       showLoaderOnConfirm: true,
-      preConfirm: (e) => {
+      preConfirm: (event) => {
         return {
           id: uuidv4(),
-          title: e,
+          title: event,
           start: selected.startStr,
           end: selected.endStr,
           allDay: selected.allDay,
@@ -60,8 +61,6 @@ export function TimelinePage() {
           timer: 1500,
         });
       }
-    } else {
-      calendarApi.unselect();
     }
   };
 
@@ -79,7 +78,9 @@ export function TimelinePage() {
         try {
           await deleteTimeline(selected.event.id);
           setCurrentEvents((prevEvents) =>
-            prevEvents.filter((event) => event.id !== selected.event.id)
+            prevEvents.filter((event) => {
+              return event.ID !== selected.event.id;
+            })
           );
           window.location.reload();
         } catch (error) {
@@ -96,14 +97,21 @@ export function TimelinePage() {
     });
   };
   return (
-    <App services="Jadwal Cuti">
+    <App services="Timeline Desktop">
       <TimelineCalendar
         currentEvents={currentEvents}
         handleDateClick={handleDateClick}
         handleEventClick={handleEventClick}
         onColorChange={handleColorChange} // Pastikan ini sesuai
         eventColor={eventColor}
-      />
+      >
+        <ColorPick checked color="#039BE5" handleColor={handleColorChange} />
+        <ColorPick color="#D50000" handleColor={handleColorChange} />
+        <ColorPick color="#F6BF26" handleColor={handleColorChange} />
+        <ColorPick color="#0B8043" handleColor={handleColorChange} />
+        <ColorPick color="#8E24AA" handleColor={handleColorChange} />
+        <ColorPick color="#616161" handleColor={handleColorChange} />
+      </TimelineCalendar>
     </App>
   );
 }

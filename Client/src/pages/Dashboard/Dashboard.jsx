@@ -10,7 +10,7 @@ import { getSags } from "../../../API/Dokumen/sag.service";
 import { getSks } from "../../../API/Dokumen/Sk.service";
 import { getSurats } from "../../../API/Dokumen/surat.service";
 import { getCutis } from "../../../API/KegiatanProses/JadwalCuti.service";
-import { getPerdins } from "../../../API/KegiatanProses/PerjalananDinas.service";
+import { getPerdins } from "../../../API/Dokumen/PerjalananDinas.service";
 import { getRapats } from "../../../API/KegiatanProses/RuangRapat.service";
 import { getProjects } from "../../../API/RencanaKerja/Project.service";
 
