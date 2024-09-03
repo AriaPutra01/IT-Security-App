@@ -67,7 +67,10 @@ export const ReusableForm = ({
       </h3>
       <div className="grid grid-cols-4 gap-6">
         {config.fields.map((field, index) => (
-          <div className="col-span-2" key={index}>
+          <div
+            className={`col-span-2 ${index % 2 === 0 && "last:col-span-4"}`}
+            key={index}
+          >
             <div className="mb-2 block">
               <Label htmlFor={field.name} value={field.label} />
             </div>
@@ -90,7 +93,17 @@ export const ReusableForm = ({
                       required={field.required}
                     />
                   );
-                case "text":
+                case "select": // Menambahkan case untuk select
+                  return (
+                    <Select id={field.name} required>
+                      {field.options?.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </Select>
+                  );
+                default:
                   return (
                     <TextInput
                       id={field.name}
@@ -101,45 +114,8 @@ export const ReusableForm = ({
                       required={field.required}
                     />
                   );
-                case "select": // Menambahkan case untuk select
-                  return (
-                    <div className="max-w-md">
-                      <Select id={field.name} required>
-                        {field.options?.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </Select>
-                    </div>
-                  );
-                default:
-                  return null; // Tambahkan default untuk menangani tipe yang tidak dikenali
               }
             })()}
-            {/* {field.type === "date" ? (
-              <TextInput
-                id={field.name}
-                name={field.name}
-                type={field.type}
-                value={
-                  formData[field.name]
-                    ? new Date(formData[field.name]).toISOString().split("T")[0]
-                    : ""
-                }
-                onChange={handleInputChange}
-                required={field.required}
-              />
-            ) : (
-              <TextInput
-                id={field.name}
-                name={field.name}
-                type={field.type}
-                value={formData[field.name]}
-                onChange={handleInputChange}
-                required={field.required}
-              />
-            )} */}
             {errors[field.name] && (
               <p className="text-red-600 text-sm">{errors[field.name]}</p>
             )}

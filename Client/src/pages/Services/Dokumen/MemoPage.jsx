@@ -21,8 +21,8 @@ export function MemoPage() {
       { name: "tanggal", label: "Tanggal", type: "date", required: true },
       { name: "no_memo", label: "Nomor Memo/Surat", type: "text", required: true },
       { name: "perihal", label: "Perihal", type: "text", required: true },
-      { name: "kategori", label: "Kategori", type: "select", options: ["sag", "iso", "surat", "berita_acara", "sk"], required: true },
       { name: "pic", label: "Pic", type: "text", required: true },
+      { name: "kategori", label: "Kategori", type: "select", options: ["sag", "iso", "surat", "berita_acara", "sk"], required: true },
     ],
     services: "memo",
   });

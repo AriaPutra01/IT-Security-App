@@ -3,6 +3,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import Swal from "sweetalert2";
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,7 +24,7 @@ export function LoginForm() {
     } catch (error) {
       Swal.fire({
         icon: "error",
-        title: "Tambah User Gagal" + error,
+        title: `Login Gagal`,
         text: "Silahkan Coba Lagi",
       });
     }

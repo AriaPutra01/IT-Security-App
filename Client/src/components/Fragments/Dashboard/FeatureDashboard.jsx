@@ -33,41 +33,20 @@ const DataItem = ({ count, label, color }) => (
 );
 
 export const FeatureDashboard = (props) => {
-  const {
-    sag,
-    iso,
-    memo,
-    surat,
-    beritaAcara,
-    sk,
-    project,
-    rapat,
-    perdin,
-    cuti,
-    masuk,
-    keluar,
-  } = props;
+  const { memo, perdin, project, rapat, cuti, masuk, keluar } = props;
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Dokumen */}
-      <div className="grid grid-cols-5 gap-5">
+      <div className="grid grid-cols-4 gap-5">
+        {/* Kegiatan & Proses */}
         <Section
-          span="col-span-4"
-          cols="grid-cols-6"
-          title="Data Dokumen"
-          borderColor="blue"
+          span="col-span-3"
+          cols="grid-cols-4"
+          title="Data Kegiatan & Proses"
+          borderColor="yellow"
         >
-          <DataItem count={sag.length} label="SAG" color="cyan" />
-          <DataItem count={iso.length} label="ISO" color="cyan" />
-          <DataItem count={memo.length} label="Memo" color="cyan" />
-          <DataItem count={surat.length} label="Surat" color="cyan" />
-          <DataItem
-            count={beritaAcara.length}
-            label="Berita Acara"
-            color="cyan"
-          />
-          <DataItem count={sk.length} label="SK" color="cyan" />
+          <DataItem count={rapat.length} label="Ruang Rapat" color="yellow" />
+          <DataItem count={cuti.length} label="Jadwal Cuti" color="yellow" />
         </Section>
 
         {/* Rencana Kerja */}
@@ -81,8 +60,23 @@ export const FeatureDashboard = (props) => {
         </Section>
       </div>
 
-      {/* Data & Innformasi */}
-      <div className="grid grid-cols-5 gap-5">
+      <div className="grid grid-cols-4 gap-5">
+        {/* Dokumen */}
+        <Section
+          span="col-span-2"
+          cols="grid-cols-2"
+          title="Data Dokumen"
+          borderColor="blue"
+        >
+          <DataItem count={memo.length} label="Memo" color="cyan" />
+          <DataItem
+            count={perdin.length}
+            label="Perjalanan Dinas"
+            color="yellow"
+          />
+        </Section>
+
+        {/* Data & Innformasi */}
         <Section
           span="col-span-2"
           cols="grid-cols-2"
@@ -91,22 +85,6 @@ export const FeatureDashboard = (props) => {
         >
           <DataItem count={masuk.length} label="Surat Masuk" color="red" />
           <DataItem count={keluar.length} label="Surat Keluar" color="red" />
-        </Section>
-
-        {/* Kegiatan & Proses */}
-        <Section
-          span="col-span-3"
-          cols="grid-cols-3"
-          title="Data Kegiatan & Proses"
-          borderColor="yellow"
-        >
-          <DataItem count={rapat.length} label="Ruang Rapat" color="yellow" />
-          <DataItem
-            count={perdin.length}
-            label="Perjalanan Dinas"
-            color="yellow"
-          />
-          <DataItem count={cuti.length} label="Jadwal Cuti" color="yellow" />
         </Section>
       </div>
     </div>
