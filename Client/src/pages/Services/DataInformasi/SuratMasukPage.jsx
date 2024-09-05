@@ -11,6 +11,8 @@ import {
   deleteSuratMasuk,
   updateSuratMasuk,
 } from "../../../../API/DataInformasi/SuratMasuk.service";
+import { useToken } from "../../../context/TokenContext";
+import { Excel } from "../../../Utilities/Excel"
 
 export function SuratMasukPage() {
   const [MainData, setMainData] = useState([]);
@@ -32,7 +34,7 @@ export function SuratMasukPage() {
     services: "Surat Masuk",
   });
   const [selectedIds, setSelectedIds] = useState([]);
-  const token = localStorage.getItem("token");
+  const { token } = useToken(); // Ambil token dari context
   let userRole = "";
   if (token) {
     const decoded = jwtDecode(token);
@@ -209,9 +211,13 @@ export function SuratMasukPage() {
           handleSelect={handleSelect}
           selectedIds={selectedIds}
           handleBulkDelete={handleBulkDelete}
-          linkExportThis="exportSuratMasuk"
-          linkUpdateThis="updateSuratMasuk"
-          importExcel="uploadSuratMasuk"
+          excel={
+            <Excel
+              linkExportThis="exportSuratMasuk"
+              linkUpdateThis="updateSuratMasuk"
+              importExcel="uploadSuratMasuk"
+            />
+          }
         />
         {/* End Table */}
 

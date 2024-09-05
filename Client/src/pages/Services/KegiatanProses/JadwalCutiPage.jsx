@@ -8,7 +8,6 @@ import {
   addCuti,
   deleteCuti,
 } from "../../../../API/KegiatanProses/JadwalCuti.service";
-import { set } from "date-fns";
 
 export function JadwalCutiPage() {
   const [currentEvents, setCurrentEvents] = useState([]);

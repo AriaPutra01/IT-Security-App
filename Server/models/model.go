@@ -24,29 +24,6 @@ type UserToken struct {
 	Expiry time.Time
 }
 
-// model for sag
-type Sag struct {
-	ID        uint      `gorm:"primaryKey"`
-	CreatedAt time.Time `gorm:"autoCreateTime"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime"`
-	Tanggal   time.Time `json:"-"`
-	NoMemo    string    `json:"no_memo"`
-	Perihal   string    `json:"perihal"`
-	Pic       string    `json:"pic"`
-}
-
-// MarshalJSON menyesuaikan serialisasi JSON untuk struct Sag
-func (i Sag) MarshalJSON() ([]byte, error) {
-	type Alias Sag
-	return json.Marshal(&struct {
-		Tanggal string `json:"tanggal"` // Format tanggal disesuaikan
-		*Alias
-	}{
-		Tanggal: i.Tanggal.Format("2006-01-02"), // Format tanggal YYYY-MM-DD
-		Alias:   (*Alias)(&i),
-	})
-}
-
 // model for memo
 type Memo struct {
 	ID        uint      `gorm:"primaryKey"`
@@ -56,103 +33,13 @@ type Memo struct {
 	NoMemo    string    `json:"no_memo"`
 	Perihal   string    `json:"perihal"`
 	Pic       string    `json:"pic"`
+	Kategori  string    `json:"kategori"`
+	CreateBy  string    `json:"create_by"`
 }
 
 // MarshalJSON menyesuaikan serialisasi JSON untuk struct Memo
 func (i Memo) MarshalJSON() ([]byte, error) {
 	type Alias Memo
-	return json.Marshal(&struct {
-		Tanggal string `json:"tanggal"` // Format tanggal disesuaikan
-		*Alias
-	}{
-		Tanggal: i.Tanggal.Format("2006-01-02"), // Format tanggal YYYY-MM-DD
-		Alias:   (*Alias)(&i),
-	})
-}
-
-// model for iso
-type Iso struct {
-	ID        uint      `gorm:"primaryKey"`
-	CreatedAt time.Time `gorm:"autoCreateTime"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime"`
-	Tanggal   time.Time `json:"-"`
-	NoMemo    string    `json:"no_memo"`
-	Perihal   string    `json:"perihal"`
-	Pic       string    `json:"pic"`
-}
-
-// MarshalJSON menyesuaikan serialisasi JSON untuk struct Iso
-func (i Iso) MarshalJSON() ([]byte, error) {
-	type Alias Iso
-	return json.Marshal(&struct {
-		Tanggal string `json:"tanggal"` // Format tanggal disesuaikan
-		*Alias
-	}{
-		Tanggal: i.Tanggal.Format("2006-01-02"), // Format tanggal YYYY-MM-DD
-		Alias:   (*Alias)(&i),
-	})
-}
-
-// model for surat
-type Surat struct {
-	ID        uint      `gorm:"primaryKey"`
-	CreatedAt time.Time `gorm:"autoCreateTime"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime"`
-	Tanggal   time.Time `json:"-"`
-	NoSurat   string    `json:"no_surat"`
-	Perihal   string    `json:"perihal"`
-	Pic       string    `json:"pic"`
-}
-
-// MarshalJSON menyesuaikan serialisasi JSON untuk struct Surat
-func (i Surat) MarshalJSON() ([]byte, error) {
-	type Alias Surat
-	return json.Marshal(&struct {
-		Tanggal string `json:"tanggal"` // Format tanggal disesuaikan
-		*Alias
-	}{
-		Tanggal: i.Tanggal.Format("2006-01-02"), // Format tanggal YYYY-MM-DD
-		Alias:   (*Alias)(&i),
-	})
-}
-
-// model for berita acara
-type BeritaAcara struct {
-	ID        uint      `gorm:"primaryKey"`
-	CreatedAt time.Time `gorm:"autoCreateTime"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime"`
-	Tanggal   time.Time `json:"-"`
-	NoSurat   string    `json:"no_surat"`
-	Perihal   string    `json:"perihal"`
-	Pic       string    `json:"pic"`
-}
-
-// MarshalJSON menyesuaikan serialisasi JSON untuk struct Surat
-func (i BeritaAcara) MarshalJSON() ([]byte, error) {
-	type Alias BeritaAcara
-	return json.Marshal(&struct {
-		Tanggal string `json:"tanggal"` // Format tanggal disesuaikan
-		*Alias
-	}{
-		Tanggal: i.Tanggal.Format("2006-01-02"), // Format tanggal YYYY-MM-DD
-		Alias:   (*Alias)(&i),
-	})
-}
-
-// model for sk
-type Sk struct {
-	ID        uint      `gorm:"primaryKey"`
-	CreatedAt time.Time `gorm:"autoCreateTime"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime"`
-	Tanggal   time.Time `json:"-"`
-	NoSurat   string    `json:"no_surat"`
-	Perihal   string    `json:"perihal"`
-	Pic       string    `json:"pic"`
-}
-
-// MarshalJSON menyesuaikan serialisasi JSON untuk struct Surat
-func (i Sk) MarshalJSON() ([]byte, error) {
-	type Alias Sk
 	return json.Marshal(&struct {
 		Tanggal string `json:"tanggal"` // Format tanggal disesuaikan
 		*Alias
@@ -178,6 +65,7 @@ type Project struct {
 	TanggalIzin     time.Time `json:"-"`
 	TanggalTor      time.Time `json:"-"`
 	Pic             string    `json:"pic"`
+	CreateBy        string    `json:"create_by"`
 }
 
 func (i Project) MarshalJSON() ([]byte, error) {
@@ -204,6 +92,7 @@ type Perdin struct {
 	Tanggal   time.Time `json:"-"`
 	Hotel     string    `json:"hotel"`
 	Transport string    `json:"transport"`
+	CreateBy  string    `json:"create_by"`
 }
 
 func (i Perdin) MarshalJSON() ([]byte, error) {
@@ -256,16 +145,22 @@ type JadwalCuti struct {
 }
 
 type Timeline struct {
-	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
-	Title  string `json:"title"`
-	Start  string `json:"start"`
-	End    string `json:"end"`
-	AllDay bool   `json:"allday"`
-	Color  string `json:"color"` // Tambahkan field ini untuk warna
+	ID         uint   `gorm:"primaryKey" json:"id"`
+	Start      string `json:"start"`
+	End        string `json:"end"`
+	ResourceId int    `json:"resourceId"` // Ubah tipe data dari string ke int
+	Title      string `json:"title"`
+	BgColor    string `json:"bgColor"`
 }
 
 func (Timeline) TableName() string {
 	return "timelines"
+}
+
+type ResourceTimeline struct {
+	ID       uint   `gorm:"primaryKey" json:"id"`
+	Name     string `json:"name"`
+	ParentID *uint  `json:"parent_id"`
 }
 
 type BookingRapat struct {
@@ -291,6 +186,7 @@ type SuratMasuk struct {
 	RelatedDiv string    `json:"related_div"`
 	DestinyDiv string    `json:"destiny_div"`
 	Tanggal    time.Time `json:"-"`
+	CreateBy   string    `json:"create_by"`
 }
 
 func (i SuratMasuk) MarshalJSON() ([]byte, error) {
@@ -314,6 +210,7 @@ type SuratKeluar struct {
 	From      string    `json:"from"`
 	Pic       string    `json:"pic"`
 	Tanggal   time.Time `json:"-"`
+	CreateBy  string    `json:"create_by"`
 }
 
 func (i SuratKeluar) MarshalJSON() ([]byte, error) {

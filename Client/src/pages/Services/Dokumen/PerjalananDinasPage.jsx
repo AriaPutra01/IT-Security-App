@@ -11,6 +11,8 @@ import {
   deletePerdin,
   updatePerdin,
 } from "../../../../API/Dokumen/PerjalananDinas.service";
+import { useToken } from "../../../context/TokenContext";
+import { Excel } from "../../../Utilities/Excel";
 
 export function PerdinPage() {
   const [MainData, setMainData] = useState([]);
@@ -31,7 +33,7 @@ export function PerdinPage() {
     services: "Perjalanan Dinas",
   });
   const [selectedIds, setSelectedIds] = useState([]);
-  const token = localStorage.getItem("token");
+  const { token } = useToken(); // Ambil token dari context
   let userRole = "";
   if (token) {
     const decoded = jwtDecode(token);
@@ -208,9 +210,13 @@ export function PerdinPage() {
           handleSelect={handleSelect}
           selectedIds={selectedIds}
           handleBulkDelete={handleBulkDelete}
-          linkExportThis="exportPerdin"
-          linkUpdateThis="updatePerdin"
-          importExcel="uploadPerdin"
+          excel={
+            <Excel
+              linkExportThis="exportPerdin"
+              linkUpdateThis="updatePerdin"
+              importExcel="uploadPerdin"
+            />
+          }
         />
         {/* End Table */}
 

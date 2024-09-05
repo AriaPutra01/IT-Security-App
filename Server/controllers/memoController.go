@@ -16,10 +16,12 @@ import (
 )
 
 type MemoRequest struct {
-	Tanggal string `json:"tanggal"`
-	NoMemo  string `json:"no_memo"`
-	Perihal string `json:"perihal"`
-	Pic     string `json:"pic"`
+	Tanggal  string `json:"tanggal"`
+	NoMemo   string `json:"no_memo"`
+	Perihal  string `json:"perihal"`
+	Pic      string `json:"pic"`
+	Kategori string `json:"kategori"`
+	CreateBy string `json:"create_by"`
 }
 
 func MemoIndex(c *gin.Context) {
@@ -56,11 +58,15 @@ func MemoCreate(c *gin.Context) {
 		return
 	}
 
+	requestBody.CreateBy = c.MustGet("username").(string)
+
 	memo := models.Memo{
 		Tanggal: tanggal,
 		NoMemo:  requestBody.NoMemo,
 		Perihal: requestBody.Perihal,
 		Pic:     requestBody.Pic,
+		Kategori: requestBody.Kategori,
+		CreateBy: requestBody.CreateBy,
 	}
 
 	result := initializers.DB.Create(&memo)
@@ -100,6 +106,7 @@ func MemoUpdate(c *gin.Context) {
 		return
 	}
 
+
 	id := c.Params.ByName("id")
 
 	var memo models.Memo
@@ -108,6 +115,8 @@ func MemoUpdate(c *gin.Context) {
 		c.JSON(404, gin.H{"error": "Memo not found"})
 		return
 	}
+
+	requestBody.CreateBy = c.MustGet("username").(string)
 
 	if requestBody.Tanggal != "" {
 		tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
@@ -135,6 +144,18 @@ func MemoUpdate(c *gin.Context) {
 	} else {
 		memo.Pic = memo.Pic
 	}
+
+	if requestBody.Kategori!= "" {
+    memo.Kategori = requestBody.Kategori
+  } else {
+    memo.Kategori = memo.Kategori
+  }
+
+	if requestBody.CreateBy!= "" {
+    memo.CreateBy = requestBody.CreateBy
+  } else {
+    memo.CreateBy = memo.CreateBy
+  }
 
 	initializers.DB.Save(&memo)
 

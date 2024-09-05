@@ -1,69 +1,54 @@
 package controllers
 
 import (
-	"log"
 	"net/http"
 	"project-its/initializers"
 	"project-its/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
-type Timeline struct {
-	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()";json:"id"`
-	Title  string `json:"title"`
-	Start  string `json:"start"`
-	End    string `json:"end"`
-	AllDay bool   `json:"allDay"`
-	Color  string `json:"color"`
-}
-
-// Create a new event
+// GetEventsTimeline retrieves all timeline events
 func GetEventsTimeline(c *gin.Context) {
 	var events []models.Timeline
 	if err := initializers.DB.Find(&events).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, events)
+	c.JSON(http.StatusOK, gin.H{"events": events})
 }
 
-// Example of using generated UUID
+// CreateEventTimeline creates a new timeline event
 func CreateEventTimeline(c *gin.Context) {
-	var event Timeline
+	var event models.Timeline
 	if err := c.ShouldBindJSON(&event); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Generate a new UUID if not provided
-	if event.ID == "" {
-		event.ID = generateUUID()
-	}
-
-	// Log the generated UUID for debugging
-	log.Printf("Generated UUID: %s", event.ID)
-
 	if err := initializers.DB.Create(&event).Error; err != nil {
-		log.Printf("Error creating event: %v", err) // Add this line
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, event)
 }
 
+// DeleteEventTimeline deletes a timeline event by ID
 func DeleteEventTimeline(c *gin.Context) {
-	id := c.Param("id") // Menggunakan c.Param jika UUID dikirim sebagai bagian dari URL
-	if id == "" {
+	idParam := c.Param("id")
+	if idParam == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID harus disertakan"})
 		return
 	}
-	if _, err := uuid.Parse(id); err != nil {
+
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
 		return
 	}
-	if err := initializers.DB.Where("id = ?", id).Delete(&Timeline{}).Error; err != nil {
+
+	if err := initializers.DB.Where("id = ?", uint(id)).Delete(&models.Timeline{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

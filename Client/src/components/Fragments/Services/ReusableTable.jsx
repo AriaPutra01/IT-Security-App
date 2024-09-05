@@ -3,11 +3,12 @@ import React, { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import DataTable from "react-data-table-component";
 import { Button } from "flowbite-react";
-import { Excel } from "../../../Utilities/Excel";
 import { SearchInput } from "../../Elements/SearchInput";
+import { useToken } from "../../../context/TokenContext";
 
 export const ReusableTable = (props) => {
   const {
+    excel,
     MainData,
     formConfig,
     handleAdd,
@@ -16,12 +17,9 @@ export const ReusableTable = (props) => {
     handleSelect,
     selectedIds,
     handleBulkDelete,
-    linkExportThis,
-    linkUpdateThis,
-    importExcel,
   } = props;
   const [globalFilterText, setGlobalFilterText] = useState("");
-  const token = localStorage.getItem("token");
+  const { token } = useToken(); // Ambil token dari context
   let userRole = "";
   if (token) {
     const decoded = jwtDecode(token);
@@ -104,8 +102,11 @@ export const ReusableTable = (props) => {
   ];
 
   const filteredData = MainData.filter((data) => {
-    return Object.values(data).some((value) =>
-      value.toString().toLowerCase().includes(globalFilterText.toLowerCase())
+    return Object.values(data).some(
+      (value) =>
+        value !== null &&
+        value !== undefined &&
+        value.toString().toLowerCase().includes(globalFilterText.toLowerCase())
     );
   });
 
@@ -132,11 +133,7 @@ export const ReusableTable = (props) => {
               >
                 Tambah
               </Button>
-              <Excel
-                linkExportThis={linkExportThis}
-                linkUpdateThis={linkUpdateThis}
-                importExcel={importExcel}
-              />
+              {excel}
               <Button
                 className="w-max"
                 color="failure"

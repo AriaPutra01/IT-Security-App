@@ -8,7 +8,6 @@ import {
   addRapat,
   deleteRapat,
 } from "../../../../API/KegiatanProses/RuangRapat.service";
-import { set } from "date-fns";
 
 export function JadwalRapatPage() {
   const [currentEvents, setCurrentEvents] = useState([]);

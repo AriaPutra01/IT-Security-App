@@ -11,6 +11,8 @@ import {
   getMemos,
   updateMemo,
 } from "../../../../API/Dokumen/memo.service";
+import { useToken } from "../../../context/TokenContext";
+import { Excel } from "../../../Utilities/Excel";
 
 export function MemoPage() {
   const [MainData, setMainData] = useState([]);
@@ -19,15 +21,26 @@ export function MemoPage() {
   const [formConfig, setFormConfig] = useState({
     fields: [
       { name: "tanggal", label: "Tanggal", type: "date", required: true },
-      { name: "no_memo", label: "Nomor Memo/Surat", type: "text", required: true },
+      {
+        name: "no_memo",
+        label: "Nomor Memo/Surat",
+        type: "text",
+        required: true,
+      },
       { name: "perihal", label: "Perihal", type: "text", required: true },
       { name: "pic", label: "Pic", type: "text", required: true },
-      { name: "kategori", label: "Kategori", type: "select", options: ["sag", "iso", "surat", "berita_acara", "sk"], required: true },
+      {
+        name: "kategori",
+        label: "Kategori",
+        type: "select",
+        options: ["sag", "iso", "surat", "berita_acara", "sk"],
+        required: true,
+      },
     ],
-    services: "memo",
+    services: "Memo",
   });
   const [selectedIds, setSelectedIds] = useState([]);
-  const token = localStorage.getItem("token");
+  const { token } = useToken(); // Ambil token dari context
   let userRole = "";
   if (token) {
     const decoded = jwtDecode(token);
@@ -204,9 +217,13 @@ export function MemoPage() {
           handleSelect={handleSelect}
           selectedIds={selectedIds}
           handleBulkDelete={handleBulkDelete}
-          linkExportThis="exportMemo"
-          linkUpdateThis="updateMemo"
-          importExcel="uploadMemo"
+          excel={
+            <Excel
+              linkExportThis="exportMemo"
+              linkUpdateThis="updateMemo"
+              importExcel="uploadMemo"
+            />
+          }
         />
         {/* End Table */}
 

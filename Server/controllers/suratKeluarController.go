@@ -21,6 +21,7 @@ type SuratKeluarRequest struct {
 	From    string `json:"from"`
 	Pic     string `json:"pic"`
 	Tanggal string `json:"tanggal"`
+	CreateBy string `json:"create_by"`
 }
 
 func SuratKeluarCreate(c *gin.Context) {
@@ -37,6 +38,8 @@ func SuratKeluarCreate(c *gin.Context) {
 	// Add some logging to see what's being received
 	log.Println("Received request body:", requestBody)
 
+	requestBody.CreateBy = c.MustGet("username").(string)
+
 	// Parse the date string
 	tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
 	if err != nil {
@@ -51,6 +54,7 @@ func SuratKeluarCreate(c *gin.Context) {
 		From:    requestBody.From,
 		Pic:     requestBody.Pic,
 		Tanggal: tanggal,
+		CreateBy: requestBody.CreateBy,
 	}
 
 	result := initializers.DB.Create(&surat_keluar)
@@ -113,6 +117,8 @@ func SuratKeluarUpdate(c *gin.Context) {
 		return
 	}
 
+	requestBody.CreateBy = c.MustGet("username").(string)
+
 	if requestBody.Tanggal != "" {
 		tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
 		if err != nil {
@@ -133,10 +139,17 @@ func SuratKeluarUpdate(c *gin.Context) {
 	} else {
 		surat_keluar.Title = surat_keluar.Title // gunakan nilai yang ada dari database
 	}
+
 	if requestBody.Pic != "" {
 		surat_keluar.Pic = requestBody.Pic
 	} else {
 		surat_keluar.Pic = surat_keluar.Pic // gunakan nilai yang ada dari database
+	}
+
+	if requestBody.CreateBy != "" {
+		surat_keluar.CreateBy = requestBody.CreateBy
+	} else {
+		surat_keluar.CreateBy = surat_keluar.CreateBy // gunakan nilai yang ada dari database
 	}
 
 	initializers.DB.Model(&surat_keluar).Updates(surat_keluar)

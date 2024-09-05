@@ -11,6 +11,8 @@ import {
   deleteSuratKeluar,
   updateSuratKeluar,
 } from "../../../../API/DataInformasi/SuratKeluar.service";
+import { useToken } from "../../../context/TokenContext";
+import { Excel } from "../../../Utilities/Excel";
 
 export function SuratKeluarPage() {
   const [MainData, setMainData] = useState([]);
@@ -27,7 +29,7 @@ export function SuratKeluarPage() {
     services: "Surat Keluar",
   });
   const [selectedIds, setSelectedIds] = useState([]);
-  const token = localStorage.getItem("token");
+  const { token } = useToken(); // Ambil token dari context
   let userRole = "";
   if (token) {
     const decoded = jwtDecode(token);
@@ -204,9 +206,13 @@ export function SuratKeluarPage() {
           handleSelect={handleSelect}
           selectedIds={selectedIds}
           handleBulkDelete={handleBulkDelete}
-          linkExportThis="exportSuratKeluar"
-          linkUpdateThis="updateSuratKeluar"
-          importExcel="uploadSuratKeluar"
+          excel={
+            <Excel
+              linkExportThis="exportSuratKeluar"
+              linkUpdateThis="updateSuratKeluar"
+              importExcel="uploadSuratKeluar"
+            />
+          }
         />
         {/* End Table */}
 

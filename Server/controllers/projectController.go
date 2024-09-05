@@ -27,6 +27,7 @@ type ProjectRequest struct {
 	TanggalIzin     string `json:"tanggal_izin"`
 	TanggalTor      string `json:"tanggal_tor"`
 	Pic             string `json:"pic"`
+	CreateBy string `json:"create_by"`
 }
 
 func ProjectCreate(c *gin.Context) {
@@ -42,6 +43,8 @@ func ProjectCreate(c *gin.Context) {
 
 	// Add some logging to see what's being received
 	log.Println("Received request body:", requestBody)
+
+	requestBody.CreateBy = c.MustGet("username").(string) 
 
 	// Parse the date string
 	bulanString := requestBody.Bulan
@@ -80,6 +83,7 @@ func ProjectCreate(c *gin.Context) {
 		TanggalIzin:     tanggal_izin,
 		TanggalTor:      tanggal_tor,
 		Pic:             requestBody.Pic,
+		CreateBy: requestBody.CreateBy,
 	}
 
 	result := initializers.DB.Create(&project)
@@ -142,6 +146,8 @@ func ProjectUpdate(c *gin.Context) {
 		c.JSON(404, gin.H{"error": "project tidak ditemukan"})
 		return
 	}
+
+	requestBody.CreateBy = c.MustGet("username").(string)
 
 	if requestBody.Bulan != "" {
 		bulan, err := time.Parse("2006-01-02", requestBody.Bulan)
@@ -216,6 +222,12 @@ func ProjectUpdate(c *gin.Context) {
 		project.Pic = requestBody.Pic
 	} else {
 		project.Pic = project.Pic // gunakan nilai yang ada dari database
+	}
+
+	if requestBody.CreateBy != "" {
+		project.CreateBy = requestBody.CreateBy
+	} else {
+		project.CreateBy = project.CreateBy // gunakan nilai yang ada dari database
 	}
 
 	initializers.DB.Model(&project).Updates(project)

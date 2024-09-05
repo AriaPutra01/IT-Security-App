@@ -2,12 +2,12 @@
 
 import axios from "axios";
 import React, { useState } from "react";
-import { jwtDecode } from "jwt-decode";
+import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({});
+  // const [errors, setErrors] = useState({});
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -16,9 +16,6 @@ export function LoginForm() {
         email,
         password,
       });
-      localStorage.setItem("token", response.data.token);
-      const decoded = jwtDecode(response.data.token);
-
       // Redirect ke dashboard
       window.location.href = "/dashboard";
     } catch (error) {
@@ -67,10 +64,8 @@ export function LoginForm() {
         </label>
       </div>
       <div className="grid grid-cols-5 gap-2">
-        <button
-          onClick={() => {
-            window.location.href = "/";
-          }}
+        <Link
+          to="/"
           type="button"
           className="col-span-1 text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center"
         >
@@ -91,7 +86,7 @@ export function LoginForm() {
               d="M5 12h14M5 12l4-4m-4 4 4 4"
             />
           </svg>
-        </button>
+        </Link>
         <button
           type="submit"
           className="col-span-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center"

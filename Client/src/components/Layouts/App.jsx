@@ -18,31 +18,20 @@ import {
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import Swal from "sweetalert2";
+import { useToken } from "../../context/TokenContext";
 
 const App = (props) => {
   const { services, children } = props;
+  const { token, userDetails } = useToken(); // Ambil token dari context
   const [Notification, setNotification] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(
-    services === "Timeline" ||
-      services === "Booking Ruang Rapat" ||
+    services === "Timeline Desktop" ||
+      services === "Booking Rapat" ||
       services === "Jadwal Rapat" ||
       services === "Jadwal Cuti"
       ? false
       : true
   );
-  const [userDetails, setUserDetails] = useState({ username: "", email: "" });
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const decoded = jwtDecode(token);
-      setUserDetails({
-        username: decoded.username,
-        email: decoded.email,
-        role: decoded.role,
-      });
-    }
-  }, []);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -53,14 +42,13 @@ const App = (props) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
+        credentials: "include", // Sertakan cookie dalam permintaan
       });
 
       // Cek status respons
       if (response.ok) {
-        // Menghapus token dari localStorage
-        localStorage.removeItem("token");
         // Redirect ke halaman login
         window.location.href = "/login";
       } else {
@@ -182,8 +170,8 @@ const App = (props) => {
                 </Sidebar.Item>
               </Sidebar.Collapse>
               {userDetails.role === "admin" ? (
-                <Sidebar.Item icon={AiOutlineUsergroupAdd} href="/register">
-                  Tambah User
+                <Sidebar.Item icon={AiOutlineUsergroupAdd} href="/user">
+                  User Management
                 </Sidebar.Item>
               ) : null}
             </Sidebar.ItemGroup>

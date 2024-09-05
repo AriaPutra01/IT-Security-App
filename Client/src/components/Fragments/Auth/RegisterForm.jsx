@@ -2,6 +2,7 @@
 import { useRef } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 export function RegisterForm() {
   const usernameRef = useRef();
@@ -24,7 +25,7 @@ export function RegisterForm() {
         icon: "success",
         title: "Tambah User Berhasil",
       }).then(() => {
-        window.location.href = "/dashboard";
+        window.location.href = "/user";
       });
     } catch (error) {
       Swal.fire({
@@ -119,17 +120,15 @@ export function RegisterForm() {
               Admin
             </label>
           </div>
-        </div>
+        </div>  
         <div className="grid grid-cols-5 gap-2 border-t-4 border-slate-600 rounded pt-4">
-          <button
-            onClick={() => {
-              window.location.href = "/dashboard";
-            }}
+          <Link
+            to="/user"
             type="button"
             className="col-span-2 text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center"
           >
             Kembali
-          </button>
+          </Link>
           <button
             type="submit"
             className="col-span-3 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center"

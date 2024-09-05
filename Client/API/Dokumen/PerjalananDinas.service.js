@@ -14,8 +14,9 @@ export function getPerdins(callback) {
 }
 
 export function addPerdin(data) {
+  const { username, ...rest } = data;
   return axios
-    .post(`${API_URL}`, data)
+    .post(`${API_URL}`, { ...rest})
     .then((response) => {
       return response.data.Perdin;
     })
@@ -25,8 +26,9 @@ export function addPerdin(data) {
 }
 
 export function updatePerdin(id, data) {
+  const { username,...rest } = data;
   return axios
-    .put(`${API_URL}/${id}`, data)
+    .put(`${API_URL}/${id}`, { ...rest })
     .then((response) => {
       return response.data.Perdin;
     })

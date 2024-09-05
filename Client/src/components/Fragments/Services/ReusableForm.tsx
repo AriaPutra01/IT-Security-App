@@ -29,7 +29,7 @@ export const ReusableForm = ({
 
   const handleInputChange = ({
     target: { name, value },
-  }: React.ChangeEvent<HTMLInputElement>) => {
+  }: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value,
@@ -95,7 +95,16 @@ export const ReusableForm = ({
                   );
                 case "select": // Menambahkan case untuk select
                   return (
-                    <Select id={field.name} required>
+                    <Select
+                      id={field.name}
+                      name={field.name} // Pastikan name ditambahkan
+                      value={formData[field.name] || ""} // Pastikan value diatur
+                      onChange={handleInputChange} // Tambahkan onChange
+                      required={field.required}
+                    >
+                      <option value="" disabled defaultValue="readonly">
+                        Pilih Kategori...
+                      </option>
                       {field.options?.map((option) => (
                         <option key={option} value={option}>
                           {option}

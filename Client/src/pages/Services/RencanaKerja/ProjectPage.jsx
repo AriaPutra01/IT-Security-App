@@ -11,6 +11,8 @@ import {
   updateProject,
   deleteProject,
 } from "../../../../API/RencanaKerja/Project.service";
+import { useToken } from "../../../context/TokenContext";
+import { Excel } from "../../../Utilities/Excel";
 
 export function ProjectPage() {
   const [MainData, setMainData] = useState([]);
@@ -68,7 +70,7 @@ export function ProjectPage() {
     services: "Project",
   });
   const [selectedIds, setSelectedIds] = useState([]);
-  const token = localStorage.getItem("token");
+  const { token } = useToken(); // Ambil token dari context
   let userRole = "";
   if (token) {
     const decoded = jwtDecode(token);
@@ -245,9 +247,13 @@ export function ProjectPage() {
           handleSelect={handleSelect}
           selectedIds={selectedIds}
           handleBulkDelete={handleBulkDelete}
-          linkExportThis="exportProject"
-          linkUpdateThis="updateProject"
-          importExcel="uploadProject"
+          excel={
+            <Excel
+              linkExportThis="exportProject"
+              linkUpdateThis="updateProject"
+              importExcel="uploadProject"
+            />
+          }
         />
         {/* End Table */}
 

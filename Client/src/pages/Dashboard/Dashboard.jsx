@@ -8,6 +8,7 @@ import { getPerdins } from "../../../API/Dokumen/PerjalananDinas.service";
 import { getCutis } from "../../../API/KegiatanProses/JadwalCuti.service";
 import { getRapats } from "../../../API/KegiatanProses/RuangRapat.service";
 import { getProjects } from "../../../API/RencanaKerja/Project.service";
+import { useToken } from "../../context/TokenContext";
 
 const useFetchData = (fetchFunction) => {
   const [data, setData] = useState([]);
@@ -18,7 +19,7 @@ const useFetchData = (fetchFunction) => {
 };
 
 export const DashboardPage = () => {
-  const token = localStorage.getItem("token"); // Ambil token dari localStorage
+  const { token } = useToken(); // Ambil token dari context
 
   const SuratKeluar = useFetchData(getSuratKeluars);
   const SuratMasuk = useFetchData(getSuratMasuks);

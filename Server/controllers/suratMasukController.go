@@ -21,6 +21,7 @@ type SuratMasukRequest struct {
 	RelatedDiv string `json:"related_div"`
 	DestinyDiv string `json:"destiny_div"`
 	Tanggal    string `json:"tanggal"`
+	CreateBy string `json:"create_by"`
 }
 
 func SuratMasukCreate(c *gin.Context) {
@@ -37,6 +38,8 @@ func SuratMasukCreate(c *gin.Context) {
 	// Add some logging to see what's being received
 	log.Println("Received request body:", requestBody)
 
+	requestBody.CreateBy = c.MustGet("username").(string)
+
 	// Parse the date string
 	tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
 	if err != nil {
@@ -51,6 +54,7 @@ func SuratMasukCreate(c *gin.Context) {
 		RelatedDiv: requestBody.RelatedDiv,
 		DestinyDiv: requestBody.DestinyDiv,
 		Tanggal:    tanggal,
+		CreateBy: requestBody.CreateBy,
 	}
 
 	result := initializers.DB.Create(&surat_masuk)
@@ -112,6 +116,8 @@ func SuratMasukUpdate(c *gin.Context) {
 		return
 	}
 
+	requestBody.CreateBy = c.MustGet("username").(string)
+
 	if requestBody.Tanggal != "" {
 		tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
 		if err != nil {
@@ -145,12 +151,17 @@ func SuratMasukUpdate(c *gin.Context) {
 		surat_masuk.DestinyDiv = surat_masuk.DestinyDiv // gunakan nilai yang ada dari database
 	}
 
+	if requestBody.CreateBy != "" {
+		surat_masuk.CreateBy = requestBody.CreateBy
+	} else {
+		surat_masuk.CreateBy = surat_masuk.CreateBy // gunakan nilai yang ada dari database
+	}
+
 	initializers.DB.Model(&surat_masuk).Updates(surat_masuk)
 
 	c.JSON(200, gin.H{
 		"surat_masuk": surat_masuk,
 	})
-
 }
 
 func SuratMasukDelete(c *gin.Context) {

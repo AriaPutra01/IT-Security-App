@@ -3,6 +3,8 @@ package main
 import (
 	"project-its/controllers"
 	"project-its/initializers"
+	"project-its/middleware"
+
 	// "project-its/middleware"
 	"time"
 
@@ -36,18 +38,13 @@ func main() {
 		MaxAge: 12 * time.Hour,
 	}))
 
-	// Middleware untuk autentikasi token
-	// authMiddleware := middleware.TokenAuthMiddleware()
-
 	// Route yang tidak memerlukan autentikasi
 	r.POST("/register", controllers.Register)
 	r.POST("/login", controllers.Login)
-	r.GET("/exportSag", controllers.CreateExcelSag)
-	r.GET("/updateSag", controllers.UpdateSheetSAG)
-	r.POST("/uploadSag", controllers.ImportExcelSag)
 
 	// Terapkan middleware autentikasi ke semua route selanjutnya
-	// r.Use(authMiddleware)
+	r.Use(middleware.TokenAuthMiddleware())
+
 	// Routes for User
 	store := cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("mysession", store))
@@ -62,13 +59,9 @@ func main() {
 	//logout must be after middleware
 	r.POST("/logout", controllers.Logout)
 
-	// Routes for SAG
-	r.GET("/sag", controllers.SagIndex)
-	r.POST("/sag", controllers.CreateSag)
-	r.GET("/sag/:id", controllers.SagShow)
-	r.PUT("/sag/:id", controllers.PostsUpdate)
-	r.DELETE("/sag/:id", controllers.PostsDelete)
-
+	r.GET("/user", controllers.UserIndex)
+	r.PUT("/user/:id", controllers.UserUpdate)
+	r.DELETE("/user/:id", controllers.UserDelete)
 
 	// Routes for Memo
 	r.GET("/memos", controllers.MemoIndex)
@@ -80,46 +73,6 @@ func main() {
 	r.GET("/updateMemo", controllers.UpdateSheetMemo)
 	r.POST("/uploadMemo", controllers.ImportExcelMemo)
 
-	// Routes for ISO
-	r.GET("/iso", controllers.IsoIndex)
-	r.POST("/iso", controllers.IsoCreate)
-	r.GET("/iso/:id", controllers.IsoShow)
-	r.PUT("/iso/:id", controllers.IsoUpdate)
-	r.DELETE("/iso/:id", controllers.IsoDelete)
-	r.GET("/exportIso", controllers.CreateExcelIso)
-	r.GET("/updateIso", controllers.UpdateSheetIso)
-	r.POST("/uploadIso", controllers.ImportExcelIso)
-
-	// Routes for Surat
-	r.POST("/surat", controllers.SuratCreate)
-	r.PUT("/surat/:id", controllers.SuratUpdate)
-	r.GET("/surat", controllers.SuratIndex)
-	r.DELETE("/surat/:id", controllers.SuratDelete)
-	r.GET("/surat/:id", controllers.SuratShow)
-	r.GET("/exportSurat", controllers.CreateExcelSurat)
-	r.GET("/updateSurat", controllers.UpdateSheetSurat)
-	r.POST("/uploadSurat", controllers.ImportExcelSurat)
-
-	//BeritaAcara routes
-	r.POST("/beritaAcara", controllers.BeritaAcaraCreate)
-	r.PUT("/beritaAcara/:id", controllers.BeritaAcaraUpdate)
-	r.GET("/beritaAcara", controllers.BeritaAcaraIndex)
-	r.DELETE("/beritaAcara/:id", controllers.BeritaAcaraDelete)
-	r.GET("/beritaAcara/:id", controllers.BeritaAcaraShow)
-	r.GET("/exportBerita", controllers.CreateExcelBerita)
-	r.GET("/updateBerita", controllers.UpdateSheetBerita)
-	r.POST("/uploadBerita", controllers.ImportExcelBerita)
-
-	//Sk routes
-	r.POST("/sk", controllers.SkCreate)
-	r.PUT("/sk/:id", controllers.SkUpdate)
-	r.GET("/sk", controllers.SkIndex)
-	r.DELETE("/sk/:id", controllers.SkDelete)
-	r.GET("/sk/:id", controllers.SkShow)
-	r.GET("/exportSk", controllers.CreateExcelSk)
-	r.GET("/updateSk", controllers.UpdateSheetSk)
-	r.POST("/uploadSk", controllers.ImportExcelSk)
-
 	//Project routes
 	r.POST("/Project", controllers.ProjectCreate)
 	r.PUT("/Project/:id", controllers.ProjectUpdate)
@@ -130,9 +83,12 @@ func main() {
 	r.POST("/uploadProject", controllers.ImportExcelProject)
 
 	//Timeline routes
-	r.GET("/timeline", controllers.GetEventsTimeline)
-	r.POST("/timeline", controllers.CreateEventTimeline)
-	r.DELETE("/timeline/:id", controllers.DeleteEventTimeline)
+	r.GET("/timelines", controllers.GetEventsTimeline)
+	r.POST("/timelines", controllers.CreateEventTimeline)
+	r.DELETE("/timelines/:id", controllers.DeleteEventTimeline)
+	r.GET("/resources", controllers.GetResourcesTimeline)
+	r.POST("/resources", controllers.CreateResourceTimeline)
+	r.DELETE("/resources/:id", controllers.DeleteResourceTimeline)
 
 	//Booking Rapat routes
 	r.GET("/booking-rapat", controllers.GetEventsBookingRapat)

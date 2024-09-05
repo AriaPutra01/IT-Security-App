@@ -11,6 +11,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type requestUser struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 func Login(c *gin.Context) {
 	var user models.User
 	var foundUser models.User
@@ -37,17 +43,29 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Simpan token ke database
+	// Simpan token di database
 	userToken := models.UserToken{
 		UserID: foundUser.ID,
 		Token:  token,
-		Expiry: time.Now().Add(72 * time.Hour), // Misalnya token berlaku 24 jam
+		Expiry: time.Now().Add(time.Hour * 1), // Token berlaku selama 1 jam
 	}
-	initializers.DB.Create(&userToken)
+	if err := initializers.DB.Create(&userToken).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save token to database"})
+		return
+	}
+
+	// Set cookie dengan HttpOnly
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "token",
+		Value:    token,
+		Path:     "/",
+		HttpOnly: false, // Menetapkan cookie sebagai HttpOnly
+		MaxAge:   3600,  // Masa berlaku cookie (1 jam)
+		// secure: true, // Uncomment jika menggunakan HTTPS
+	})
 
 	// Tambahkan informasi pengguna dalam response
 	c.JSON(http.StatusOK, gin.H{
-		"token": token,
 		"user": gin.H{
 			"username": foundUser.Username,
 			"email":    foundUser.Email,
@@ -59,9 +77,9 @@ func GenerateJWT(foundUser models.User) (string, error) {
 	claims := jwt.MapClaims{
 		"username": foundUser.Username,
 		"email":    foundUser.Email,
-		"role":     foundUser.Role,                        // Jika ada field role
-		"sub":      foundUser.ID,                          // Menyimpan userID di klaim
-		"exp":      time.Now().Add(time.Hour * 24).Unix(), // Token berlaku selama 24 jam
+		"role":     foundUser.Role,                       // Jika ada field role
+		"sub":      foundUser.ID,                         // Menyimpan userID di klaim
+		"exp":      time.Now().Add(time.Hour * 1).Unix(), // Token berlaku selama 24 jam
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -120,5 +138,94 @@ func Logout(c *gin.Context) {
 		return
 	}
 
+	// Hapus cookie
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:   "token",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1, // Menghapus cookie
+	})
+
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
+}
+
+func UserIndex(c *gin.Context) {
+
+	// Get models from DB
+	var users []models.User
+	initializers.DB.Find(&users)
+
+	//Respond with them
+	c.JSON(200, gin.H{
+		"users": users,
+	})
+}
+
+func UserUpdate(c *gin.Context) {
+
+	var requestBody requestUser
+
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.Status(400)
+		c.Error(err) // log the error
+		return
+	}
+
+	id := c.Params.ByName("id")
+
+	var users models.User
+	initializers.DB.First(&users, id)
+
+	if err := initializers.DB.First(&users, id).Error; err != nil {
+		c.JSON(404, gin.H{"error": "user tidak ditemukan"})
+		return
+	}
+
+	if requestBody.Username != "" {
+		users.Username = requestBody.Username
+	} else {
+		users.Username = users.Username // gunakan nilai yang ada dari database
+	}
+
+	if requestBody.Email != "" {
+		users.Email = requestBody.Email
+	} else {
+		users.Email = users.Email // gunakan nilai yang ada dari database
+	}
+	if requestBody.Password != "" {
+		users.Password = requestBody.Password
+	} else {
+		users.Password = users.Password // gunakan nilai yang ada dari database
+	}
+
+	initializers.DB.Model(&users).Updates(users)
+
+	c.JSON(200, gin.H{
+		"users": users,
+	})
+
+}
+
+func UserDelete(c *gin.Context) {
+
+	//get id
+	id := c.Params.ByName("id")
+
+	// find the user
+	var users models.User
+
+	if err := initializers.DB.First(&users, id).Error; err != nil {
+		c.JSON(404, gin.H{"error": "users not found"})
+		return
+	}
+
+	/// delete it
+	if err := initializers.DB.Delete(&users).Error; err != nil {
+		c.JSON(404, gin.H{"error": "users Failed to Delete"})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"users": "users deleted",
+	})
 }

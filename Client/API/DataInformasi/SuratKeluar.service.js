@@ -14,8 +14,9 @@ export function getSuratKeluars(callback) {
 }
 
 export function addSuratKeluar(data) {
+  const { username, ...rest } = data;
   return axios
-    .post(`${API_URL}`, data)
+    .post(`${API_URL}`, { ...rest })
     .then((response) => {
       return response.data.SuratKeluar;
     })
@@ -25,8 +26,9 @@ export function addSuratKeluar(data) {
 }
 
 export function updateSuratKeluar(id, data) {
+  const { username,...rest } = data;
   return axios
-    .put(`${API_URL}/${id}`, data)
+    .put(`${API_URL}/${id}`, { ...rest })
     .then((response) => {
       return response.data.SuratKeluar;
     })

@@ -20,6 +20,7 @@ type perdinRequest struct {
 	Tanggal   string `json:"tanggal"`
 	Hotel     string `json:"hotel"`
 	Transport string `json:"transport"`
+	CreateBy  string    `json:"create_by"`
 }
 
 func PerdinCreate(c *gin.Context) {
@@ -43,11 +44,14 @@ func PerdinCreate(c *gin.Context) {
 		return
 	}
 
+	requestBody.CreateBy = c.MustGet("username").(string)
+
 	perdin := models.Perdin{
 		NoPerdin:  requestBody.NoPerdin,
 		Tanggal:   tanggal,
 		Hotel:     requestBody.Hotel,
 		Transport: requestBody.Transport,
+		CreateBy:  requestBody.CreateBy,
 	}
 
 	result := initializers.DB.Create(&perdin)
@@ -110,6 +114,8 @@ func PerdinUpdate(c *gin.Context) {
 		return
 	}
 
+	requestBody.CreateBy = c.MustGet("username").(string)
+
 	if requestBody.Tanggal != "" {
 		tanggal, err := time.Parse("2006-01-02", requestBody.Tanggal)
 		if err != nil {
@@ -130,10 +136,17 @@ func PerdinUpdate(c *gin.Context) {
 	} else {
 		perdin.Transport = perdin.Transport // gunakan nilai yang ada dari database
 	}
+
 	if requestBody.Hotel != "" {
 		perdin.Hotel = requestBody.Hotel
 	} else {
 		perdin.Hotel = perdin.Hotel // gunakan nilai yang ada dari database
+	}
+
+	if requestBody.CreateBy != "" {
+		perdin.CreateBy = requestBody.CreateBy
+	} else {
+		perdin.CreateBy = perdin.CreateBy // gunakan nilai yang ada dari database
 	}
 
 	initializers.DB.Model(&perdin).Updates(perdin)

@@ -3,7 +3,8 @@ package middleware
 import (
 	"fmt"
 	"net/http"
-	"strings"
+
+	// "strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -11,16 +12,14 @@ import (
 
 func TokenAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenString := c.GetHeader("Authorization")
-		if tokenString == "" {
+		cookie, err := c.Cookie("token")
+		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Anda tidak bisa mengakses halaman ini. Silahkan Login Terlebih Dahulu atau Anda Bisa Register Terlebih Dahulu Kepada Admin"})
 			c.Abort()
 			return
 		}
 
-		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
-
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.Parse(cookie, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("metode penandatanganan tidak sesuai")
 			}

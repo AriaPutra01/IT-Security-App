@@ -14,8 +14,9 @@ export function getMemos(callback) {
 }
 
 export function addMemo(data) {
+  const { usernane, ...rest} = data;
   return axios
-    .post(`${API_URL}`, data)
+    .post(`${API_URL}`, { ...rest })
     .then((response) => {
       return response.data.posts;
     })
@@ -25,8 +26,9 @@ export function addMemo(data) {
 }
 
 export function updateMemo(id, data) {
+  const { username, ...rest} = data
   return axios
-    .put(`${API_URL}/${id}`, data)
+    .put(`${API_URL}/${id}`, { ...rest })
     .then((response) => {
       return response.data.posts;
     })

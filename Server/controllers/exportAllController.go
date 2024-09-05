@@ -37,22 +37,12 @@ func ExportAllSheets(c *gin.Context) {
 	}
 
 	// Fetch data from database
-	var sags []models.Sag
 	var memos []models.Memo
-	var isos []models.Iso
-	var surats []models.Surat
-	var beritaAcaras []models.BeritaAcara
-	var sks []models.Sk
 	var projects []models.Project
 	var perdins []models.Perdin
 	var suratMasuks []models.SuratMasuk
 	var suratKeluars []models.SuratKeluar
-	initializers.DB.Find(&sags)
 	initializers.DB.Find(&memos)
-	initializers.DB.Find(&isos)
-	initializers.DB.Find(&surats)
-	initializers.DB.Find(&beritaAcaras)
-	initializers.DB.Find(&sks)
 	initializers.DB.Find(&projects)
 	initializers.DB.Find(&perdins)
 	initializers.DB.Find(&suratMasuks)
@@ -126,29 +116,9 @@ func ExportAllSheets(c *gin.Context) {
 		// Write data rows
 		var dataRows []interface{}
 		switch sheetName {
-		case "SAG":
-			for _, sag := range sags {
-				dataRows = append(dataRows, sag)
-			}
 		case "MEMO":
 			for _, memo := range memos {
 				dataRows = append(dataRows, memo)
-			}
-		case "ISO":
-			for _, iso := range isos {
-				dataRows = append(dataRows, iso)
-			}
-		case "SURAT":
-			for _, surat := range surats {
-				dataRows = append(dataRows, surat)
-			}
-		case "BERITA ACARA":
-			for _, beritaAcara := range beritaAcaras {
-				dataRows = append(dataRows, beritaAcara)
-			}
-		case "SK":
-			for _, sk := range sks {
-				dataRows = append(dataRows, sk)
 			}
 		case "PROJECT":
 			for _, project := range projects {
@@ -171,42 +141,12 @@ func ExportAllSheets(c *gin.Context) {
 		for i, dataRow := range dataRows {
 			rowNum := i + 2 // Start from the second row (first row is header)
 			switch sheetName {
-			case "SAG":
-				sag := dataRow.(models.Sag)
-				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), sag.Tanggal.Format("2006-01-02"))
-				f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), sag.NoMemo)
-				f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), sag.Perihal)
-				f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), sag.Pic)
 			case "MEMO":
 				memo := dataRow.(models.Memo)
 				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), memo.Tanggal.Format("2006-01-02"))
 				f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), memo.NoMemo)
 				f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), memo.Perihal)
 				f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), memo.Pic)
-			case "ISO":
-				iso := dataRow.(models.Iso)
-				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), iso.Tanggal.Format("2006-01-02"))
-				f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), iso.NoMemo)
-				f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), iso.Perihal)
-				f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), iso.Pic)
-			case "SURAT":
-				surat := dataRow.(models.Surat)
-				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), surat.Tanggal.Format("2006-01-02"))
-				f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), surat.NoSurat)
-				f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), surat.Perihal)
-				f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), surat.Pic)
-			case "BERITA ACARA":
-				beritaAcara := dataRow.(models.BeritaAcara)
-				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), beritaAcara.Tanggal.Format("2006-01-02"))
-				f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), beritaAcara.NoSurat)
-				f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), beritaAcara.Perihal)
-				f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), beritaAcara.Pic)
-			case "SK":
-				sk := dataRow.(models.Sk)
-				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), sk.Tanggal.Format("2006-01-02"))
-				f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), sk.NoSurat)
-				f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), sk.Perihal)
-				f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), sk.Pic)
 			case "PROJECT":
 				project := dataRow.(models.Project)
 				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), project.KodeProject)
@@ -288,23 +228,13 @@ func UpdateAllSheets(c *gin.Context) {
 	sheetNames := []string{"SAG", "MEMO", "ISO", "SURAT", "BERITA ACARA", "SK", "PROJECT", "PERDIN", "SURAT MASUK", "SURAT KELUAR"}
 
 	// Fetch updated data from the database
-	var sags []models.Sag
 	var memos []models.Memo
-	var isos []models.Iso
-	var surats []models.Surat
-	var beritaAcaras []models.BeritaAcara
-	var sks []models.Sk
 	var projects []models.Project
 	var perdins []models.Perdin
 	var suratMasuks []models.SuratMasuk
 	var suratKeluars []models.SuratKeluar
 
-	initializers.DB.Find(&sags)
 	initializers.DB.Find(&memos)
-	initializers.DB.Find(&isos)
-	initializers.DB.Find(&surats)
-	initializers.DB.Find(&beritaAcaras)
-	initializers.DB.Find(&sks)
 	initializers.DB.Find(&projects)
 	initializers.DB.Find(&perdins)
 	initializers.DB.Find(&suratMasuks)
@@ -377,29 +307,9 @@ func UpdateAllSheets(c *gin.Context) {
 		// Write data rows
 		var dataRows []interface{}
 		switch sheetName {
-		case "SAG":
-			for _, sag := range sags {
-				dataRows = append(dataRows, sag)
-			}
 		case "MEMO":
 			for _, memo := range memos {
 				dataRows = append(dataRows, memo)
-			}
-		case "ISO":
-			for _, iso := range isos {
-				dataRows = append(dataRows, iso)
-			}
-		case "SURAT":
-			for _, surat := range surats {
-				dataRows = append(dataRows, surat)
-			}
-		case "BERITA ACARA":
-			for _, beritaAcara := range beritaAcaras {
-				dataRows = append(dataRows, beritaAcara)
-			}
-		case "SK":
-			for _, sk := range sks {
-				dataRows = append(dataRows, sk)
 			}
 		case "PROJECT":
 			for _, project := range projects {
@@ -422,42 +332,12 @@ func UpdateAllSheets(c *gin.Context) {
 		for i, dataRow := range dataRows {
 			rowNum := i + 2 // Start from the second row (first row is header)
 			switch sheetName {
-			case "SAG":
-				sag := dataRow.(models.Sag)
-				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), sag.Tanggal.Format("2006-01-02"))
-				f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), sag.NoMemo)
-				f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), sag.Perihal)
-				f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), sag.Pic)
 			case "MEMO":
 				memo := dataRow.(models.Memo)
 				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), memo.Tanggal.Format("2006-01-02"))
 				f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), memo.NoMemo)
 				f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), memo.Perihal)
 				f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), memo.Pic)
-			case "ISO":
-				iso := dataRow.(models.Iso)
-				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), iso.Tanggal.Format("2006-01-02"))
-				f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), iso.NoMemo)
-				f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), iso.Perihal)
-				f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), iso.Pic)
-			case "SURAT":
-				surat := dataRow.(models.Surat)
-				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), surat.Tanggal.Format("2006-01-02"))
-				f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), surat.NoSurat)
-				f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), surat.Perihal)
-				f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), surat.Pic)
-			case "BERITA ACARA":
-				beritaAcara := dataRow.(models.BeritaAcara)
-				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), beritaAcara.Tanggal.Format("2006-01-02"))
-				f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), beritaAcara.NoSurat)
-				f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), beritaAcara.Perihal)
-				f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), beritaAcara.Pic)
-			case "SK":
-				sk := dataRow.(models.Sk)
-				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), sk.Tanggal.Format("2006-01-02"))
-				f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), sk.NoSurat)
-				f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), sk.Perihal)
-				f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), sk.Pic)
 			case "PROJECT":
 				project := dataRow.(models.Project)
 				f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), project.KodeProject)

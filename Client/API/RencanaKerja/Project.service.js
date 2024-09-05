@@ -14,8 +14,9 @@ export function getProjects(callback) {
 }
 
 export function addProject(data) {
+  const { username, ...rest } = data;
   return axios
-    .post(`${API_URL}`, data)
+    .post(`${API_URL}`, { ...rest })
     .then((response) => {
       return response.data.Project;
     })
@@ -25,8 +26,9 @@ export function addProject(data) {
 }
 
 export function updateProject(id, data) {
+  const { username,...rest } = data;
   return axios
-    .put(`${API_URL}/${id}`, data)
+    .put(`${API_URL}/${id}`, { ...rest })
     .then((response) => {
       return response.data.Project;
     })
