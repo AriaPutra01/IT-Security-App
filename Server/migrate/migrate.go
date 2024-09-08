@@ -23,12 +23,14 @@ func main() {
 		&models.SuratMasuk{},
 		&models.SuratKeluar{},
 		&models.Perdin{},
-		&models.RuangRapat{},
-		&models.Notification{},
-		&models.JadwalCuti{},
-		&models.Timeline{},
-		&models.ResourceTimeline{},
+		&models.TimelineProject{},
+		&models.ResourceProject{},
+		&models.TimelineDesktop{},
+		&models.ResourceDesktop{},
 		&models.BookingRapat{},
+		&models.JadwalRapat{},
+		&models.JadwalCuti{},
+		&models.Notification{},
 	)
 
 }

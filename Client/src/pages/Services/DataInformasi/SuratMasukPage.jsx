@@ -12,7 +12,7 @@ import {
   updateSuratMasuk,
 } from "../../../../API/DataInformasi/SuratMasuk.service";
 import { useToken } from "../../../context/TokenContext";
-import { Excel } from "../../../Utilities/Excel"
+import { Excel } from "../../../Utilities/Excel";
 
 export function SuratMasukPage() {
   const [MainData, setMainData] = useState([]);
@@ -45,7 +45,7 @@ export function SuratMasukPage() {
   useEffect(() => {
     getSuratMasuks((data) => {
       // ambil dari API
-      setMainData(data.reverse());
+      setMainData(datae);
     });
   }, []);
 
@@ -78,8 +78,18 @@ export function SuratMasukPage() {
 
   // tambah data
   const AddSubmit = async (data) => {
+    let newFreshId = 0;
+    MainData.forEach((data) => {
+      if (data.ID >= newFreshId) newFreshId = data.ID + 1;
+    });
+    const newData = {
+      ...data,
+      ID: newFreshId,
+      CreatedAt: new Date().toISOString(),
+      UpdatedAt: new Date().toISOString(),
+    };
     try {
-      await addSuratMasuk(data); // tambah data ke API
+      await addSuratMasuk(newData); // tambah data ke API
       Swal.fire({
         icon: "success",
         title: "Berhasil!",
@@ -87,8 +97,7 @@ export function SuratMasukPage() {
         showConfirmButton: false,
         timer: 1500,
       }).then(() => {
-        window.location.reload();
-        setMainData([...MainData, data]);
+        setMainData([...MainData, newData]);
       });
     } catch (error) {
       Swal.fire({

@@ -1,66 +1,70 @@
 import { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid"; // Import UUID
 import Swal from "sweetalert2";
 import App from "../../../components/Layouts/App";
-import { BookingRapatCalendar } from "../../../components/Fragments/Services/Calendar/BookingRapatCalendar";
+import { Calendar } from "../../../components/Fragments/Services/Calendar/Calendar";
 import {
   getBookingRapat,
   addBookingRapat,
   deleteBookingRapat,
 } from "../../../../API/KegiatanProses/BookingRapat.service";
+import { Button, Label, Modal, TextInput } from "flowbite-react";
+import { ColorPick } from "../../../Utilities/ColorPick";
 
 export function BookingRapatPage() {
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [formData, setFormData] = useState({});
   const [currentEvents, setCurrentEvents] = useState([]);
-  const [eventColor, setEventColor] = useState(""); // Menambahkan state untuk warna
-  const handleColorChange = (color) => {
-    setEventColor(color);
+  const onCloseFormModal = () => {
+    setFormModalOpen(false);
+    setFormData({});
   };
+
   // Fetch events
   useEffect(() => {
     getBookingRapat((data) => {
-      setCurrentEvents(data.reverse());
+      setCurrentEvents(data);
     });
   }, []);
 
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    const newEvent = {
+      title: formData.title,
+      start: formData.start,
+      end: formData.end,
+      allDay: formData.allDay,
+      color: formData.color,
+    };
+    try {
+      await addBookingRapat(newEvent);
+      setCurrentEvents((prevEvents) => [...prevEvents, newEvent]);
+      onCloseFormModal();
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Gagal!",
+        text: "Error saat menyimpan data: " + error.message,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  };
+
   // Handle date click to add new event
   const handleDateClick = async (selected) => {
-    const { value: title } = await Swal.fire({
-      title: "Masukan Event!",
-      input: "text",
-      inputAttributes: {
-        autocapitalize: "off",
-      },
-      showCancelButton: true,
-      confirmButtonText: "Simpan",
-      showLoaderOnConfirm: true,
-      preConfirm: (e) => {
-        return {
-          id: uuidv4(),
-          title: e,
-          start: selected.startStr,
-          end: selected.endStr,
-          allDay: selected.allDay,
-          color: eventColor, // Pastikan ini menggunakan state eventColor yang terbaru
-        };
-      },
+    setFormModalOpen(true);
+    setFormData({
+      title: "",
+      start: selected.startStr,
+      end: selected.endStr,
+      allDay: selected.allDay,
+      color: "black",
     });
-    if (title) {
-      try {
-        const newEvent = await addBookingRapat(title);
-        setCurrentEvents((prevEvents) => [...prevEvents, newEvent]); // Pastikan event baru ditambahkan
-        window.location.reload(); // Ini mungkin perlu dihapus untuk menghindari reload
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Gagal!",
-          text: "Error saat menyimpan data: " + error.message,
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      }
-    } else {
-      calendarApi.unselect();
-    }
   };
 
   // Handle event click to delete event
@@ -79,9 +83,7 @@ export function BookingRapatPage() {
           setCurrentEvents((prevEvents) =>
             prevEvents.filter((event) => event.id !== selected.event.id)
           );
-          window.location.reload();
         } catch (error) {
-          // Perbaikan di sini
           Swal.fire({
             icon: "error",
             title: "Gagal!",
@@ -94,14 +96,48 @@ export function BookingRapatPage() {
     });
   };
   return (
-    <App services="Booking Rapat">
-      <BookingRapatCalendar
+    <App services="Booking Ruang Rapat">
+      <Calendar
+        view="dayGridMonth"
         currentEvents={currentEvents}
         handleDateClick={handleDateClick}
         handleEventClick={handleEventClick}
-        onColorChange={handleColorChange} // Pastikan ini sesuai
-        eventColor={eventColor}
       />
+      {/* ModalForm */}
+      <Modal show={formModalOpen} size="xl" onClose={onCloseFormModal} popup>
+        <Modal.Header />
+        <Modal.Body>
+          <form onSubmit={handleFormSubmit}>
+            <div className="grid grid-cols-4 gap-4">
+              <div className="flex flex-col col-span-3">
+                <Label htmlFor="title" value="Title" />
+                <TextInput
+                  id="title"
+                  name="title"
+                  type="text"
+                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 appearance-none  focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                  placeholder="masukan event"
+                  value={formData.title}
+                  onChange={handleFormChange}
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-2 justify-start col-span-1">
+                <Label htmlFor="color" value="Color" />
+                <ColorPick
+                  name="color"
+                  onChange={handleFormChange}
+                  className="w-full h-full mb-2 p-[2px]"
+                />
+              </div>
+              <Button className="col-span-4" type="submit">
+                Simpan
+              </Button>
+            </div>
+          </form>
+        </Modal.Body>
+      </Modal>
+      {/* endModalForm */}
     </App>
   );
 }

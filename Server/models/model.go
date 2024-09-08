@@ -49,6 +49,29 @@ func (i Memo) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// model for perdin
+type Perdin struct {
+	ID        uint      `gorm:"primaryKey"`
+	CreatedAt time.Time `gorm:"autoCreateTime"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime"`
+	NoPerdin  string    `json:"no_perdin"`
+	Tanggal   time.Time `json:"-"`
+	Hotel     string    `json:"hotel"`
+	Transport string    `json:"transport"`
+	CreateBy  string    `json:"create_by"`
+}
+
+func (i Perdin) MarshalJSON() ([]byte, error) {
+	type Alias Perdin
+	return json.Marshal(&struct {
+		Tanggal string `json:"tanggal"` // Format tanggal disesuaikan
+		*Alias
+	}{
+		Tanggal: i.Tanggal.Format("2006-01-02"), // Format tanggal YYYY-MM-DD
+		Alias:   (*Alias)(&i),
+	})
+}
+
 // model for project
 type Project struct {
 	ID              uint      `gorm:"primaryKey"`
@@ -83,56 +106,46 @@ func (i Project) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// model for perdin
-type Perdin struct {
-	ID        uint      `gorm:"primaryKey"`
-	CreatedAt time.Time `gorm:"autoCreateTime"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime"`
-	NoPerdin  string    `json:"no_perdin"`
-	Tanggal   time.Time `json:"-"`
-	Hotel     string    `json:"hotel"`
-	Transport string    `json:"transport"`
-	CreateBy  string    `json:"create_by"`
-}
-
-func (i Perdin) MarshalJSON() ([]byte, error) {
-	type Alias Perdin
-	return json.Marshal(&struct {
-		Tanggal string `json:"tanggal"` // Format tanggal disesuaikan
-		*Alias
-	}{
-		Tanggal: i.Tanggal.Format("2006-01-02"), // Format tanggal YYYY-MM-DD
-		Alias:   (*Alias)(&i),
-	})
-}
-
-// model ruang-rapat
+// model jadwal-rapat
 func generateUUID() uuid.UUID {
 	return uuid.New()
 }
 
-type RuangRapat struct {
+type Notification struct {
+	ID    uint      `gorm:"primaryKey" json:"id"`
+	Title string    `json:"title"`
+	Start time.Time `json:"start"`
+}
+
+type BookingRapat struct {
+	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
+	Title  string `json:"title"`
+	Start  string `json:"start"`
+	End    string `json:"end"`
+	AllDay bool   `json:"allDay"`
+	Color  string `json:"color"` // Tambahkan field ini untuk warna
+}
+
+func (BookingRapat) TableName() string {
+	return "booking_rapats"
+}
+
+type JadwalRapat struct {
 	ID     uuid.UUID `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
 	Title  string    `json:"title"`
 	Start  string    `json:"start"`
 	End    string    `json:"end"`
 	AllDay bool      `json:"allDay"`
-	Color  string    `json:"color"` // Tambahkan field ini untuk warna
+	Color  string    `json:"color"`
 }
 
-func (r *RuangRapat) BeforeCreate(tx *gorm.DB) error {
+func (r *JadwalRapat) BeforeCreate(tx *gorm.DB) error {
 	r.ID = generateUUID()
 	return nil
 }
 
-func (RuangRapat) TableName() string {
-	return "ruang_rapats"
-}
-
-type Notification struct {
-	ID    uint      `gorm:"primaryKey"`
-	Title string    `json:"title"`
-	Start time.Time `json:"start"`
+func (JadwalRapat) TableName() string {
+	return "Jadwal_rapats"
 }
 
 type JadwalCuti struct {
@@ -140,11 +153,11 @@ type JadwalCuti struct {
 	Title  string `json:"title"`
 	Start  string `json:"start"`
 	End    string `json:"end"`
-	AllDay bool   `json:"allday"`
+	AllDay bool   `json:"allDay"`
 	Color  string `json:"color"` // Tambahkan field ini untuk warna
 }
 
-type Timeline struct {
+type TimelineProject struct {
 	ID         uint   `gorm:"primaryKey" json:"id"`
 	Start      string `json:"start"`
 	End        string `json:"end"`
@@ -153,27 +166,33 @@ type Timeline struct {
 	BgColor    string `json:"bgColor"`
 }
 
-func (Timeline) TableName() string {
-	return "timelines"
+func (TimelineProject) TableName() string {
+	return "timeline_projects"
 }
 
-type ResourceTimeline struct {
+type ResourceProject struct {
 	ID       uint   `gorm:"primaryKey" json:"id"`
 	Name     string `json:"name"`
 	ParentID *uint  `json:"parent_id"`
 }
 
-type BookingRapat struct {
-	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
-	Title  string
-	Start  string
-	End    string
-	AllDay bool
-	Color  string `json:"color"` // Tambahkan field ini untuk warna
+type TimelineDesktop struct {
+	ID         uint   `gorm:"primaryKey" json:"id"`
+	Start      string `json:"start"`
+	End        string `json:"end"`
+	ResourceId int    `json:"resourceId"` // Ubah tipe data dari string ke int
+	Title      string `json:"title"`
+	BgColor    string `json:"bgColor"`
 }
 
-func (BookingRapat) TableName() string {
-	return "booking_rapats"
+func (TimelineDesktop) TableName() string {
+	return "timeline_desktops"
+}
+
+type ResourceDesktop struct {
+	ID       uint   `gorm:"primaryKey" json:"id"`
+	Name     string `json:"name"`
+	ParentID *uint  `json:"parent_id"`
 }
 
 // model for suratMasuk

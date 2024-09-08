@@ -47,7 +47,7 @@ func Login(c *gin.Context) {
 	userToken := models.UserToken{
 		UserID: foundUser.ID,
 		Token:  token,
-		Expiry: time.Now().Add(time.Hour * 1), // Token berlaku selama 1 jam
+		Expiry: time.Now().Add(time.Hour * 1 * 24 * 30), // Token berlaku selama 30 hari
 	}
 	if err := initializers.DB.Create(&userToken).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save token to database"})
@@ -59,8 +59,8 @@ func Login(c *gin.Context) {
 		Name:     "token",
 		Value:    token,
 		Path:     "/",
-		HttpOnly: false, // Menetapkan cookie sebagai HttpOnly
-		MaxAge:   3600,  // Masa berlaku cookie (1 jam)
+		HttpOnly: false,          // Menetapkan cookie sebagai HttpOnly
+		MaxAge:   3600 * 24 * 30, // Masa berlaku cookie (30 hari)
 		// secure: true, // Uncomment jika menggunakan HTTPS
 	})
 
@@ -77,13 +77,13 @@ func GenerateJWT(foundUser models.User) (string, error) {
 	claims := jwt.MapClaims{
 		"username": foundUser.Username,
 		"email":    foundUser.Email,
-		"role":     foundUser.Role,                       // Jika ada field role
-		"sub":      foundUser.ID,                         // Menyimpan userID di klaim
-		"exp":      time.Now().Add(time.Hour * 1).Unix(), // Token berlaku selama 24 jam
+		"role":     foundUser.Role,                                 // Jika ada field role
+		"sub":      foundUser.ID,                                   // Menyimpan userID di klaim
+		"exp":      time.Now().Add(time.Hour * 1 * 24 * 30).Unix(), // Token berlaku selama 30 hari
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte("rahasia")) // Ganti "rahasia" dengan secret key Anda
+	tokenString, err := token.SignedString([]byte("KopikapBasi123||Djarumsuper01||Akuganteng123||qwe234223")) // Ganti "rahasia" dengan secret key Anda
 	if err != nil {
 		return "", err
 	}

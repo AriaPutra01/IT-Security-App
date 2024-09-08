@@ -42,7 +42,7 @@ export const UserPage = () => {
   useEffect(() => {
     getUsers((data) => {
       // ambil dari API
-      setMainData(data.reverse());
+      setMainData(data);
     });
   }, []);
 

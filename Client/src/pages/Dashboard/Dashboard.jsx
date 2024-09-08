@@ -5,8 +5,11 @@ import { getSuratKeluars } from "../../../API/DataInformasi/SuratKeluar.service"
 import { getSuratMasuks } from "../../../API/DataInformasi/SuratMasuk.service";
 import { getMemos } from "../../../API/Dokumen/memo.service";
 import { getPerdins } from "../../../API/Dokumen/PerjalananDinas.service";
+import { getEventsProject } from "../../../API/KegiatanProses/TimelineProject.service";
+import { getEventsDesktop } from "../../../API/KegiatanProses/TimelineDesktop.service";
+import { getBookingRapat } from "../../../API/KegiatanProses/BookingRapat.service";
 import { getCutis } from "../../../API/KegiatanProses/JadwalCuti.service";
-import { getRapats } from "../../../API/KegiatanProses/RuangRapat.service";
+import { getRapats } from "../../../API/KegiatanProses/JadwalRapat.service";
 import { getProjects } from "../../../API/RencanaKerja/Project.service";
 import { useToken } from "../../context/TokenContext";
 
@@ -25,6 +28,9 @@ export const DashboardPage = () => {
   const SuratMasuk = useFetchData(getSuratMasuks);
   const Memo = useFetchData(getMemos);
   const Perdin = useFetchData(getPerdins);
+  const TimelineProject = useFetchData(getEventsProject);
+  const TimelineDesktop = useFetchData(getEventsDesktop);
+  const Booking = useFetchData(getBookingRapat);
   const Cuti = useFetchData(getCutis);
   const Rapat = useFetchData(getRapats);
   const Project = useFetchData(getProjects);
@@ -33,9 +39,12 @@ export const DashboardPage = () => {
     <App services="Dashboard">
       <FeatureDashboard
         memo={Memo}
-        project={Project}
-        rapat={Rapat}
         perdin={Perdin}
+        project={Project}
+        timelineProject={TimelineProject}
+        timelineDesktop={TimelineDesktop}
+        booking={Booking}
+        rapat={Rapat}
         cuti={Cuti}
         masuk={SuratMasuk}
         keluar={SuratKeluar}

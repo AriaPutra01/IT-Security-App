@@ -1,13 +1,15 @@
 import React from "react";
 
-export const ColorPick = ({ checked, color, onColorChange }) => {
+export const ColorPick = (props) => {
+  const { name, onChange, className, value } = props;
   return (
     <input
-      type="radio"
-      defaultChecked={checked}
-      name="color"
-      className={`size-6 bg-[${color}] rounded-full cursor-pointer checked:bg-[${color}] checked:ring-[${color}] active:ring-[${color}] hover:scale-105`}
-      onClick={() => onColorChange(color)} // Panggil fungsi onColorChange
+      value={value}
+      className={className}
+      type="color"
+      id={name}
+      name={name}
+      onChange={onChange}
     />
   );
 };

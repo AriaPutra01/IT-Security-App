@@ -82,23 +82,31 @@ func main() {
 	r.GET("/updateProject", controllers.UpdateSheetProject)
 	r.POST("/uploadProject", controllers.ImportExcelProject)
 
-	//Timeline routes
-	r.GET("/timelines", controllers.GetEventsTimeline)
-	r.POST("/timelines", controllers.CreateEventTimeline)
-	r.DELETE("/timelines/:id", controllers.DeleteEventTimeline)
-	r.GET("/resources", controllers.GetResourcesTimeline)
-	r.POST("/resources", controllers.CreateResourceTimeline)
-	r.DELETE("/resources/:id", controllers.DeleteResourceTimeline)
+	//Timeline Project routes
+	r.GET("/timelineProject", controllers.GetEventsProject)
+	r.POST("/timelineProject", controllers.CreateEventProject)
+	r.DELETE("/timelineProject/:id", controllers.DeleteEventProject)
+	r.GET("/resourceProject", controllers.GetResourcesProject)
+	r.POST("/resourceProject", controllers.CreateResourceProject)
+	r.DELETE("/resourceProject/:id", controllers.DeleteResourceProject)
+
+	//Timeline Desktop routes
+	r.GET("/timelineDesktop", controllers.GetEventsDesktop)
+	r.POST("/timelineDesktop", controllers.CreateEventDesktop)
+	r.DELETE("/timelineDesktop/:id", controllers.DeleteEventDesktop)
+	r.GET("/resourceDesktop", controllers.GetResourcesDesktop)
+	r.POST("/resourceDesktop", controllers.CreateResourceDesktop)
+	r.DELETE("/resourceDesktop/:id", controllers.DeleteResourceDesktop)
 
 	//Booking Rapat routes
 	r.GET("/booking-rapat", controllers.GetEventsBookingRapat)
 	r.POST("/booking-rapat", controllers.CreateEventBookingRapat)
 	r.DELETE("/booking-rapat/:id", controllers.DeleteEventBookingRapat)
 
-	// Ruang Rapat routes
-	r.GET("/ruang-rapat", controllers.GetEvents)
-	r.POST("/ruang-rapat", controllers.CreateEvent)
-	r.DELETE("/ruang-rapat/:id", controllers.DeleteEvent)
+	// jadwal Rapat routes
+	r.GET("/jadwal-rapat", controllers.GetEventsRapat)
+	r.POST("/jadwal-rapat", controllers.CreateEventRapat)
+	r.DELETE("/jadwal-rapat/:id", controllers.DeleteEventRapat)
 	r.GET("/notifications", controllers.GetNotifications)
 	r.DELETE("/notifications/:id", controllers.DeleteNotification)
 

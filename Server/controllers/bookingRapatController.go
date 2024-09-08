@@ -11,7 +11,7 @@ import (
 )
 
 type BookingRapat struct {
-	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()";json:"id"`
+	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"; json:"id"`
 	Title  string `json:"title"`
 	Start  string `json:"start"`
 	End    string `json:"end"`

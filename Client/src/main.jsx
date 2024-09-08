@@ -24,7 +24,8 @@ import { PerdinPage } from "./pages/Services/Dokumen/PerjalananDinasPage";
 import { ProjectPage } from "./pages/Services/RencanaKerja/ProjectPage";
 import { BaseProjectPage } from "./pages/Services/RencanaKerja/BaseProjectPage";
 // Kegiatan Proses
-import TimelinePage from "./pages/Services/KegiatanProses/TimelinePage";
+import { TimelineProjectPage } from "./pages/Services/KegiatanProses/TimelineProjectPage";
+import { TimelineDesktopPage } from "./pages/Services/KegiatanProses/TimelineDesktopPage";
 import { BookingRapatPage } from "./pages/Services/KegiatanProses/BookingRapatPage";
 import { JadwalRapatPage } from "./pages/Services/KegiatanProses/JadwalRapatPage";
 import { JadwalCutiPage } from "./pages/Services/KegiatanProses/JadwalCutiPage";
@@ -33,7 +34,6 @@ import { SuratMasukPage } from "./pages/Services/DataInformasi/SuratMasukPage";
 import { SuratKeluarPage } from "./pages/Services/DataInformasi/SuratKeluarPage";
 
 import axios from "axios";
-
 axios.defaults.withCredentials = true; // Izinkan pengiriman cookie
 
 const ProtectedRoute = ({ children, requiredRole }) => {
@@ -117,10 +117,18 @@ const router = createBrowserRouter([
   },
   // Kegiatan Proses
   {
-    path: "/timeline",
+    path: "/timeline-project",
     element: (
       <ProtectedRoute>
-        <TimelinePage />
+        <TimelineProjectPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/timeline-desktop",
+    element: (
+      <ProtectedRoute>
+        <TimelineDesktopPage />
       </ProtectedRoute>
     ),
   },

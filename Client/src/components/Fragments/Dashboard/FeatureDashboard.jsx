@@ -33,19 +33,45 @@ const DataItem = ({ count, label, color }) => (
 );
 
 export const FeatureDashboard = (props) => {
-  const { memo, perdin, project, rapat, cuti, masuk, keluar } = props;
+  const {
+    memo,
+    perdin,
+    project,
+    timelineProject,
+    timelineDesktop,
+    booking,
+    rapat,
+    cuti,
+    masuk,
+    keluar,
+  } = props;
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="grid grid-cols-4 gap-5">
-        {/* Kegiatan & Proses */}
+      <div className="grid grid-cols-5 gap-5">
+        {/* Kegiatan */}
         <Section
-          span="col-span-3"
-          cols="grid-cols-4"
-          title="Data Kegiatan & Proses"
+          span="col-span-4"
+          cols="grid-cols-5"
+          title="Data Kegiatan"
           borderColor="yellow"
         >
-          <DataItem count={rapat.length} label="Ruang Rapat" color="yellow" />
+          <DataItem
+            count={timelineProject.length}
+            label="Timeline Project"
+            color="yellow"
+          />
+          <DataItem
+            count={timelineDesktop.length}
+            label="Timeline Desktop"
+            color="yellow"
+          />
+          <DataItem
+            count={booking.length}
+            label="Booking Ruang Rapat"
+            color="yellow"
+          />
+          <DataItem count={rapat.length} label="Jadwal Rapat" color="yellow" />
           <DataItem count={cuti.length} label="Jadwal Cuti" color="yellow" />
         </Section>
 
@@ -72,7 +98,7 @@ export const FeatureDashboard = (props) => {
           <DataItem
             count={perdin.length}
             label="Perjalanan Dinas"
-            color="yellow"
+            color="cyan"
           />
         </Section>
 

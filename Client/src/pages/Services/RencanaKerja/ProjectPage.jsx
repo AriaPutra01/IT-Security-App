@@ -81,7 +81,7 @@ export function ProjectPage() {
   useEffect(() => {
     getProjects((data) => {
       // ambil dari API
-      setMainData(data.reverse());
+      setMainData(data);
     });
   }, []);
 
@@ -114,8 +114,18 @@ export function ProjectPage() {
 
   // tambah data
   const AddSubmit = async (data) => {
+    let newFreshId = 0;
+    MainData.forEach((data) => {
+      if (data.ID >= newFreshId) newFreshId = data.ID + 1;
+    });
+    const newData = {
+      ...data,
+      ID: newFreshId,
+      CreatedAt: new Date().toISOString(),
+      UpdatedAt: new Date().toISOString(),
+    };
     try {
-      await addProject(data); // tambah data ke API
+      await addProject(newData); // tambah data ke API
       Swal.fire({
         icon: "success",
         title: "Berhasil!",
@@ -123,8 +133,7 @@ export function ProjectPage() {
         showConfirmButton: false,
         timer: 1500,
       }).then(() => {
-        window.location.reload();
-        setMainData([...MainData, data]);
+        setMainData([...MainData, newData]);
       });
     } catch (error) {
       Swal.fire({

@@ -40,7 +40,7 @@ export function SuratKeluarPage() {
   useEffect(() => {
     getSuratKeluars((data) => {
       // ambil dari API
-      setMainData(data.reverse());
+      setMainData(data);
     });
   }, []);
 
@@ -73,8 +73,18 @@ export function SuratKeluarPage() {
 
   // tambah data
   const AddSubmit = async (data) => {
+    let newFreshId = 0;
+    MainData.forEach((data) => {
+      if (data.ID >= newFreshId) newFreshId = data.ID + 1;
+    });
+    const newData = {
+      ...data,
+      ID: newFreshId,
+      CreatedAt: new Date().toISOString(),
+      UpdatedAt: new Date().toISOString(),
+    };
     try {
-      await addSuratKeluar(data); // tambah data ke API
+      await addSuratKeluar(newData); // tambah data ke API
       Swal.fire({
         icon: "success",
         title: "Berhasil!",
@@ -82,8 +92,7 @@ export function SuratKeluarPage() {
         showConfirmButton: false,
         timer: 1500,
       }).then(() => {
-        window.location.reload();
-        setMainData([...MainData, data]);
+        setMainData([...MainData, newData]);
       });
     } catch (error) {
       Swal.fire({
