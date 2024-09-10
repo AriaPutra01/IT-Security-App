@@ -13,7 +13,6 @@ import (
 func SetNotification(title string, startTime time.Time) {
 	// Set lokasi ke WIB
 	loc, err := time.LoadLocation("Asia/Jakarta")
-	if err != nil {
 		log.Printf("Error loading location: %v", err)
 		return
 	}
@@ -55,10 +54,8 @@ func SetNotification(title string, startTime time.Time) {
 	}
 }
 
-func GetNotifications(c *gin.Context) {
+=======
 	var notifications []models.Notification
-	if err := initializers.DB.Find(&notifications).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, notifications)
@@ -66,10 +63,10 @@ func GetNotifications(c *gin.Context) {
 
 func DeleteNotification(c *gin.Context) {
 	id := c.Param("id")
+<<<<<<< HEAD
 	log.Printf("ID yang diterima untuk dihapus: %s", id) // Tambahkan log ini
 	if id == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID harus disertakan"})
-		return
 	}
 
 	// Menghapus notifikasi berdasarkan ID
@@ -79,4 +76,7 @@ func DeleteNotification(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent) // Mengembalikan status 204 No Content
-}
+=======
+	log.Printf("Received ID: %s", id)
+
+	notificationID, err := strconv.Atoi(id)
