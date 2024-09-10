@@ -3,7 +3,9 @@ import Swal from "sweetalert2";
 import { Button, Label, Modal, TextInput } from "flowbite-react";
 import { ColorPick } from "../../../../Utilities/ColorPick";
 import FullCalendar from "@fullcalendar/react";
-import { formatDate } from "@fullcalendar/core";
+import { format } from "date-fns";
+import idLocale from "date-fns/locale/id";
+// import { formatDate } from "@fullcalendar/core";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -13,6 +15,7 @@ export const Calendar = ({ view, get, add, remove }) => {
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [formData, setFormData] = useState({});
   const [currentEvents, setCurrentEvents] = useState([]);
+
   const onCloseFormModal = () => {
     setFormModalOpen(false);
     setFormData({});
@@ -62,7 +65,7 @@ export const Calendar = ({ view, get, add, remove }) => {
       start: selected.startStr,
       end: selected.endStr,
       allDay: selected.allDay,
-      color: "#2596be",
+      color: "#4285f4",
     });
   };
 
@@ -111,21 +114,22 @@ export const Calendar = ({ view, get, add, remove }) => {
               </p>
             </div>
           ) : (
-            currentEvents.map((event) => (
-              <div
-                key={event.id}
-                className="overflow-auto grow border-b-2 border-l-2 border-sky-500 shadow p-2 rounded"
-              >
-                <div className="text-sky-500 font-bold">{event.title}</div>
-                <div className="">
-                  {formatDate(event.start, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  })}
+            currentEvents.map((event) => {
+              return (
+                <div
+                  key={event.id}
+                  className="ring-2 ring-slate-200 overflow-auto grow shadow py-2 px-3 rounded"
+                  style={{ backgroundColor: event.color }}
+                >
+                  <div className="font-bold text-white">{event.title}</div>
+                  <div className="text-white">
+                    {format(event.start, "dd MMMM HH:mm", {
+                      locale: idLocale,
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
@@ -157,8 +161,8 @@ export const Calendar = ({ view, get, add, remove }) => {
         <Modal.Header />
         <Modal.Body>
           <form onSubmit={handleFormSubmit}>
-            <div className="grid grid-cols-4 gap-4">
-              <div className="flex flex-col col-span-3">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col">
                 <Label htmlFor="title" value="Title" />
                 <TextInput
                   id="title"
@@ -171,13 +175,27 @@ export const Calendar = ({ view, get, add, remove }) => {
                   required
                 />
               </div>
-              <div className="flex flex-col gap-2 justify-start col-span-1">
+              <div className="flex flex-col gap-2 justify-start">
                 <Label htmlFor="color" value="Color" />
                 <ColorPick
+                  colors={[
+                    {
+                      id: "blue",
+                      label: "Blue",
+                      value: "#4285f4",
+                      checked: true,
+                    },
+                    { id: "red", label: "Red", value: "#db4437" },
+                    { id: "yellow", label: "Yellow", value: "#fbbc05" },
+                    { id: "green", label: "Green", value: "#0f9d58" },
+                    { id: "teal", label: "Teal", value: "#00bfa5" },
+                    { id: "purple", label: "Purple", value: "#9c27b0" },
+                    { id: "pink", label: "Pink", value: "#e91e63" },
+                  ]}
                   name="color"
                   value={formData.color}
                   onChange={handleFormChange}
-                  className="w-full h-full mb-2 p-[2px]"
+                  className="mb-2 p-[2px]"
                 />
               </div>
               <Button className="col-span-4" type="submit">

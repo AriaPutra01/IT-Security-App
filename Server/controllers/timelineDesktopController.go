@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"project-its/initializers"
 	"project-its/models"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,7 +29,23 @@ func CreateEventDesktop(c *gin.Context) {
 		return
 	}
 
-	setNotification(&event)
+	// Parsing waktu untuk notifikasi
+	loc, err := time.LoadLocation("Asia/Jakarta")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error loading location"})
+		return
+	}
+
+	// Ubah format parsing sesuai dengan format yang diterima
+	startTime, err := time.ParseInLocation("2006-01-02 15:04:05", event.Start, loc) // Ubah format di sini
+	if err != nil {
+		log.Printf("Error parsing start time: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error parsing start time"})
+		return
+	}
+
+	// Panggil fungsi SetNotification
+	SetNotification(event.Title, startTime)
 
 	if err := initializers.DB.Create(&event).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

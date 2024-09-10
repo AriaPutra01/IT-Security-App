@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"project-its/initializers"
 	"project-its/models"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,7 +27,28 @@ func CreateEventRapat(c *gin.Context) {
 		return
 	}
 
-	setNotification(&event)
+	// Set notification menggunakan fungsi dari notificationController
+	loc, err := time.LoadLocation("Asia/Jakarta")
+	if err != nil {
+		log.Printf("Error loading location: %v", err)
+		return
+	}
+
+	var startTime time.Time
+	if event.AllDay {
+		// Jika AllDay = true, set waktu ke tengah malam
+		startTime, err = time.ParseInLocation("2006-01-02T15:04:05", event.Start+"T00:00:00", loc)
+	} else {
+		// Jika tidak, parse dengan format RFC3339
+		startTime, err = time.ParseInLocation(time.RFC3339, event.Start, loc)
+	}
+
+	if err != nil {
+		log.Printf("Error parsing start time: %v", err)
+		return
+	}
+
+	SetNotification(event.Title, startTime) // Panggil fungsi SetNotification
 
 	if err := initializers.DB.Create(&event).Error; err != nil {
 		log.Printf("Error creating event: %v", err)
