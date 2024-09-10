@@ -16,11 +16,12 @@ import (
 )
 
 type perdinRequest struct {
+	ID        uint   `gorm:"primaryKey"`
 	NoPerdin  string `json:"no_perdin"`
 	Tanggal   string `json:"tanggal"`
 	Hotel     string `json:"hotel"`
 	Transport string `json:"transport"`
-	CreateBy  string    `json:"create_by"`
+	CreateBy  string `json:"create_by"`
 }
 
 func PerdinCreate(c *gin.Context) {
@@ -63,7 +64,7 @@ func PerdinCreate(c *gin.Context) {
 
 	// Return it
 	c.JSON(200, gin.H{
-		"Perdin": perdin,
+		"perdin": perdin,
 	})
 
 }
@@ -76,7 +77,7 @@ func PerdinIndex(c *gin.Context) {
 
 	//Respond with them
 	c.JSON(200, gin.H{
-		"Perdin": perdin,
+		"perdin": perdin,
 	})
 }
 
@@ -90,7 +91,7 @@ func PerdinShow(c *gin.Context) {
 
 	//Respond with them
 	c.JSON(200, gin.H{
-		"Perdin": perdin,
+		"perdin": perdin,
 	})
 }
 
@@ -177,7 +178,7 @@ func PerdinDelete(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"Perdin": "Perdin deleted",
+		"perdin": "Perdin deleted",
 	})
 }
 

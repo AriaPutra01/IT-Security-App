@@ -9,9 +9,9 @@ import { BiLogOut } from "react-icons/bi";
 import { Dropdown } from "flowbite-react";
 import { useState, useEffect } from "react";
 import {
-  deleteNotifRapat,
-  GetNotifRapat,
-} from "../../../API/KegiatanProses/Notification/NotifRuangRapat";
+  deleteNotification,
+  GetNotification,
+} from "../../../API/KegiatanProses/Notification/Notification";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import Swal from "sweetalert2";
@@ -50,9 +50,7 @@ const App = (props) => {
 
   // Fetch events
   useEffect(() => {
-    GetNotifRapat((event) => {
-      setNotification(event);
-    });
+    GetNotification(setNotification);
   }, []);
 
   const handleDelete = async (id) => {
@@ -66,7 +64,7 @@ const App = (props) => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteNotifRapat(id); // hapus data di API
+          await deleteNotification(id); // hapus data di API
           setNotification((prevData) =>
             prevData.filter((event) => event.ID !== id)
           );
@@ -81,7 +79,7 @@ const App = (props) => {
     <div className="grid grid-cols-2fr">
       <Sidebar
         img="../../../public/images/logobjb.png"
-        title="Virtual Office"
+        title="IT Security"
         username={userDetails.username}
         email={userDetails.email}
       >
@@ -119,8 +117,8 @@ const App = (props) => {
           icon={<BiLogOut />}
         />
       </Sidebar>
-      <div className="grid grid-rows-2fr">
-        <div className="mx-4 pe-2 mt-2 flex justify-between border-b-2 border-gray-100">
+      <div className="grid grid-rows-2fr h-screen">
+        <header className="mx-4 pe-2 mt-2 flex justify-between border-b-2 border-gray-100">
           <div className="flex gap-2 items-end m-2">
             <div>
               <Label className="block text-sm">Halaman</Label>
@@ -211,7 +209,7 @@ const App = (props) => {
               })
             )}
           </Dropdown>
-        </div>
+        </header>
         <div className="mt-4 px-2 w-full overflow-auto">{children}</div>
       </div>
     </div>

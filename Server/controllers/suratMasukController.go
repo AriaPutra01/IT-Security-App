@@ -16,12 +16,13 @@ import (
 )
 
 type SuratMasukRequest struct {
+	ID         uint   `gorm:"primaryKey"`
 	NoSurat    string `json:"no_surat"`
 	Title      string `json:"title"`
 	RelatedDiv string `json:"related_div"`
 	DestinyDiv string `json:"destiny_div"`
 	Tanggal    string `json:"tanggal"`
-	CreateBy string `json:"create_by"`
+	CreateBy   string `json:"create_by"`
 }
 
 func SuratMasukCreate(c *gin.Context) {
@@ -54,7 +55,7 @@ func SuratMasukCreate(c *gin.Context) {
 		RelatedDiv: requestBody.RelatedDiv,
 		DestinyDiv: requestBody.DestinyDiv,
 		Tanggal:    tanggal,
-		CreateBy: requestBody.CreateBy,
+		CreateBy:   requestBody.CreateBy,
 	}
 
 	result := initializers.DB.Create(&surat_masuk)
@@ -184,7 +185,7 @@ func SuratMasukDelete(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"message": "Deleted",
+		"SuratMasuk": "Deleted",
 	})
 }
 

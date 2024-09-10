@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -107,10 +106,6 @@ func (i Project) MarshalJSON() ([]byte, error) {
 }
 
 // model jadwal-rapat
-func generateUUID() uuid.UUID {
-	return uuid.New()
-}
-
 type Notification struct {
 	ID    uint      `gorm:"primaryKey" json:"id"`
 	Title string    `json:"title"`
@@ -118,7 +113,7 @@ type Notification struct {
 }
 
 type BookingRapat struct {
-	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
+	ID     uint   `gorm:"primaryKey" json:"id"`
 	Title  string `json:"title"`
 	Start  string `json:"start"`
 	End    string `json:"end"`
@@ -131,25 +126,20 @@ func (BookingRapat) TableName() string {
 }
 
 type JadwalRapat struct {
-	ID     uuid.UUID `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
-	Title  string    `json:"title"`
-	Start  string    `json:"start"`
-	End    string    `json:"end"`
-	AllDay bool      `json:"allDay"`
-	Color  string    `json:"color"`
-}
-
-func (r *JadwalRapat) BeforeCreate(tx *gorm.DB) error {
-	r.ID = generateUUID()
-	return nil
+	ID     uint   `gorm:"primaryKey" json:"id"`
+	Title  string `json:"title"`
+	Start  string `json:"start"`
+	End    string `json:"end"`
+	AllDay bool   `json:"allDay"`
+	Color  string `json:"color"`
 }
 
 func (JadwalRapat) TableName() string {
-	return "Jadwal_rapats"
+	return "jadwal_rapats"
 }
 
 type JadwalCuti struct {
-	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()" json:"id"`
+	ID     uint   `gorm:"primaryKey" json:"id"`
 	Title  string `json:"title"`
 	Start  string `json:"start"`
 	End    string `json:"end"`

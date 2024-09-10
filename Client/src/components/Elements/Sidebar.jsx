@@ -25,9 +25,7 @@ export default function Sidebar({ children, img, title, username, email }) {
               alt=""
             />
             {expanded && (
-              <span className="text-gray-600 font-bold text-xl">
-                <i>{title}</i>
-              </span>
+              <span className="text-gray-600 font-bold text-xl">{title}</span>
             )}
           </div>
           <button
@@ -74,6 +72,7 @@ export default function Sidebar({ children, img, title, username, email }) {
 }
 
 export function SidebarItem({
+  onClick,
   href,
   icon = <MdKeyboardArrowRight />,
   text,
@@ -86,6 +85,7 @@ export function SidebarItem({
   return (
     <li>
       <Link
+        onClick={onClick}
         className={`
         relative flex items-center py-2 px-3 my-1
         font-medium rounded-md cursor-pointer
@@ -119,7 +119,7 @@ export function SidebarItem({
           <div
             className={`
           absolute z-10 left-full rounded-md px-2 py-1 ml-6
-          bg-sky-100 text-sky-800 text-sm
+          bg-sky-100 text-sky-800 hover:scale-110 hover:ring-2 text-sm
           invisible opacity-20 -translate-x-3 transition-all
           group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
           `}
@@ -188,7 +188,7 @@ export function SidebarCollapse({ children, icon, text, alert }) {
               <div key={index} className="relative group">
                 <Link
                   to={child.props.href}
-                  className={`absolute z-10 left-full rounded-md px-2 py-1 ml-6 bg-sky-100 text-sky-800 text-sm invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0`}
+                  className={`absolute z-10 left-full rounded-md px-2 py-1 ml-6 bg-sky-100 text-sky-800 hover:scale-110 hover:ring-2 text-sm invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0`}
                   style={{ marginTop: `${index * 2}rem` }}
                 >
                   <span className="w-max">

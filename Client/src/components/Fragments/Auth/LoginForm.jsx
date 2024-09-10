@@ -21,8 +21,7 @@ export function LoginForm() {
     } catch (error) {
       Swal.fire({
         icon: "error",
-        title: `Login Gagal`,
-        text: "Silahkan Coba Lagi",
+        title: error.response.data.error + "!",
       });
     }
   };

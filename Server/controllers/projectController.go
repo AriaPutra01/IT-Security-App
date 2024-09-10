@@ -16,6 +16,7 @@ import (
 )
 
 type ProjectRequest struct {
+	ID              uint   `gorm:"primaryKey"`
 	KodeProject     string `json:"kode_project"`
 	JenisPengadaan  string `json:"jenis_pengadaan"`
 	NamaPengadaan   string `json:"nama_pengadaan"`
@@ -27,7 +28,7 @@ type ProjectRequest struct {
 	TanggalIzin     string `json:"tanggal_izin"`
 	TanggalTor      string `json:"tanggal_tor"`
 	Pic             string `json:"pic"`
-	CreateBy string `json:"create_by"`
+	CreateBy        string `json:"create_by"`
 }
 
 func ProjectCreate(c *gin.Context) {
@@ -44,7 +45,7 @@ func ProjectCreate(c *gin.Context) {
 	// Add some logging to see what's being received
 	log.Println("Received request body:", requestBody)
 
-	requestBody.CreateBy = c.MustGet("username").(string) 
+	requestBody.CreateBy = c.MustGet("username").(string)
 
 	// Parse the date string
 	bulanString := requestBody.Bulan
@@ -83,7 +84,7 @@ func ProjectCreate(c *gin.Context) {
 		TanggalIzin:     tanggal_izin,
 		TanggalTor:      tanggal_tor,
 		Pic:             requestBody.Pic,
-		CreateBy: requestBody.CreateBy,
+		CreateBy:        requestBody.CreateBy,
 	}
 
 	result := initializers.DB.Create(&project)
@@ -95,7 +96,7 @@ func ProjectCreate(c *gin.Context) {
 
 	// Return it
 	c.JSON(200, gin.H{
-		"Project": project,
+		"project": project,
 	})
 
 }
@@ -108,7 +109,7 @@ func ProjectIndex(c *gin.Context) {
 
 	//Respond with them
 	c.JSON(200, gin.H{
-		"Project": project,
+		"project": project,
 	})
 }
 
@@ -123,7 +124,7 @@ func ProjectShow(c *gin.Context) {
 
 	//Respond with them
 	c.JSON(200, gin.H{
-		"Project": project,
+		"project": project,
 	})
 }
 
@@ -233,7 +234,7 @@ func ProjectUpdate(c *gin.Context) {
 	initializers.DB.Model(&project).Updates(project)
 
 	c.JSON(200, gin.H{
-		"Project": project,
+		"project": project,
 	})
 
 }
@@ -258,7 +259,7 @@ func ProjectDelete(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"message": "Deleted",
+		"project": "Deleted",
 	})
 }
 

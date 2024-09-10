@@ -45,7 +45,6 @@ export const FeatureDashboard = (props) => {
     masuk,
     keluar,
   } = props;
-
   return (
     <div className="flex flex-col gap-5">
       <div className="grid grid-cols-5 gap-5">
