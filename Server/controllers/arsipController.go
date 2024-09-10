@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"project-its/initializers"
 	"project-its/models"
 
@@ -14,10 +15,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	accountName   = "itsproject"
-	accountKey    = "EnrPkwbyOBKlj57MliEipaIyhiYopF8RxlJL3htHGCLXg2vlTfIwiGQedB+GS9XiN95azazsLANb+ASt72N5xQ=="
-	containerName = "projectits"
+var (
+	accountName  = os.Getenv("ACCOUNT_NAME")
+	accountKey    = os.Getenv("ACCOUNT_KEY")
+	containerName = os.Getenv("CONTAINER_NAME")
 )
 
 func getBlobServiceClient() azblob.ServiceURL {
@@ -41,64 +42,62 @@ func getBlobServiceClient() azblob.ServiceURL {
 }
 
 func UploadHandler(c *gin.Context) {
-    id := c.PostForm("id") // Mendapatkan ID dari form data
-    file, err := c.FormFile("file")
-    if err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "File diperlukan"})
-        return
-    }
+	id := c.PostForm("id") // Mendapatkan ID dari form data
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "File diperlukan"})
+		return
+	}
 
-    // Membuat path berdasarkan ID
-    filename := fmt.Sprintf("%s/%s", id, file.Filename)
+	// Membuat path berdasarkan ID
+	filename := fmt.Sprintf("%s/%s", id, file.Filename)
 
-    // Membuka file
-    src, err := file.Open()
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuka file"})
-        return
-    }
-    defer src.Close()
+	// Membuka file
+	src, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuka file"})
+		return
+	}
+	defer src.Close()
 
-    // Mengunggah file ke Azure Blob Storage
-    containerURL := getBlobServiceClient().NewContainerURL(containerName)
-    blobURL := containerURL.NewBlockBlobURL(filename)
+	// Mengunggah file ke Azure Blob Storage
+	containerURL := getBlobServiceClient().NewContainerURL(containerName)
+	blobURL := containerURL.NewBlockBlobURL(filename)
 
-    _, err = azblob.UploadStreamToBlockBlob(context.TODO(), src, blobURL, azblob.UploadStreamToBlockBlobOptions{})
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengunggah file"})
-        return
-    }
+	_, err = azblob.UploadStreamToBlockBlob(context.TODO(), src, blobURL, azblob.UploadStreamToBlockBlobOptions{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengunggah file"})
+		return
+	}
 
-    c.JSON(http.StatusOK, gin.H{"message": "File berhasil diunggah"})
+	c.JSON(http.StatusOK, gin.H{"message": "File berhasil diunggah"})
 }
-
 
 func GetFilesByID(c *gin.Context) {
-    id := c.Param("id") // Mendapatkan ID dari URL
+	id := c.Param("id") // Mendapatkan ID dari URL
 
-    containerURL := getBlobServiceClient().NewContainerURL(containerName)
-    prefix := fmt.Sprintf("%s/", id) // Prefix untuk daftar blob di folder tertentu (ID)
+	containerURL := getBlobServiceClient().NewContainerURL(containerName)
+	prefix := fmt.Sprintf("%s/", id) // Prefix untuk daftar blob di folder tertentu (ID)
 
-    var files []string
-    for marker := (azblob.Marker{}); marker.NotDone(); {
-        listBlob, err := containerURL.ListBlobsFlatSegment(context.TODO(), marker, azblob.ListBlobsSegmentOptions{
-            Prefix: prefix, // Hanya daftar blob dengan prefix yang ditentukan (folder)
-        })
-        if err != nil {
-            c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat daftar file"})
-            return
-        }
+	var files []string
+	for marker := (azblob.Marker{}); marker.NotDone(); {
+		listBlob, err := containerURL.ListBlobsFlatSegment(context.TODO(), marker, azblob.ListBlobsSegmentOptions{
+			Prefix: prefix, // Hanya daftar blob dengan prefix yang ditentukan (folder)
+		})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat daftar file"})
+			return
+		}
 
-        for _, blobInfo := range listBlob.Segment.BlobItems {
-            files = append(files, blobInfo.Name)
-        }
+		for _, blobInfo := range listBlob.Segment.BlobItems {
+			files = append(files, blobInfo.Name)
+		}
 
-        marker = listBlob.NextMarker
-    }
+		marker = listBlob.NextMarker
+	}
 
-    c.JSON(http.StatusOK, gin.H{"files": files}) // Pastikan mengembalikan array files
+	c.JSON(http.StatusOK, gin.H{"files": files}) // Pastikan mengembalikan array files
 }
-
 
 // Fungsi untuk menghapus file dari Azure Blob Storage
 func DeleteFileHandler(c *gin.Context) {
@@ -109,8 +108,8 @@ func DeleteFileHandler(c *gin.Context) {
 		return
 	}
 
-		// Membuat path lengkap berdasarkan ID dan nama file
-		fullPath := fmt.Sprintf("%s/%s", id, filename)
+	// Membuat path lengkap berdasarkan ID dan nama file
+	fullPath := fmt.Sprintf("%s/%s", id, filename)
 
 	containerURL := getBlobServiceClient().NewContainerURL(containerName)
 	blobURL := containerURL.NewBlockBlobURL(fullPath)

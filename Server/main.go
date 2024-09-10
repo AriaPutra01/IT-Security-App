@@ -48,7 +48,6 @@ func main() {
 	store := cookie.NewStore([]byte("secret"))
 	r.Use(sessions.Sessions("mysession", store))
 
-	r.GET("/updateAll", controllers.UpdateAllSheets)
 	r.GET("/exportAll", controllers.ExportAllSheets)
 
 	// Setup session store
@@ -69,7 +68,6 @@ func main() {
 	r.PUT("/memos/:id", controllers.MemoUpdate)
 	r.DELETE("/memos/:id", controllers.MemoDelete)
 	r.GET("/exportMemo", controllers.CreateExcelMemo)
-	r.GET("/updateMemo", controllers.UpdateSheetMemo)
 	r.POST("/uploadMemo", controllers.ImportExcelMemo)
 
 	//Project routes
@@ -78,7 +76,6 @@ func main() {
 	r.GET("/Project", controllers.ProjectIndex)
 	r.DELETE("/Project/:id", controllers.ProjectDelete)
 	r.GET("/exportProject", controllers.CreateExcelProject)
-	r.GET("/updateProject", controllers.UpdateSheetProject)
 	r.POST("/uploadProject", controllers.ImportExcelProject)
 
 	//Timeline routes
@@ -113,7 +110,6 @@ func main() {
 	r.DELETE("/Perdin/:id", controllers.PerdinDelete)
 	r.GET("/Perdin/:id", controllers.PerdinShow)
 	r.GET("/exportPerdin", controllers.CreateExcelPerdin)
-	r.GET("/updatePerdin", controllers.UpdateSheetPerdin)
 	r.POST("/uploadPerdin", controllers.ImportExcelPerdin)
 
 	//Surat  Masuk routes
@@ -123,7 +119,6 @@ func main() {
 	r.DELETE("/SuratMasuk/:id", controllers.SuratMasukDelete)
 	r.GET("/SuratMasuk/:id", controllers.SuratMasukShow)
 	r.GET("/exportSuratMasuk", controllers.CreateExcelSuratMasuk)
-	r.GET("/updateSuratMasuk", controllers.UpdateSheetSuratMasuk)
 	r.POST("/uploadSuratMasuk", controllers.ImportExcelSuratMasuk)
 
 	//Surat  Keluar routes
@@ -133,7 +128,6 @@ func main() {
 	r.DELETE("/SuratKeluar/:id", controllers.SuratKeluarDelete)
 	r.GET("/SuratKeluar/:id", controllers.SuratKeluarShow)
 	r.GET("/exportSuratKeluar", controllers.CreateExcelSuratKeluar)
-	r.GET("/updateSuratKeluar", controllers.UpdateSheetSuratKeluar)
 	r.POST("/uploadSuratKeluar", controllers.ImportExcelSuratKeluar)
 
 	// Rute untuk upload file

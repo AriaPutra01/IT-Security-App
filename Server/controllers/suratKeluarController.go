@@ -250,62 +250,6 @@ func CreateExcelSuratKeluar(c *gin.Context) {
 	c.Writer.Write(buf.Bytes())
 }
 
-func UpdateSheetSuratKeluar(c *gin.Context) {
-	dir := "D:\\excel"
-	fileName := "its_report.xlsx"
-	filePath := filepath.Join(dir, fileName)
-
-	// Check if the file exists
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		c.String(http.StatusBadRequest, "File tidak ada")
-		return
-	}
-
-	// Open the existing Excel file
-	f, err := excelize.OpenFile(filePath)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Error membuka file: %v", err)
-		return
-	}
-	defer f.Close()
-
-	// Define sheet name
-	sheetName := "SURAT KELUAR"
-
-	// Check if sheet exists and delete it if it does
-	if _, err := f.GetSheetIndex(sheetName); err == nil {
-		f.DeleteSheet(sheetName)
-	}
-	f.NewSheet(sheetName)
-
-	// Write header row
-	f.SetCellValue(sheetName, "A1", "No Surat")
-	f.SetCellValue(sheetName, "B1", "Title")
-	f.SetCellValue(sheetName, "C1", "From")
-	f.SetCellValue(sheetName, "D1", "Pic")
-	f.SetCellValue(sheetName, "E1", "Tanggal")
-
-	// Fetch updated data from the database
-	var surat_keluars []models.SuratKeluar
-	initializers.DB.Find(&surat_keluars)
-
-	// Write data rows
-	for i, surat_keluar := range surat_keluars {
-		rowNum := i + 2 // Start from the second row (first row is header)
-		f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), surat_keluar.NoSurat)
-		f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), surat_keluar.Title)
-		f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), surat_keluar.From)
-		f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), surat_keluar.Pic)
-		f.SetCellValue(sheetName, fmt.Sprintf("E%d", rowNum), surat_keluar.Tanggal.Format("2006-01-02"))
-	}
-
-	if err := f.SaveAs(filePath); err != nil {
-		c.String(http.StatusInternalServerError, "Error saving file: %v", err)
-		return
-	}
-
-}
-
 func ImportExcelSuratKeluar(c *gin.Context) {
 	// Mengambil file dari form upload
 	file, _, err := c.Request.FormFile("file")

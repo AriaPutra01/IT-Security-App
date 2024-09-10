@@ -246,54 +246,6 @@ func CreateExcelPerdin(c *gin.Context) {
 	c.Writer.Write(buf.Bytes())
 }
 
-func UpdateSheetPerdin(c *gin.Context) {
-	dir := "D:\\excel"
-	fileName := "its_report.xlsx"
-	filePath := filepath.Join(dir, fileName)
-
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		c.String(http.StatusBadRequest, "File tidak ada")
-		return
-	}
-
-	f, err := excelize.OpenFile(filePath)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Error membuka file: %v", err)
-		return
-	}
-	defer f.Close()
-
-	sheetName := "PERDIN"
-
-	if _, err := f.GetSheetIndex(sheetName); err == nil {
-		f.DeleteSheet(sheetName)
-	}
-	f.NewSheet(sheetName)
-
-	f.SetCellValue(sheetName, "A1", "No Perdin")
-	f.SetCellValue(sheetName, "B1", "Tanggal")
-	f.SetCellValue(sheetName, "C1", "Hotel")
-	f.SetCellValue(sheetName, "D1", "Transport")
-
-	var perdins []models.Perdin
-	initializers.DB.Find(&perdins)
-
-	for i, perdin := range perdins {
-		rowNum := i + 2
-		f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), perdin.NoPerdin)
-		f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), perdin.Tanggal.Format("2006-01-02"))
-		f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), perdin.Hotel)
-		f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), perdin.Transport)
-	}
-
-	if err := f.SaveAs(filePath); err != nil {
-		c.String(http.StatusInternalServerError, "Error menyimpan file: %v", err)
-		return
-	}
-
-	c.Redirect(http.StatusFound, "/Perdin")
-}
-
 func ImportExcelPerdin(c *gin.Context) {
 	// Mengambil file dari form upload
 	file, _, err := c.Request.FormFile("file")

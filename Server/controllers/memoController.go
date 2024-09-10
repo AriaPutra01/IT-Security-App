@@ -201,7 +201,7 @@ func CreateExcelMemo(c *gin.Context) {
 	f := excelize.NewFile()
 
 	// Define sheet names
-	sheetNames := []string{"SAG", "MEMO", "ISO", "SURAT", "BERITA ACARA", "SK", "PROJECT", "PERDIN", "SURAT MASUK", "SURAT KELUAR"}
+	sheetNames := []string{"MEMO", "SURAT", "BERITA ACARA", "SK", "PROJECT", "PERDIN", "SURAT MASUK", "SURAT KELUAR"}
 
 	// Create sheets and set headers for "SAG" only
 	for _, sheetName := range sheetNames {
@@ -211,6 +211,8 @@ func CreateExcelMemo(c *gin.Context) {
 			f.SetCellValue(sheetName, "B1", "NoMemo")
 			f.SetCellValue(sheetName, "C1", "Perihal")
 			f.SetCellValue(sheetName, "D1", "Pic")
+			f.SetCellValue(sheetName, "E1", "Kategori")
+			f.SetCellValue(sheetName, "F1", "CreateBy")
 		} else {
 			f.NewSheet(sheetName)
 		}
@@ -229,6 +231,8 @@ func CreateExcelMemo(c *gin.Context) {
 		f.SetCellValue(memoSheetName, fmt.Sprintf("B%d", rowNum), memo.NoMemo)
 		f.SetCellValue(memoSheetName, fmt.Sprintf("C%d", rowNum), memo.Perihal)
 		f.SetCellValue(memoSheetName, fmt.Sprintf("D%d", rowNum), memo.Pic)
+		f.SetCellValue(memoSheetName, fmt.Sprintf("E%d", rowNum), memo.Kategori)
+		f.SetCellValue(memoSheetName, fmt.Sprintf("F%d", rowNum), memo.CreateBy)
 	}
 
 	// Delete the default "Sheet1" sheet
@@ -247,67 +251,6 @@ func CreateExcelMemo(c *gin.Context) {
 	c.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
 	c.Writer.Write(buf.Bytes())
-}
-
-func UpdateSheetMemo(c *gin.Context) {
-	dir := "D:\\excel"
-	fileName := "its_report.xlsx"
-	filePath := filepath.Join(dir, fileName)
-
-	// Check if the file exists
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		c.String(http.StatusBadRequest, "File tidak ada")
-		return
-	}
-
-	// Open the existing Excel file
-	f, err := excelize.OpenFile(filePath)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Error membuka file: %v", err)
-		return
-	}
-	defer f.Close()
-
-	// Define sheet name
-	sheetName := "MEMO"
-
-	// Check if the sheet exists
-	sheetIndex, err := f.GetSheetIndex(sheetName)
-	if err != nil || sheetIndex == -1 {
-		c.String(http.StatusBadRequest, "Lembar kerja MEMO tidak ditemukan")
-		return
-	}
-
-	// Clear existing data except the header by deleting rows
-	rows, err := f.GetRows(sheetName)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Error getting rows: %v", err)
-		return
-	}
-	for i := 1; i < len(rows); i++ { // Start from 1 to keep the header
-		f.RemoveRow(sheetName, 2) // Always remove the second row since the sheet compresses up
-	}
-
-	// Fetch updated data from the database
-	var memos []models.Memo
-	initializers.DB.Find(&memos)
-
-	// Write data rows
-	for i, memo := range memos {
-		rowNum := i + 2 // Start from the second row (first row is header)
-		f.SetCellValue(sheetName, fmt.Sprintf("A%d", rowNum), memo.Tanggal.Format("2006-01-02"))
-		f.SetCellValue(sheetName, fmt.Sprintf("B%d", rowNum), memo.NoMemo)
-		f.SetCellValue(sheetName, fmt.Sprintf("C%d", rowNum), memo.Perihal)
-		f.SetCellValue(sheetName, fmt.Sprintf("D%d", rowNum), memo.Pic)
-	}
-
-	// Save the file with updated data
-	if err := f.SaveAs(filePath); err != nil {
-		c.String(http.StatusInternalServerError, "Error menyimpan file: %v", err)
-		return
-	}
-
-	c.Redirect(http.StatusFound, "http://localhost:8000/memo")
 }
 
 func ImportExcelMemo(c *gin.Context) {
@@ -368,6 +311,8 @@ func ImportExcelMemo(c *gin.Context) {
 		noMemo := row[1]
 		perihal := row[2]
 		pic := row[3]
+		kategori := row[4]
+		createBy := row[5]
 
 		// Parse tanggal
 		tanggal, err := time.Parse("2006-01-02", tanggalString)
@@ -381,6 +326,8 @@ func ImportExcelMemo(c *gin.Context) {
 			NoMemo:  noMemo,
 			Perihal: perihal,
 			Pic:     pic,
+			Kategori:     kategori,
+			CreateBy:     createBy,
 		}
 
 		// Simpan ke database

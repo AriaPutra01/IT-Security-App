@@ -131,15 +131,11 @@ export const ReusableTable = (props) => {
   const [selectedId, setSelectedId] = useState(null);
 
   const {
-    excel,
     MainData,
     formConfig,
-    handleAdd,
     handleEdit,
     handleDelete,
     handleSelect,
-    selectedIds,
-    handleBulkDelete,
     showUploadButton, // Tambahkan prop ini
   } = props;
 
