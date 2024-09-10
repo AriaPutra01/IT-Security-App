@@ -6,7 +6,7 @@ export function getCutis(callback) {
   return axios
     .get(`${API_URL}`)
     .then((response) => {
-      callback(response.data);
+      callback(response.data.cuti);
     })
     .catch((error) => {
       throw new Error(`Gagal mengambil data. Alasan: ${error.message}`);
@@ -24,11 +24,7 @@ export function addCuti(data) {
     });
 }
 
-export function deleteCuti(id) {
-  if (!id) {
-    throw new Error("ID harus disertakan untuk menghapus data.");
-  }
-  return axios
+export function deleteCuti(id) {return axios
     .delete(`${API_URL}/${id}`)
     .then((response) => {
       return response.data;

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"project-its/initializers"
 	"project-its/models"
@@ -27,6 +28,8 @@ func CreateEventProject(c *gin.Context) {
 		return
 	}
 
+	setNotification(&event)
+
 	if err := initializers.DB.Create(&event).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -48,6 +51,7 @@ func DeleteEventProject(c *gin.Context) {
 		return
 	}
 
+	// Pastikan ID dikonversi ke tipe data yang sesuai
 	if err := initializers.DB.Where("id = ?", uint(id)).Delete(&models.TimelineProject{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -84,10 +88,26 @@ func CreateResourceProject(c *gin.Context) {
 
 // DeleteResource deletes a resource by ID
 func DeleteResourceProject(c *gin.Context) {
-	id := c.Param("id")
-	if err := initializers.DB.Where("id = ?", id).Delete(&models.ResourceProject{}).Error; err != nil {
+	idParam := c.Param("id")
+	if idParam == "" || idParam == "undefined" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID harus disertakan dan valid"})
+		return
+	}
+
+	id, err := strconv.ParseUint(idParam, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
+		return
+	}
+
+	log.Printf("Attempting to delete ResourceProject with ID: %d", id)
+
+	if err := initializers.DB.Where("id = ?", uint(id)).Delete(&models.ResourceProject{}).Error; err != nil {
+		log.Printf("Error deleting ResourceProject with ID: %d, error: %v", id, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	log.Printf("Successfully deleted ResourceProject with ID: %d", id)
 	c.Status(http.StatusNoContent)
 }

@@ -6,7 +6,7 @@ export function getRapats(callback) {
   return axios
     .get(`${API_URL}`)
     .then((response) => {
-      callback(response.data);
+      callback(response.data.rapat);
     })
     .catch((error) => {
       throw new Error(`Gagal mengambil data. Alasan: ${error.message}`);
@@ -15,10 +15,7 @@ export function getRapats(callback) {
 
 export function addRapat(data) {
   return axios
-    .post(`${API_URL}`, {
-      ...data,
-      color: data.color // Pastikan warna termasuk dalam data yang dikirim
-    })
+    .post(`${API_URL}`, data)
     .then((response) => {
       return response.data;
     })
@@ -28,9 +25,6 @@ export function addRapat(data) {
 }
 
 export function deleteRapat(id) {
-  if (!id) {
-    throw new Error("ID harus disertakan untuk menghapus data.");
-  }
   return axios
     .delete(`${API_URL}/${id}`)
     .then((response) => {

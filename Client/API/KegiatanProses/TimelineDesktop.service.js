@@ -18,7 +18,7 @@ export function addEventDesktop(data) {
   return axios
     .post(API_URL, data)
     .then((response) => {
-      return response.data.events;
+      return response.data;
     })
     .catch((error) => {
       throw new Error(`Gagal menambahkan data. Alasan: ${error.message}`);
@@ -29,7 +29,7 @@ export function deleteEventDesktop(id) {
   return axios
     .delete(`${API_URL}/${id}`)
     .then((response) => {
-      return response.data.events;
+      return response.data;
     })
     .catch((error) => {
       throw new Error(`Gagal menghapus data. Alasan: ${error.message}`);
@@ -51,7 +51,7 @@ export function addResource(data) {
   return axios
     .post(RESOURCE_API_URL, data)
     .then((response) => {
-      return response.data.resources; // Pastikan response data memiliki struktur yang benar
+      return response.data;
     })
     .catch((error) => {
       throw new Error(`Gagal menambahkan resource. Alasan: ${error.message}`);
@@ -62,7 +62,7 @@ export function deleteResource(id) {
   return axios
     .delete(`${RESOURCE_API_URL}/${id}`)
     .then((response) => {
-      return response.data.resources;
+      return response.data;
     })
     .catch((error) => {
       throw new Error(`Gagal menghapus resource. Alasan: ${error.message}`);

@@ -82,6 +82,10 @@ func main() {
 	r.GET("/updateProject", controllers.UpdateSheetProject)
 	r.POST("/uploadProject", controllers.ImportExcelProject)
 
+	// Notif Calendar
+	r.GET("/notifications", controllers.GetNotifications)
+	r.DELETE("/notifications/:id", controllers.DeleteNotification)
+
 	//Timeline Project routes
 	r.GET("/timelineProject", controllers.GetEventsProject)
 	r.POST("/timelineProject", controllers.CreateEventProject)
@@ -107,8 +111,6 @@ func main() {
 	r.GET("/jadwal-rapat", controllers.GetEventsRapat)
 	r.POST("/jadwal-rapat", controllers.CreateEventRapat)
 	r.DELETE("/jadwal-rapat/:id", controllers.DeleteEventRapat)
-	r.GET("/notifications", controllers.GetNotifications)
-	r.DELETE("/notifications/:id", controllers.DeleteNotification)
 
 	// Jadwal Cuti routes
 	r.GET("/jadwal-cuti", controllers.GetEventsCuti)

@@ -103,7 +103,7 @@ export const ReusableForm = ({
                       required={field.required}
                     >
                       <option value="" disabled defaultValue="readonly">
-                        Pilih Kategori...
+                        Pilih...
                       </option>
                       {field.options?.map((option) => (
                         <option key={option} value={option}>

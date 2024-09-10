@@ -89,8 +89,8 @@ function Timeline({
     schedulerData.localeDayjs.locale("id");
     getEvents((eventData) => {
       getResources((resourceData) => {
-        schedulerData.setResources(resourceData || []);
-        schedulerData.setEvents(eventData || []);
+        schedulerData.setResources(resourceData);
+        schedulerData.setEvents(eventData);
         dispatch({ type: "INITIALIZE", payload: schedulerData });
       });
     });
@@ -98,26 +98,18 @@ function Timeline({
 
   const prevClick = (schedulerData) => {
     schedulerData.prev();
-    getEvents()
-      .then((data) => {
-        schedulerData.setEvents(data || []);
-        dispatch({ type: "UPDATE_SCHEDULER", payload: schedulerData });
-      })
-      .catch((error) => {
-        alert(`Error fetching timelines: ${error.message}`);
-      });
+    getEvents((data) => {
+      schedulerData.setEvents(data);
+      dispatch({ type: "UPDATE_SCHEDULER", payload: schedulerData });
+    });
   };
 
   const nextClick = (schedulerData) => {
     schedulerData.next();
-    getEvents()
-      .then((data) => {
-        schedulerData.setEvents(data || []);
-        dispatch({ type: "UPDATE_SCHEDULER", payload: schedulerData });
-      })
-      .catch((error) => {
-        alert(`Error fetching timelines: ${error.message}`);
-      });
+    getEvents((data) => {
+      schedulerData.setEvents(data);
+      dispatch({ type: "UPDATE_SCHEDULER", payload: schedulerData });
+    });
   };
 
   const onViewChange = (schedulerData, view) => {
@@ -126,26 +118,18 @@ function Timeline({
       view.showAgenda,
       view.isEventPerspective
     );
-    getEvents()
-      .then((data) => {
-        schedulerData.setEvents(data || []);
-        dispatch({ type: "UPDATE_SCHEDULER", payload: schedulerData });
-      })
-      .catch((error) => {
-        alert(`Error fetching timelines: ${error.message}`);
-      });
+    getEvents((data) => {
+      schedulerData.setEvents(data);
+      dispatch({ type: "UPDATE_SCHEDULER", payload: schedulerData });
+    });
   };
 
   const onSelectDate = (schedulerData, date) => {
     schedulerData.setDate(date);
-    getEvents()
-      .then((data) => {
-        schedulerData.setEvents(data || []);
-        dispatch({ type: "UPDATE_SCHEDULER", payload: schedulerData });
-      })
-      .catch((error) => {
-        alert(`Error fetching timelines: ${error.message}`);
-      });
+    getEvents((data) => {
+      schedulerData.setEvents(data);
+      dispatch({ type: "UPDATE_SCHEDULER", payload: schedulerData });
+    });
   };
 
   const onCloseFormModal = () => {
@@ -167,25 +151,23 @@ function Timeline({
     type,
     item
   ) => {
-    let newFreshId = 0;
-    schedulerData.events.forEach((item) => {
-      if (item.id >= newFreshId) newFreshId = item.id + 1;
-    });
     setFormModalOpen(true);
     setFormData({
-      newFreshId,
+      schedulerData,
       title: "",
       start,
       end,
       slotId,
+      slotName,
       bgColor: "#2596be",
+      type,
+      item,
     });
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     const newEvent = {
-      id: formData.newFreshId,
       title: formData.title,
       start: formData.start,
       end: formData.end,
@@ -193,15 +175,15 @@ function Timeline({
       bgColor: formData.bgColor,
     };
     try {
-      insertEvent(newEvent);
-      state.viewModel.addEvent(newEvent);
+      const response = await insertEvent(newEvent);
+      state.viewModel.addEvent(response);
       dispatch({ type: "UPDATE_SCHEDULER", payload: state.viewModel });
       onCloseFormModal();
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Gagal!",
-        text: "Error saat menyimpan data: " + error.message,
+        text: "Error saat menyimpan data: " + error,
         showConfirmButton: false,
         timer: 1500,
       });
@@ -281,8 +263,8 @@ function Timeline({
     });
     if (name) {
       try {
-        insertResource(name);
-        schedulerData.addResource(name);
+        const newResource = await insertResource(name);
+        schedulerData.addResource(newResource);
         dispatch({ type: "UPDATE_SCHEDULER", payload: schedulerData });
       } catch (err) {
         Swal.fire({
@@ -313,29 +295,25 @@ function Timeline({
         await removeResource(slot.slotId);
 
         // Hapus event yang memiliki resourceId yang sama dari server
-        const eventsToDelete = schedulerData.filter(
+        const eventsToDelete = schedulerData.events.filter(
           (event) => event.resourceId === slot.slotId
         );
+
         for (const event of eventsToDelete) {
           await removeEvent(event.id);
         }
 
         // Hapus resource dan event dari client
-        const updatedResources = schedulerData.filter(
+        const updatedResources = schedulerData.resources.filter(
           (resource) => resource.id !== slot.slotId
         );
-        const updatedEvents = schedulerData.filter(
+        const updatedEvents = schedulerData.events.filter(
           (event) => event.resourceId !== slot.slotId
         );
         schedulerData.setResources(updatedResources);
         schedulerData.setEvents(updatedEvents);
 
         dispatch({ type: "UPDATE_SCHEDULER", payload: schedulerData });
-        Swal.fire(
-          "Terhapus!",
-          "Resource dan event terkait telah dihapus.",
-          "success"
-        );
       } catch (error) {
         Swal.fire(
           "Gagal!",
@@ -427,7 +405,7 @@ function Timeline({
                   id="title"
                   name="title"
                   className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 appearance-none  focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder="masukan event"
+                  placeholder={`Anda memasukan event di resource "${formData.slotName}"`}
                   value={formData.title}
                   onChange={handleFormChange}
                   required

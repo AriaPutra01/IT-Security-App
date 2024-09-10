@@ -7,17 +7,7 @@ import (
 	"project-its/models"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
-
-type BookingRapat struct {
-	ID     string `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"; json:"id"`
-	Title  string `json:"title"`
-	Start  string `json:"start"`
-	End    string `json:"end"`
-	AllDay bool   `json:"allDay"`
-	Color  string `json:"color"`
-}
 
 // Create a new event
 func GetEventsBookingRapat(c *gin.Context) {
@@ -26,31 +16,25 @@ func GetEventsBookingRapat(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, events)
+	c.JSON(http.StatusOK, gin.H{"booking": events})
 }
 
 // Example of using generated UUID
 func CreateEventBookingRapat(c *gin.Context) {
-	var event BookingRapat
+	var event models.BookingRapat
 	if err := c.ShouldBindJSON(&event); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Generate a new UUID if not provided
-	if event.ID == "" {
-		event.ID = generateUUID()
-	}
-
-	// Log the generated UUID for debugging
-	log.Printf("Generated UUID: %s", event.ID)
+	setNotification(&event)
 
 	if err := initializers.DB.Create(&event).Error; err != nil {
 		log.Printf("Error creating event: %v", err) // Add this line
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, event)
 }
 
 func DeleteEventBookingRapat(c *gin.Context) {
@@ -59,11 +43,7 @@ func DeleteEventBookingRapat(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID harus disertakan"})
 		return
 	}
-	if _, err := uuid.Parse(id); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID tidak valid"})
-		return
-	}
-	if err := initializers.DB.Where("id = ?", id).Delete(&BookingRapat{}).Error; err != nil {
+	if err := initializers.DB.Where("id = ?", id).Delete(&models.BookingRapat{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

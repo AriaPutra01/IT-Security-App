@@ -16,11 +16,12 @@ import (
 )
 
 type SuratKeluarRequest struct {
-	NoSurat string `json:"no_surat"`
-	Title   string `json:"title"`
-	From    string `json:"from"`
-	Pic     string `json:"pic"`
-	Tanggal string `json:"tanggal"`
+	ID       uint   `gorm:"primaryKey"`
+	NoSurat  string `json:"no_surat"`
+	Title    string `json:"title"`
+	From     string `json:"from"`
+	Pic      string `json:"pic"`
+	Tanggal  string `json:"tanggal"`
 	CreateBy string `json:"create_by"`
 }
 
@@ -49,11 +50,11 @@ func SuratKeluarCreate(c *gin.Context) {
 	}
 
 	surat_keluar := models.SuratKeluar{
-		NoSurat: requestBody.NoSurat,
-		Title:   requestBody.Title,
-		From:    requestBody.From,
-		Pic:     requestBody.Pic,
-		Tanggal: tanggal,
+		NoSurat:  requestBody.NoSurat,
+		Title:    requestBody.Title,
+		From:     requestBody.From,
+		Pic:      requestBody.Pic,
+		Tanggal:  tanggal,
 		CreateBy: requestBody.CreateBy,
 	}
 
@@ -155,7 +156,7 @@ func SuratKeluarUpdate(c *gin.Context) {
 	initializers.DB.Model(&surat_keluar).Updates(surat_keluar)
 
 	c.JSON(200, gin.H{
-		"surat_keluar": surat_keluar,
+		"SuratKeluar": surat_keluar,
 	})
 }
 
@@ -179,7 +180,7 @@ func SuratKeluarDelete(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"message": "Deleted",
+		"SuratKeluar": "Deleted",
 	})
 }
 

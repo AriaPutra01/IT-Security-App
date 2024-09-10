@@ -1,22 +1,27 @@
-import { FormatDate } from "../../../Utilities/FormatDate";
-import React, { useState } from "react";
+// import { FormatDate } from "../../../Utilities/FormatDate";
+import { ReusableForm } from "../../Fragments/Services/ReusableForm";
+import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import DataTable from "react-data-table-component";
-import { Button } from "flowbite-react";
+import { Button, Modal } from "flowbite-react";
 import { SearchInput } from "../../Elements/SearchInput";
 import { useToken } from "../../../context/TokenContext";
+import { Excel } from "../../../Utilities/Excel";
+import Swal from "sweetalert2";
 
 export const ReusableTable = (props) => {
   const {
+    get,
+    set,
+    addUser,
+    update,
+    remove,
     excel,
-    MainData,
+    ExportExcel,
+    UpdateExcel,
+    ImportExcel,
     formConfig,
-    handleAdd,
-    handleEdit,
-    handleDelete,
-    handleSelect,
-    selectedIds,
-    handleBulkDelete,
+    setFormConfig,
   } = props;
   const [globalFilterText, setGlobalFilterText] = useState("");
   const { token } = useToken(); // Ambil token dari context
@@ -26,16 +31,177 @@ export const ReusableTable = (props) => {
     userRole = decoded.role;
   }
 
-  const renderCellContent = (field, value) => {
-    switch (field.type) {
-      case "number":
-        return `Rp. ${new Intl.NumberFormat("id-ID").format(value)}`;
-      case "date":
-        return FormatDate(value);
-      default:
-        return value;
+  //
+  const [MainData, setMainData] = useState([]);
+  const [formModalOpen, setFormModalOpen] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  useEffect(() => {
+    get((data) => {
+      // ambil dari API
+      setMainData(data);
+    });
+  }, []);
+
+  const onCloseFormModal = () => {
+    setFormModalOpen(false);
+    setFormData({});
+  };
+
+  const handleAddUser = () => {
+    window.location.href = "/add-user";
+  };
+
+  const handleAdd = () => {
+    setFormModalOpen(true);
+    setFormConfig((prevConfig) => ({
+      ...prevConfig,
+      action: "add",
+      onSubmit: (data) => AddSubmit(data),
+    }));
+  };
+
+  const handleEdit = (MainData) => {
+    setFormModalOpen(true);
+    setFormConfig((prevConfig) => ({
+      ...prevConfig,
+      action: "edit",
+      onSubmit: (data) => EditSubmit(data),
+    }));
+    setFormData({ ...MainData });
+  };
+
+  const AddSubmit = async (data) => {
+    try {
+      const response = await set(data); // tambah data ke API
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Data berhasil ditambahkan",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        setMainData([...MainData, response]);
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Gagal!",
+        text: "Error saat menyimpan data",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } finally {
+      onCloseFormModal();
     }
   };
+
+  const EditSubmit = async (data) => {
+    try {
+      const response = await update(data.ID, data); // edit data ke API
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Data berhasil diperbarui",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        setMainData(
+          MainData.map((item) => {
+            return item.ID === data.ID ? response : item;
+          })
+        );
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Gagal!",
+        text: "Error saat mengubah data",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } finally {
+      onCloseFormModal();
+    }
+  };
+
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Anda akan menghapus data ini!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, saya yakin",
+      cancelButtonText: "Batal",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await remove(id);
+          setMainData((prevData) => prevData.filter((data) => data.ID !== id));
+          Swal.fire({
+            icon: "info",
+            title: "Berhasil!",
+            text: "Data berhasil dihapus",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } catch (error) {
+          Swal.fire("Gagal!", "Error saat hapus data:", "error");
+        }
+      }
+    });
+  };
+
+  // handle select
+  const handleSelect = ({ selectedRows }) => {
+    const id = selectedRows.map((data) => data.ID);
+    setSelectedIds(id);
+  };
+
+  // Function untuk hapus multi select checkbox
+  const handleBulkDelete = async () => {
+    Swal.fire({
+      title: "Apakah Anda yakin?",
+      text: "Anda akan menghapus data yang dipilih!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, saya yakin",
+      cancelButtonText: "Batal",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await Promise.all(selectedIds.map((id) => remove(id))); // hapus data di API
+          setMainData((prevData) =>
+            prevData.filter((data) => !selectedIds.includes(data.ID))
+          );
+          setSelectedIds([]);
+          Swal.fire({
+            icon: "info",
+            title: "Berhasil!",
+            text: "Data berhasil dihapus",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } catch (error) {
+          Swal.fire("Gagal!", "Error saat hapus data:", "error");
+        }
+      }
+    });
+  };
+
+  //
+
+  // const renderCellContent = (field, value) => {
+  //   switch (field.type) {
+  //     case "number":
+  //       return `Rp. ${new Intl.NumberFormat("id-ID").format(value)}`;
+  //     case "date":
+  //       return FormatDate(value);
+  //     default:
+  //       return value;
+  //   }
+  // };
 
   const header = formConfig.fields.map((field) => {
     return {
@@ -127,13 +293,19 @@ export const ReusableTable = (props) => {
             <>
               <Button
                 className="flex justify-center items-center"
-                onClick={handleAdd}
+                onClick={addUser ? handleAddUser : handleAdd}
                 action="add"
                 color="info"
               >
                 Tambah
               </Button>
-              {excel}
+              {excel && (
+                <Excel
+                  linkExportThis={ExportExcel}
+                  linkUpdateThis={UpdateExcel}
+                  importExcel={ImportExcel}
+                />
+              )}
               <Button
                 className="w-max"
                 color="failure"
@@ -167,6 +339,18 @@ export const ReusableTable = (props) => {
           fixedHeader
         />
       </div>
+      {/* ModalForm */}
+      <Modal show={formModalOpen} size="xl" onClose={onCloseFormModal} popup>
+        <Modal.Header />
+        <Modal.Body>
+          <ReusableForm
+            config={formConfig}
+            formData={formData}
+            setFormData={setFormData}
+          />
+        </Modal.Body>
+      </Modal>
+      {/* endModalForm */}
     </div>
   );
 };

@@ -16,6 +16,7 @@ import (
 )
 
 type MemoRequest struct {
+	ID       uint   `gorm:"primaryKey"`
 	Tanggal  string `json:"tanggal"`
 	NoMemo   string `json:"no_memo"`
 	Perihal  string `json:"perihal"`
@@ -31,7 +32,7 @@ func MemoIndex(c *gin.Context) {
 	initializers.DB.Find(&memos)
 
 	c.JSON(200, gin.H{
-		"posts": memos,
+		"memo": memos,
 	})
 
 }
@@ -61,10 +62,10 @@ func MemoCreate(c *gin.Context) {
 	requestBody.CreateBy = c.MustGet("username").(string)
 
 	memo := models.Memo{
-		Tanggal: tanggal,
-		NoMemo:  requestBody.NoMemo,
-		Perihal: requestBody.Perihal,
-		Pic:     requestBody.Pic,
+		Tanggal:  tanggal,
+		NoMemo:   requestBody.NoMemo,
+		Perihal:  requestBody.Perihal,
+		Pic:      requestBody.Pic,
 		Kategori: requestBody.Kategori,
 		CreateBy: requestBody.CreateBy,
 	}
@@ -106,7 +107,6 @@ func MemoUpdate(c *gin.Context) {
 		return
 	}
 
-
 	id := c.Params.ByName("id")
 
 	var memo models.Memo
@@ -145,17 +145,17 @@ func MemoUpdate(c *gin.Context) {
 		memo.Pic = memo.Pic
 	}
 
-	if requestBody.Kategori!= "" {
-    memo.Kategori = requestBody.Kategori
-  } else {
-    memo.Kategori = memo.Kategori
-  }
+	if requestBody.Kategori != "" {
+		memo.Kategori = requestBody.Kategori
+	} else {
+		memo.Kategori = memo.Kategori
+	}
 
-	if requestBody.CreateBy!= "" {
-    memo.CreateBy = requestBody.CreateBy
-  } else {
-    memo.CreateBy = memo.CreateBy
-  }
+	if requestBody.CreateBy != "" {
+		memo.CreateBy = requestBody.CreateBy
+	} else {
+		memo.CreateBy = memo.CreateBy
+	}
 
 	initializers.DB.Save(&memo)
 

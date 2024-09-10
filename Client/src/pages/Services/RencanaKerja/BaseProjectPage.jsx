@@ -31,7 +31,7 @@ export const BaseProjectPage = () => {
               <Table.Cell>SER</Table.Cell>
             </Table.Row>
           </Table.Body>
-        </Table >
+        </Table>
         <Label value="A" />
         <Table hoverable>
           <Table.Head>
