@@ -21,7 +21,7 @@ export function SuratMasukPage() {
         type: "text",
         required: true,
       },
-      { name: "destiny_div", label: "Destiny", type: "text", required: true },
+      { name: "destiny_div", label: "Tujuan", type: "text", required: true },
       { name: "tanggal", label: "Date Issue", type: "date", required: true },
     ],
     services: "Surat Masuk",

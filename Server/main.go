@@ -4,8 +4,6 @@ import (
 	"project-its/controllers"
 	"project-its/initializers"
 	"project-its/middleware"
-
-	// "project-its/middleware"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -72,6 +70,16 @@ func main() {
 	r.GET("/exportMemo", controllers.CreateExcelMemo)
 	r.GET("/updateMemo", controllers.UpdateSheetMemo)
 	r.POST("/uploadMemo", controllers.ImportExcelMemo)
+
+	// Routes for Sagiso
+	r.GET("/sagiso", controllers.SagisoIndex)
+	r.POST("/sagiso", controllers.SagisoCreate)
+	r.GET("/sagiso/:id", controllers.SagisoShow)
+	r.PUT("/sagiso/:id", controllers.SagisoUpdate)
+	r.DELETE("/sagiso/:id", controllers.SagisoDelete)
+	r.GET("/exportSagiso", controllers.CreateExcelSagiso)
+	r.GET("/updateSagiso", controllers.UpdateSheetSagiso)
+	r.POST("/uploadSagiso", controllers.ImportExcelSagiso)
 
 	//Project routes
 	r.POST("/Project", controllers.ProjectCreate)
@@ -146,6 +154,21 @@ func main() {
 	r.GET("/exportSuratKeluar", controllers.CreateExcelSuratKeluar)
 	r.GET("/updateSuratKeluar", controllers.UpdateSheetSuratKeluar)
 	r.POST("/uploadSuratKeluar", controllers.ImportExcelSuratKeluar)
+
+	// Rute untuk upload file
+	r.POST("/upload", controllers.UploadHandler)
+	r.GET("/download/:id/:filename", controllers.DownloadFileHandler) // Ubah endpoint
+
+	// Rute untuk hapus file
+	r.DELETE("/delete/:id/:filename", controllers.DeleteFileHandler)
+
+	// Routes for Arsip
+	r.GET("/Arsip", controllers.ArsipIndex) // Tambahkan rute untuk membuat arsip
+	r.POST("/Arsip", controllers.CreateArsip)
+	r.PUT("/Arsip/:id", controllers.UpdateArsip)    // Tambahkan rute untuk memperbarui arsip
+	r.DELETE("/Arsip/:id", controllers.DeleteArsip) // Tambahkan rute untuk menghapus arsip
+
+	r.GET("/files/:id", controllers.GetFilesByID)
 
 	r.Run()
 }

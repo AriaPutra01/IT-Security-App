@@ -12,6 +12,7 @@ import "../../../../calendar.css";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
 import { ColorPick } from "../../../../Utilities/ColorPick";
+import idLocale from "date-fns/locale/id";
 
 const initialState = {
   showScheduler: false,
@@ -60,19 +61,7 @@ function Timeline({
         nonAgendaDayCellHeaderFormat: "M/D|HH:mm",
         views: [
           {
-            viewName: "Day",
-            viewType: ViewType.Day,
-            showAgenda: false,
-            isEventPerspective: false,
-          },
-          {
-            viewName: "Week",
-            viewType: ViewType.Week,
-            showAgenda: false,
-            isEventPerspective: false,
-          },
-          {
-            viewName: "Month",
+            viewName: "Bulan",
             viewType: ViewType.Month,
             showAgenda: false,
             isEventPerspective: false,
@@ -86,7 +75,7 @@ function Timeline({
         yearMaxEvents: 4,
       }
     );
-    schedulerData.localeDayjs.locale("id");
+    schedulerData.localeDayjs.locale(idLocale);
     getEvents((eventData) => {
       getResources((resourceData) => {
         schedulerData.setResources(resourceData);

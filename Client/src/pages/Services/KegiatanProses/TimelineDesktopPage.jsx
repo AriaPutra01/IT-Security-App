@@ -12,7 +12,7 @@ import {
 
 export const TimelineDesktopPage = () => {
   return (
-    <App services="Timeline Desktop">
+    <App services="Timeline Wallpaper Desktop">
       <Timeline
         getEvents={getEventsDesktop}
         insertEvent={addEventDesktop}

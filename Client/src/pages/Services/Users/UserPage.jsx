@@ -38,7 +38,9 @@ export const UserPage = () => {
           formConfig={formConfig}
           setFormConfig={setFormConfig}
           get={getUsers}
-          addUser
+          CustomHandleAdd={() => {
+            window.location.href = "/add-user";
+          }}
           update={updateUser}
           remove={deleteUser}
         />

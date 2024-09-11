@@ -19,6 +19,7 @@ import ErrorPage from "./pages/Error/404";
 import { DashboardPage } from "./pages/Dashboard/Dashboard";
 // Dokumen
 import { MemoPage } from "./pages/Services/Dokumen/MemoPage";
+import { SagisoPage } from "./pages/Services/Dokumen/Sagiso.page";
 import { PerdinPage } from "./pages/Services/Dokumen/PerjalananDinasPage";
 // Rencana Kerja
 import { ProjectPage } from "./pages/Services/RencanaKerja/ProjectPage";
@@ -32,6 +33,7 @@ import { JadwalCutiPage } from "./pages/Services/KegiatanProses/JadwalCutiPage";
 // Data Informasi
 import { SuratMasukPage } from "./pages/Services/DataInformasi/SuratMasukPage";
 import { SuratKeluarPage } from "./pages/Services/DataInformasi/SuratKeluarPage";
+import { ArsipPage } from "./pages/Services/DataInformasi/ArsipPage";
 
 import axios from "axios";
 axios.defaults.withCredentials = true; // Izinkan pengiriman cookie
@@ -87,6 +89,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <MemoPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/memos",
+    element: (
+      <ProtectedRoute>
+        <SagisoPage />
       </ProtectedRoute>
     ),
   },
@@ -170,6 +180,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <SuratKeluarPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/arsip",
+    element: (
+      <ProtectedRoute>
+        <ArsipPage />
       </ProtectedRoute>
     ),
   },

@@ -48,6 +48,30 @@ func (i Memo) MarshalJSON() ([]byte, error) {
 	})
 }
 
+type Sagiso struct {
+	ID        uint      `gorm:"primaryKey"`
+	CreatedAt time.Time `gorm:"autoCreateTime"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime"`
+	Tanggal   time.Time `json:"-"`
+	NoMemo    string    `json:"no_memo"`
+	Perihal   string    `json:"perihal"`
+	Pic       string    `json:"pic"`
+	Kategori  string    `json:"kategori"`
+	CreateBy  string    `json:"create_by"`
+}
+
+// MarshalJSON menyesuaikan serialisasi JSON untuk struct Memo
+func (i Sagiso) MarshalJSON() ([]byte, error) {
+	type Alias Sagiso
+	return json.Marshal(&struct {
+		Tanggal string `json:"tanggal"` // Format tanggal disesuaikan
+		*Alias
+	}{
+		Tanggal: i.Tanggal.Format("2006-01-02"), // Format tanggal YYYY-MM-DD
+		Alias:   (*Alias)(&i),
+	})
+}
+
 // model for perdin
 type Perdin struct {
 	ID        uint      `gorm:"primaryKey"`
@@ -230,5 +254,30 @@ func (i SuratKeluar) MarshalJSON() ([]byte, error) {
 	}{
 		Tanggal: i.Tanggal.Format("2006-01-02"), // Format tanggal YYYY-MM-DD
 		Alias:   (*Alias)(&i),
+	})
+}
+
+type Arsip struct {
+	gorm.Model
+	NoArsip           string    `json:"no_arsip"`
+	JenisDokumen      string    `json:"jenis_dokumen"`
+	NoDokumen         string    `json:"no_dokumen"`
+	TanggalDokumen    time.Time `json:"-"`
+	Perihal           string    `json:"perihal"`
+	NoBox             string    `json:"no_box"`
+	TanggalPenyerahan time.Time `json:"-"`
+	Keterangan        string    `json:"keterangan"`
+}
+
+func (i Arsip) MarshalJSON() ([]byte, error) {
+	type Alias Arsip
+	return json.Marshal(&struct {
+		TanggalDokumen string `json:"tanggal_dokumen"`
+		TanggalPenyerahan  string `json:"tanggal_penyerahan"`
+		*Alias
+	}{
+		TanggalDokumen: i.TanggalDokumen.Format("2006-01-02"),
+		TanggalPenyerahan:  i.TanggalPenyerahan.Format("2006-01-02"),
+		Alias:       (*Alias)(&i),
 	})
 }

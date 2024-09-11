@@ -26,7 +26,7 @@ export function MemoPage() {
         name: "kategori",
         label: "Kategori",
         type: "select",
-        options: ["sag", "iso", "surat", "berita_acara", "sk"],
+        options: ["Surat", "Berita acara", "Sk"],
         required: true,
       },
     ],

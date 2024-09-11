@@ -36,9 +36,7 @@ const App = ({ services, children }) => {
         credentials: "include", // Sertakan cookie dalam permintaan
       });
 
-      // Cek status respons
       if (response.ok) {
-        // Redirect ke halaman login
         window.location.href = "/login";
       } else {
         const errorData = await response.json();
@@ -97,6 +95,7 @@ const App = ({ services, children }) => {
           icon={<HiOutlineClipboardDocumentList />}
         >
           <SidebarItem href="/memo" text="Memo" />
+          <SidebarItem href="/memos" text="Memos" />
           <SidebarItem href="/perjalanan-dinas" text="Perjalanan Dinas" />
         </SidebarCollapse>
         <SidebarCollapse text="Project" icon={<GoProjectSymlink />}>
@@ -105,7 +104,7 @@ const App = ({ services, children }) => {
         </SidebarCollapse>
         <SidebarCollapse text="Kegiatan" icon={<GrPlan />}>
           <SidebarItem href="/timeline-project" text="Timeline Project" />
-          <SidebarItem href="/timeline-desktop" text="Timeline Desktop" />
+          <SidebarItem href="/timeline-desktop" text="Timeline Wallpaper Desktop" />
           <SidebarItem href="/booking-rapat" text="Booking Ruang Rapat" />
           <SidebarItem href="/jadwal-rapat" text="Jadwal Rapat" />
           <SidebarItem href="/jadwal-cuti" text="Jadwal Cuti" />
@@ -113,6 +112,7 @@ const App = ({ services, children }) => {
         <SidebarCollapse text="Informasi" icon={<SlEnvolopeLetter />}>
           <SidebarItem href="/surat-masuk" text="Surat Masuk" />
           <SidebarItem href="/surat-keluar" text="Surat Keluar" />
+          <SidebarItem href="/arsip" text="Arsip" />
         </SidebarCollapse>
         <SidebarItem href="/user" text="User" icon={<FiUsers />} />
         <SidebarItem

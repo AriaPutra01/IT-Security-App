@@ -45,7 +45,7 @@ export function ProjectPage() {
         required: true,
       },
       { name: "anggaran", label: "Anggaran", type: "number", required: true },
-      { name: "no_izin", label: "No Izin", type: "text", required: true },
+      { name: "no_izin", label: "No Izin Prinsip", type: "text", required: true },
       {
         name: "tanggal_izin",
         label: "Tanggal Izin",

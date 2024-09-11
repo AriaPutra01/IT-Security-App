@@ -19,6 +19,7 @@ func main() {
 		&models.User{},
 		&models.UserToken{},
 		&models.Memo{},
+		&models.Sagiso{},
 		&models.Project{},
 		&models.SuratMasuk{},
 		&models.SuratKeluar{},
@@ -31,6 +32,7 @@ func main() {
 		&models.JadwalRapat{},
 		&models.JadwalCuti{},
 		&models.Notification{},
+		&models.Arsip{},
 	)
 
 }

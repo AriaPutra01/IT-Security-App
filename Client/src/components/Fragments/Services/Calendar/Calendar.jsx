@@ -123,7 +123,7 @@ export const Calendar = ({ view, get, add, remove }) => {
                 >
                   <div className="font-bold text-white">{event.title}</div>
                   <div className="text-white">
-                    {format(event.start, "dd MMMM HH:mm", {
+                    {format(event.start, "dd MMMM", {
                       locale: idLocale,
                     })}
                   </div>
@@ -135,6 +135,17 @@ export const Calendar = ({ view, get, add, remove }) => {
       </div>
       <div className="mx-3 max-h-[85vh] overflow-auto">
         <FullCalendar
+          locale={idLocale}
+          titleFormat={{
+            year: "numeric",
+            day: "numeric",
+            month: "long",
+          }}
+          slotLabelFormat={{
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }}
           plugins={[
             dayGridPlugin,
             timeGridPlugin,
@@ -145,6 +156,13 @@ export const Calendar = ({ view, get, add, remove }) => {
             left: "prev,next today",
             center: "title",
             right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+          }}
+          buttonText={{
+            today: "Hari Ini",
+            month: "Bulan",
+            week: "Minggu",
+            day: "Hari",
+            list: "Agenda",
           }}
           initialView={view}
           editable={true}

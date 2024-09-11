@@ -7,31 +7,101 @@ import { Button, Modal } from "flowbite-react";
 import { SearchInput } from "../../Elements/SearchInput";
 import { useToken } from "../../../context/TokenContext";
 import { Excel } from "../../../Utilities/Excel";
+import { FaUpload } from "react-icons/fa"; // Tambahkan ikon upload
 import Swal from "sweetalert2";
 
-export const ReusableTable = (props) => {
-  const {
-    get,
-    set,
-    addUser,
-    update,
-    remove,
-    excel,
-    ExportExcel,
-    UpdateExcel,
-    ImportExcel,
-    formConfig,
-    setFormConfig,
-  } = props;
-  const [globalFilterText, setGlobalFilterText] = useState("");
+export const ReusableTable = ({
+  get,
+  set,
+  CustomHandleAdd,
+  UploadArsip,
+  update,
+  remove,
+  excel,
+  ExportExcel,
+  UpdateExcel,
+  ImportExcel,
+  formConfig,
+  setFormConfig,
+}) => {
   const { token } = useToken(); // Ambil token dari context
   let userRole = "";
   if (token) {
     const decoded = jwtDecode(token);
     userRole = decoded.role;
   }
+  const [globalFilterText, setGlobalFilterText] = useState("");
 
-  //
+  // File
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [selectedId, setSelectedId] = useState(null);
+
+  const fetchUploadedFiles = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8080/files/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include", // Sertakan cookie dalam permintaan
+      });
+      const data = await response.json();
+      if (data.files) {
+        setUploadedFiles(data.files);
+      } else {
+        setUploadedFiles([]); // Set ke array kosong jika tidak ada file
+      }
+    } catch (error) {
+      console.error("Error fetching uploaded files:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedId) {
+      fetchUploadedFiles(selectedId);
+    }
+  }, [selectedId]);
+
+  const uploadFileToServer = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("id", selectedId); // Gunakan selectedId saat mengupload file
+    try {
+      const response = await fetch("http://localhost:8080/upload", {
+        method: "POST",
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include", // Sertakan cookie dalam permintaan
+      });
+      if (response.ok) {
+        Swal.fire({
+          icon: "success",
+          title: "File uploaded successfully!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        fetchUploadedFiles(selectedId);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Error uploading file.",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Error occurred during the file upload.",
+      });
+      console.error("Error:", error);
+    }
+  };
+  // File
+
+  // FORM
   const [MainData, setMainData] = useState([]);
   const [formModalOpen, setFormModalOpen] = useState(false);
   const [formData, setFormData] = useState({});
@@ -39,18 +109,13 @@ export const ReusableTable = (props) => {
 
   useEffect(() => {
     get((data) => {
-      // ambil dari API
-      setMainData(data);
+      setMainData(data || []);
     });
   }, []);
 
   const onCloseFormModal = () => {
     setFormModalOpen(false);
     setFormData({});
-  };
-
-  const handleAddUser = () => {
-    window.location.href = "/add-user";
   };
 
   const handleAdd = () => {
@@ -190,8 +255,6 @@ export const ReusableTable = (props) => {
     });
   };
 
-  //
-
   // const renderCellContent = (field, value) => {
   //   switch (field.type) {
   //     case "number":
@@ -262,6 +325,18 @@ export const ReusableTable = (props) => {
               />
             </svg>
           </Button>
+          {UploadArsip && (
+            <Button
+              className="w-full"
+              onClick={() => {
+                setSelectedId(data.ID);
+                setIsModalOpen(true);
+              }}
+              color="info"
+            >
+              <FaUpload />
+            </Button>
+          )}
         </div>
       ),
     },
@@ -275,6 +350,7 @@ export const ReusableTable = (props) => {
         value.toString().toLowerCase().includes(globalFilterText.toLowerCase())
     );
   });
+  // FORM
 
   return (
     <div className="w-full rounded-lg p-2 overflow-auto">
@@ -293,7 +369,7 @@ export const ReusableTable = (props) => {
             <>
               <Button
                 className="flex justify-center items-center"
-                onClick={addUser ? handleAddUser : handleAdd}
+                onClick={CustomHandleAdd || handleAdd}
                 action="add"
                 color="info"
               >
@@ -339,6 +415,16 @@ export const ReusableTable = (props) => {
           fixedHeader
         />
       </div>
+      {/* ModalFile */}
+      <FileUploadModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onUpload={uploadFileToServer}
+        uploadedFiles={uploadedFiles}
+        fetchFiles={() => fetchUploadedFiles(selectedId)}
+        selectedId={selectedId} // Tambahkan selectedId saat memanggil FileUploadModal
+      />
+      {/* ModalFile */}
       {/* ModalForm */}
       <Modal show={formModalOpen} size="xl" onClose={onCloseFormModal} popup>
         <Modal.Header />
@@ -352,5 +438,144 @@ export const ReusableTable = (props) => {
       </Modal>
       {/* endModalForm */}
     </div>
+  );
+};
+
+const FileUploadModal = ({
+  isOpen,
+  onClose,
+  onUpload,
+  uploadedFiles,
+  fetchFiles,
+  selectedId,
+}) => {
+  const { token } = useToken(); // Ambil token dari context
+  let userRole = "";
+  if (token) {
+    const decoded = jwtDecode(token);
+    userRole = decoded.role;
+  }
+  // Tambahkan selectedId sebagai prop
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleSubmit = () => {
+    if (file) {
+      onUpload(file); // Panggil onUpload dari parent (ReusableTable)
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please select a file before uploading!",
+      });
+    }
+  };
+
+  const handleDeleteFile = async (fileName) => {
+    try {
+      const response = await fetch(`http://localhost:8080/delete/${fileName}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include", // Sertakan cookie dalam permintaan
+      });
+
+      if (response.ok) {
+        Swal.fire({
+          icon: "success",
+          title: "File deleted successfully!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        fetchFiles(); // Refresh daftar file setelah penghapusan
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Error deleting file.",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Error occurred during the file deletion.",
+      });
+      console.error("Error:", error);
+    }
+  };
+
+  return (
+    <Modal show={isOpen} onClose={onClose}>
+      <Modal.Header>Upload File</Modal.Header>
+      <Modal.Body>
+        <input type="file" onChange={handleFileChange} />
+        <ul>
+          {uploadedFiles.map((file, index) => (
+            <li key={index} className="flex items-center justify-between mb-2">
+              {/* Tambahkan mb-2 untuk margin bawah */}
+              <span>{file}</span>
+              <div className="flex gap-2">
+                <Button onClick={() => handleDeleteFile(file)} color="failure">
+                  Hapus
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (selectedId) {
+                      fetch(`http://localhost:8080/download/${file}`, {
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                        credentials: "include", // Sertakan cookie dalam permintaan
+                      })
+                        .then((response) => {
+                          if (response.ok) {
+                            return response.blob();
+                          }
+                          throw new Error("Network response was not ok.");
+                        })
+                        .then((blob) => {
+                          const url = window.URL.createObjectURL(blob);
+                          const a = document.createElement("a");
+                          a.href = url;
+                          a.download = file;
+                          document.body.appendChild(a);
+                          a.click();
+                          a.remove();
+                        })
+                        .catch((error) => {
+                          Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Error downloading file.",
+                          });
+                          console.error("Error:", error);
+                        });
+                    } else {
+                      Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "No file selected for download.",
+                      });
+                    }
+                  }}
+                  color="success"
+                >
+                  Download
+                </Button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={onClose}>Batal</Button>
+        <Button onClick={handleSubmit}>Kirim</Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
