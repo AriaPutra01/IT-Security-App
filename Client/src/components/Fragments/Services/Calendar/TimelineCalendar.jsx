@@ -58,7 +58,6 @@ function Timeline({
         schedulerWidth: "94%",
         responsiveByParent: true,
         customCellWidth: 30,
-        nonAgendaDayCellHeaderFormat: "M/D|HH:mm",
         views: [
           {
             viewName: "Bulan",
@@ -83,6 +82,7 @@ function Timeline({
         dispatch({ type: "INITIALIZE", payload: schedulerData });
       });
     });
+    console.log(schedulerData);
   }, []);
 
   const prevClick = (schedulerData) => {
@@ -387,28 +387,44 @@ function Timeline({
         <Modal.Header />
         <Modal.Body>
           <form onSubmit={handleFormSubmit}>
-            <div className="grid grid-cols-4 gap-4">
-              <div className="flex flex-col col-span-3">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col">
                 <Label htmlFor="title" value="Title" />
                 <TextInput
                   id="title"
                   name="title"
+                  type="text"
                   className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 appearance-none  focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder={`Anda memasukan event di resource "${formData.slotName}"`}
+                  placeholder="masukan event"
                   value={formData.title}
                   onChange={handleFormChange}
                   required
                 />
               </div>
-              <div className="flex flex-col gap-2 justify-start col-span-1">
-                <Label htmlFor="bgColor" value="Color" />
+              <div className="flex flex-col gap-2 justify-start">
+                <Label htmlFor="color" value="Color" />
                 <ColorPick
+                  colors={[
+                    {
+                      id: "blue",
+                      label: "Blue",
+                      value: "#4285f4",
+                      checked: true,
+                    },
+                    { id: "red", label: "Red", value: "#db4437" },
+                    { id: "yellow", label: "Yellow", value: "#fbbc05" },
+                    { id: "green", label: "Green", value: "#0f9d58" },
+                    { id: "teal", label: "Teal", value: "#00bfa5" },
+                    { id: "purple", label: "Purple", value: "#9c27b0" },
+                    { id: "pink", label: "Pink", value: "#e91e63" },
+                  ]}
                   name="bgColor"
                   value={formData.bgColor}
                   onChange={handleFormChange}
-                  className="w-full h-full mb-2 p-[2px]"
+                  className="mb-2 p-[2px]"
                 />
               </div>
+              
               <Button className="col-span-4" type="submit">
                 Simpan
               </Button>
