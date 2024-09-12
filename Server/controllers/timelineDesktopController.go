@@ -45,7 +45,7 @@ func CreateEventDesktop(c *gin.Context) {
 	}
 
 	// Panggil fungsi SetNotification
-	SetNotification(event.Title, startTime)
+	SetNotification(event.Title, startTime, "TimelineWallpaperDesktop")
 
 	if err := initializers.DB.Create(&event).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

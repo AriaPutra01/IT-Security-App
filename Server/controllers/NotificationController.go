@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetNotification(title string, startTime time.Time) {
+func SetNotification(title string, startTime time.Time, category string) {
 	// Set lokasi ke WIB
 	loc, err := time.LoadLocation("Asia/Jakarta")
 	if err != nil {
@@ -47,12 +47,15 @@ func SetNotification(title string, startTime time.Time) {
 	}()
 
 	notification := models.Notification{
-		Title: title,
-		Start: startTime, // assuming you want to notify 1 hour before the event starts
+		Title:    title,
+		Start:    startTime,
+		Category: category,
 	}
 	if err := initializers.DB.Create(&notification).Error; err != nil {
 		log.Printf("Error creating notification: %v", err)
 	}
+	log.Printf("Notification created with category: %s, title: %s", category, title) // Tambahkan log ini
+
 }
 
 func GetNotifications(c *gin.Context) {

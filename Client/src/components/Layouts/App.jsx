@@ -21,7 +21,13 @@ import Sidebar, { SidebarItem, SidebarCollapse } from "../Elements/Sidebar";
 
 const App = ({ services, children }) => {
   const { token, userDetails } = useToken(); // Ambil token dari context
-  const [notification, setNotification] = useState([]);
+  const [notification, setNotification] = useState({
+    JadwalCuti: [],
+    JadwalRapat: [],
+    TimelineProject: [],
+    TimelineWallpaperDesktop: [],
+    BookingRapat: [],
+  });
 
   // Logout user
   const handleSignOut = async () => {
@@ -50,7 +56,21 @@ const App = ({ services, children }) => {
   // Fetch events
   useEffect(() => {
     GetNotification((data) => {
-      setNotification(data);
+      const groupedNotifications = {
+        JadwalCuti: [],
+        JadwalRapat: [],
+        BookingRapat: [],
+        TimelineWallpaperDesktop: [],
+        TimelineProject: [],
+      };
+
+      data.forEach((event) => {
+        if (groupedNotifications[event.category]) {
+          groupedNotifications[event.category].push(event);
+        }
+      });
+
+      setNotification(groupedNotifications);
     });
   }, []);
 
@@ -67,9 +87,16 @@ const App = ({ services, children }) => {
       if (result.isConfirmed) {
         try {
           await deleteNotification(id); // hapus data di API
-          setNotification(
-            (prevData) => prevData.filter((event) => event.id !== id) // Pastikan ini menggunakan 'id' yang benar
-          );
+          setNotification((prevData) => {
+            // Pastikan prevData adalah array
+            const updatedNotifications = { ...prevData }; // Salin objek sebelumnya
+            Object.keys(updatedNotifications).forEach((category) => {
+              updatedNotifications[category] = updatedNotifications[
+                category
+              ].filter((event) => event.id !== id);
+            });
+            return updatedNotifications; // Kembalikan objek yang diperbarui
+          });
         } catch (error) {
           Swal.fire("Gagal!", "Error saat hapus Notif:", error);
         }
@@ -104,7 +131,10 @@ const App = ({ services, children }) => {
         </SidebarCollapse>
         <SidebarCollapse text="Kegiatan" icon={<GrPlan />}>
           <SidebarItem href="/timeline-project" text="Timeline Project" />
-          <SidebarItem href="/timeline-desktop" text="Timeline Wallpaper Desktop" />
+          <SidebarItem
+            href="/timeline-desktop"
+            text="Timeline Wallpaper Desktop"
+          />
           <SidebarItem href="/booking-rapat" text="Booking Ruang Rapat" />
           <SidebarItem href="/jadwal-rapat" text="Jadwal Rapat" />
           <SidebarItem href="/jadwal-cuti" text="Jadwal Cuti" />
@@ -143,13 +173,19 @@ const App = ({ services, children }) => {
               inline
               label={
                 <div className="relative flex items-center">
-                  {notification && notification.length > 0 && (
-                    <div className="absolute -translate-x-[3px] rounded-full bg-green-400">
-                      <div className="w-full text-xs text-white px-[5px]">
-                        {notification.length}
+                  {notification &&
+                    Object.values(notification).some(
+                      (category) => category.length > 0
+                    ) && (
+                      <div className="absolute -translate-x-[3px] rounded-full bg-green-400">
+                        <div className="w-full text-xs text-white px-[5px]">
+                          {Object.values(notification).reduce(
+                            (total, category) => total + category.length,
+                            0
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                   <svg
                     className="w-[34px] h-[34px] text-slate-800 dark:text-white"
                     aria-hidden="true"
@@ -159,7 +195,10 @@ const App = ({ services, children }) => {
                     fill="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path d="M17.133 12.632v-1.8a5.406 5.406 0 0 0-4.154-5.262.955.955 0 0 0 .021-.106V3.1a1 1 0 0 0-2 0v2.364a.955.955 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C6.867 15.018 5 15.614 5 16.807 5 17.4 5 18 5.538 18h12.924C19 18 19 17.4 19 16.807c0-1.193-1.867-1.789-1.867-4.175ZM8.823 19a3.453 3.453 0 0 0 6.354 0H8.823Z" />
+                    <path
+                      d="M17.133 12.632v-1.8a5.406 5.406 0 0 1-4.154-5.262.955.955 0 0 0 .021-.106V3.1a1 1 0 0 0-2 0v2.364a.955.955 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C6.867 15.018 5 15.614 5 16.807 5 17.4 5 18 5.538 18h12.924C19 18 19 17.4 19 16.807c0-1.193-1.867-1.789-1.867-4.175ZM10 6h4V4h-4v2Zm1 4a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Zm4 0a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                 </div>
               }
@@ -167,58 +206,67 @@ const App = ({ services, children }) => {
               <Dropdown.Header>
                 <h1 className="text-base">Notification</h1>
               </Dropdown.Header>
-              {notification.length === 0 ? (
-                <Dropdown.Item className="block text-sm text-gray-600">
-                  <Badge color="warning">
-                    <h1>Tidak ada jadwal dalam wakut dekat</h1>
+              {Object.keys(notification).every(
+                (category) => notification[category].length === 0
+              ) && (
+                <span className="text-sm text-gray-600">
+                  <Badge color="warning" className="m-3">
+                    Tidak ada notifikasi
                   </Badge>
-                </Dropdown.Item>
-              ) : (
-                notification.map((event) => {
-                  const formattedStart = format(event.start, "dd MMMM HH:mm", {
-                    locale: idLocale,
-                  });
-                  return (
-                    <div
-                      key={event.id}
-                      className="flex items-center justify-between gap-2"
-                    >
-                      <Dropdown.Item className="flex gap-4">
-                        <div className="grid grid-cols-2">
-                          <span className="col-span-2 text-start ms-2 font-bold text-base truncate w-48">
-                            {event.title}
-                          </span>
-                          <span className="col-span-2">
-                            Pada Waktu {formattedStart}
-                          </span>
-                        </div>
-                        <div
-                          className="block text-sm truncate cursor-pointer hover:scale-110 text-red-600  rounded transition-all"
-                          onClick={() => {
-                            handleDelete(event.id);
-                          }}
-                        >
-                          <svg
-                            className="w-6 h-6"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M8.586 2.586A2 2 0 0 1 10 2h4a2 2 0 0 1 2 2v2h3a1 1 0 1 1 0 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a1 1 0 0 1 0-2h3V4a2 2 0 0 1 .586-1.414ZM10 6h4V4h-4v2Zm1 4a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Zm4 0a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                      </Dropdown.Item>
-                    </div>
-                  );
-                })
+                </span>
               )}
+              {Object.keys(notification).map((category) => (
+                <div key={category}>
+                  {notification[category].length > 0 && (
+                    <>
+                      <h2 className="ml-2 font-bold">{category}</h2>
+                      {notification[category].map((event) => {
+                        const formattedStart = format(
+                          event.start,
+                          "dd MMMM HH:mm",
+                          {
+                            locale: idLocale,
+                          }
+                        );
+                        return (
+                          <Dropdown.Item key={event.id} className="flex gap-4">
+                            <div className="grid grid-cols-2">
+                              <span className="col-span-2 text-start ms-2 font-bold text-base truncate w-48">
+                                {event.title}
+                              </span>
+                              <span className="col-span-2">
+                                Pada Waktu {formattedStart}
+                              </span>
+                            </div>
+                            <div
+                              className="block text-sm truncate cursor-pointer hover:scale-110 text-red-600 rounded transition-all"
+                              onClick={() => {
+                                handleDelete(event.id);
+                              }}
+                            >
+                              <svg
+                                className="w-6 h-6"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M8.586 2.586A2 2 0 0 1 10 2h4a2 2 0 0 1 2 2v2h3a1 1 0 1 1 0 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a1 1 0 0 1 0-2h3V4a2 2 0 0 1 .586-1.414ZM10 6h4V4h-4v2Zm1 4a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Zm4 0a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                          </Dropdown.Item>
+                        );
+                      })}
+                    </>
+                  )}
+                </div>
+              ))}
             </Dropdown>
           </div>
         </header>

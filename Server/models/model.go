@@ -131,9 +131,10 @@ func (i Project) MarshalJSON() ([]byte, error) {
 
 // model jadwal-rapat
 type Notification struct {
-	ID    uint      `gorm:"primaryKey" json:"id"`
-	Title string    `json:"title"`
-	Start time.Time `json:"start"`
+	ID       uint      `gorm:"primaryKey" json:"id"`
+	Title    string    `json:"title"`
+	Start    time.Time `json:"start"`
+	Category string    `json:"category"`
 }
 
 type BookingRapat struct {
@@ -272,12 +273,12 @@ type Arsip struct {
 func (i Arsip) MarshalJSON() ([]byte, error) {
 	type Alias Arsip
 	return json.Marshal(&struct {
-		TanggalDokumen string `json:"tanggal_dokumen"`
-		TanggalPenyerahan  string `json:"tanggal_penyerahan"`
+		TanggalDokumen    string `json:"tanggal_dokumen"`
+		TanggalPenyerahan string `json:"tanggal_penyerahan"`
 		*Alias
 	}{
-		TanggalDokumen: i.TanggalDokumen.Format("2006-01-02"),
-		TanggalPenyerahan:  i.TanggalPenyerahan.Format("2006-01-02"),
-		Alias:       (*Alias)(&i),
+		TanggalDokumen:    i.TanggalDokumen.Format("2006-01-02"),
+		TanggalPenyerahan: i.TanggalPenyerahan.Format("2006-01-02"),
+		Alias:             (*Alias)(&i),
 	})
 }

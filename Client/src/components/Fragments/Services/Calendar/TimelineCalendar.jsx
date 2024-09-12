@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useState, useRef } from "react";
 import { Button, Label, Modal, TextInput } from "flowbite-react";
 import {
   Scheduler,
@@ -10,9 +10,9 @@ import {
 } from "react-big-schedule";
 import "../../../../calendar.css";
 import dayjs from "dayjs";
+import moment from "moment";
 import Swal from "sweetalert2";
 import { ColorPick } from "../../../../Utilities/ColorPick";
-import idLocale from "date-fns/locale/id";
 
 const initialState = {
   showScheduler: false,
@@ -48,6 +48,8 @@ function Timeline({
     height: 0,
   });
 
+  const parentRef = useRef(null);
+
   useEffect(() => {
     const schedulerData = new SchedulerData(
       new dayjs().format(DATE_FORMAT),
@@ -55,7 +57,7 @@ function Timeline({
       false,
       false,
       {
-        schedulerWidth: "94%",
+        resourceName: "Project",
         responsiveByParent: true,
         customCellWidth: 30,
         views: [
@@ -66,7 +68,7 @@ function Timeline({
             isEventPerspective: false,
           },
         ],
-        schedulerMaxHeight: 400,
+        schedulerMaxHeight: 440,
         dayMaxEvents: 2,
         weekMaxEvents: 4,
         monthMaxEvents: 4,
@@ -74,7 +76,75 @@ function Timeline({
         yearMaxEvents: 4,
       }
     );
-    schedulerData.localeDayjs.locale(idLocale);
+    // schedulerData.localeDayjs.locale("en");
+    //
+    moment.locale("id", {
+      months:
+        "Januari_Februari_Maret_April_Mei_Juni_Juli_Agustus_September_Oktober_November_Desember".split(
+          "_"
+        ),
+      monthsShort: "Jan_Feb_Mar_Apr_Mei_Jun_Jul_Agu_Sep_Okt_Nov_Des".split("_"),
+      monthsParseExact: true,
+      weekdays: "Minggu_Senin_Selasa_Rabu_Kamis_Jumat_Sabtu".split("_"),
+      weekdaysShort: "Min_Sen_Sel_Rab_Kam_Jum_Sab".split("_"),
+      weekdaysMin: "Mg_Sn_Sl_Rb_Km_Jm_Sb".split("_"),
+      weekdaysParseExact: true,
+      longDateFormat: {
+        LT: "HH:mm",
+        LTS: "HH:mm:ss",
+        L: "DD/MM/YYYY",
+        LL: "D MMMM YYYY",
+        LLL: "D MMMM YYYY HH:mm",
+        LLLL: "dddd, D MMMM YYYY HH:mm",
+      },
+      calendar: {
+        sameDay: "[Hari ini pukul] LT",
+        nextDay: "[Besok pukul] LT",
+        nextWeek: "dddd [pukul] LT",
+        lastDay: "[Kemarin pukul] LT",
+        lastWeek: "dddd [lalu pukul] LT",
+        sameElse: "L",
+      },
+      relativeTime: {
+        future: "dalam %s",
+        past: "%s yang lalu",
+        s: "beberapa detik",
+        m: "semenit",
+        mm: "%d menit",
+        h: "sejam",
+        hh: "%d jam",
+        d: "sehari",
+        dd: "%d hari",
+        M: "sebulan",
+        MM: "%d bulan",
+        y: "setahun",
+        yy: "%d tahun",
+      },
+      dayOfMonthOrdinalParse: /\d{1,2}/,
+      ordinal: function (number) {
+        return number;
+      },
+      meridiemParse: /pagi|siang|sore|malam/,
+      isPM: function (input) {
+        return /^(siang|sore|malam)$/.test(input);
+      },
+      meridiem: function (hours, minutes, isLower) {
+        if (hours < 11) {
+          return "pagi";
+        } else if (hours < 15) {
+          return "siang";
+        } else if (hours < 19) {
+          return "sore";
+        } else {
+          return "malam";
+        }
+      },
+      week: {
+        dow: 1, // Senin adalah hari pertama dalam seminggu.
+        doy: 4, // Digunakan untuk menentukan minggu pertama dalam setahun.
+      },
+    });
+    //
     getEvents((eventData) => {
       getResources((resourceData) => {
         schedulerData.setResources(resourceData);
@@ -82,7 +152,6 @@ function Timeline({
         dispatch({ type: "INITIALIZE", payload: schedulerData });
       });
     });
-    console.log(schedulerData);
   }, []);
 
   const prevClick = (schedulerData) => {
@@ -360,7 +429,9 @@ function Timeline({
   );
 
   return (
-    <div className="w-full flex justify-start">
+    <div className="w-full flex justify-start" ref={parentRef}>
+      {" "}
+      {/* Tambahkan ref ke elemen induk */}
       {state.showScheduler && (
         <div>
           <Scheduler
@@ -378,6 +449,7 @@ function Timeline({
             toggleExpandFunc={toggleExpandFunc}
             slotClickedFunc={slotClickedFunc}
             leftCustomHeader={leftCustomHeader}
+            parentRef={parentRef} // Teruskan ref ke Scheduler
           />
           {popover}
         </div>
@@ -424,7 +496,7 @@ function Timeline({
                   className="mb-2 p-[2px]"
                 />
               </div>
-              
+
               <Button className="col-span-4" type="submit">
                 Simpan
               </Button>

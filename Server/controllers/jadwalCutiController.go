@@ -49,7 +49,7 @@ func CreateEventCuti(c *gin.Context) {
 		return
 	}
 
-	SetNotification(event.Title, startTime) // Panggil fungsi SetNotification
+	SetNotification(event.Title, startTime, "JadwalCuti") // Panggil fungsi SetNotification
 	
 	if err := initializers.DB.Create(&event).Error; err != nil {
 		log.Printf("Error creating event: %v", err) // Add this line
