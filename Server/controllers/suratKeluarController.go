@@ -23,6 +23,7 @@ type SuratKeluarRequest struct {
 	Pic      string `json:"pic"`
 	Tanggal  string `json:"tanggal"`
 	CreateBy string `json:"create_by"`
+	Info     string `json:"info"`
 }
 
 func SuratKeluarCreate(c *gin.Context) {
@@ -56,6 +57,7 @@ func SuratKeluarCreate(c *gin.Context) {
 		Pic:      requestBody.Pic,
 		Tanggal:  tanggal,
 		CreateBy: requestBody.CreateBy,
+		Info:       requestBody.CreateBy,
 	}
 
 	result := initializers.DB.Create(&surat_keluar)

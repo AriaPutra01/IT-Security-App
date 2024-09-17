@@ -15,6 +15,7 @@ type requestUser struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Info     string `json:"info"`
 }
 
 func Login(c *gin.Context) {

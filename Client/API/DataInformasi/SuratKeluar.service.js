@@ -6,7 +6,10 @@ export function getSuratKeluars(callback) {
   return axios
     .get(`${API_URL}`)
     .then((response) => {
-      callback(response.data.SuratKeluar);
+      callback(response.data.SuratKeluar.map(SuratKeluar => ({
+        ...SuratKeluar,
+        info: SuratKeluar.info // Menyertakan kolom Info
+      })));    
     })
     .catch((error) => {
       throw new Error(`Gagal mengambil data. Alasan: ${error.message}`);
@@ -16,7 +19,7 @@ export function getSuratKeluars(callback) {
 export function addSuratKeluar(data) {
   const { username, ...rest } = data;
   return axios
-    .post(`${API_URL}`, { ...rest })
+    .post(`${API_URL}`, { ...rest, info: username })
     .then((response) => {
       return response.data.SuratKeluar;
     })

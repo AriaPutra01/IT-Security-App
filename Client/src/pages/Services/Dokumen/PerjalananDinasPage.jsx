@@ -47,6 +47,7 @@ export function PerdinPage() {
           ExportExcel="exportPerdin"
           UpdateExcel="uupdatePerdin"
           importExcel="upload"
+          InfoColumn={true}
         />
         {/* End Tabel */}
       </div>

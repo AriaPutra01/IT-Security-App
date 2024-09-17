@@ -23,6 +23,7 @@ type MemoRequest struct {
 	Pic      string `json:"pic"`
 	Kategori string `json:"kategori"`
 	CreateBy string `json:"create_by"`
+	Info     string `json:"info"`
 }
 
 func MemoIndex(c *gin.Context) {
@@ -68,6 +69,7 @@ func MemoCreate(c *gin.Context) {
 		Pic:      requestBody.Pic,
 		Kategori: requestBody.Kategori,
 		CreateBy: requestBody.CreateBy,
+		Info:       requestBody.CreateBy,
 	}
 
 	result := initializers.DB.Create(&memo)

@@ -43,6 +43,7 @@ export const UserPage = () => {
           }}
           update={updateUser}
           remove={deleteUser}
+          InfoColumn={false}
         />
         {/* End Table */}
       </div>

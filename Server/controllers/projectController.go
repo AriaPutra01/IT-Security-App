@@ -29,6 +29,7 @@ type ProjectRequest struct {
 	TanggalTor      string `json:"tanggal_tor"`
 	Pic             string `json:"pic"`
 	CreateBy        string `json:"create_by"`
+	Info            string `json:"info"`
 }
 
 func ProjectCreate(c *gin.Context) {
@@ -85,6 +86,7 @@ func ProjectCreate(c *gin.Context) {
 		TanggalTor:      tanggal_tor,
 		Pic:             requestBody.Pic,
 		CreateBy:        requestBody.CreateBy,
+		Info:       requestBody.CreateBy,
 	}
 
 	result := initializers.DB.Create(&project)

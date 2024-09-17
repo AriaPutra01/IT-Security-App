@@ -6,7 +6,10 @@ export function getProjects(callback) {
   return axios
     .get(`${API_URL}`)
     .then((response) => {
-      callback(response.data.project);
+      callback(response.data.project.map(project => ({
+        ...project,
+        info: project.info // Menyertakan kolom Info
+      })));    
     })
     .catch((error) => {
       throw new Error(`Gagal mengambil data. Alasan: ${error.message}`);
@@ -16,7 +19,7 @@ export function getProjects(callback) {
 export function addProject(data) {
   const { username, ...rest } = data;
   return axios
-    .post(`${API_URL}`, { ...rest })
+    .post(`${API_URL}`, { ...rest, info: username })
     .then((response) => {
       return response.data.project;
     })

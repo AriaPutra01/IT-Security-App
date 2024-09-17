@@ -14,6 +14,7 @@ type User struct {
 	Email    string
 	Password string
 	Role     string
+	Info     string
 }
 
 type UserToken struct {
@@ -34,6 +35,7 @@ type Memo struct {
 	Pic       string    `json:"pic"`
 	Kategori  string    `json:"kategori"`
 	CreateBy  string    `json:"create_by"`
+	Info      string    `json:"info"`
 }
 
 // MarshalJSON menyesuaikan serialisasi JSON untuk struct Memo
@@ -58,6 +60,7 @@ type Sagiso struct {
 	Pic       string    `json:"pic"`
 	Kategori  string    `json:"kategori"`
 	CreateBy  string    `json:"create_by"`
+	Info      string    `json:"info"`
 }
 
 // MarshalJSON menyesuaikan serialisasi JSON untuk struct Memo
@@ -72,6 +75,50 @@ func (i Sagiso) MarshalJSON() ([]byte, error) {
 	})
 }
 
+//list meeting
+type MeetingList struct {
+	ID               uint      `gorm:"primaryKey"`
+	CreatedAt        time.Time `gorm:"autoCreateTime"`
+	UpdatedAt        time.Time `gorm:"autoUpdateTime"`
+	Hari             string    `json:"hari"`
+	Tanggal          time.Time `json:"-"`
+	Perihal          string    `json:"perihal"`
+	Waktu            string    `json:"waktu"`
+	Tempat           string    `json:"tempat"`
+	Pic              string    `json:"pic"`
+	CreateBy         string    `json:"create_by"`
+	Info             string    `json:"info"`
+}
+
+// model for meeting
+type Meeting struct {
+	ID               uint      `gorm:"primaryKey"`
+	CreatedAt        time.Time `gorm:"autoCreateTime"`
+	UpdatedAt        time.Time `gorm:"autoUpdateTime"`
+	Task             string    `json:"task"`
+	TindakLanjut     string    `json:"tindak_lanjut"`
+	Status           string    `json:"status"`
+	UpdatePengerjaan *string    `json:"update_pengerjaan"`
+	Pic              string    `json:"pic"`
+	TanggalTarget    time.Time `json:"-"`
+	TanggalActual    time.Time `gorm:"default:NULL" json:"-"`
+	CreateBy         string    `json:"create_by"`
+	Info             string    `json:"info"`
+}
+
+func (i Meeting) MarshalJSON() ([]byte, error) {
+	type Alias Meeting
+	return json.Marshal(&struct {
+		TanggalTarget string `json:"tanggal_target"` // Format tanggal disesuaikan
+		TanggalActual string `json:"tanggal_actual"` // Format tanggal disesuaikan
+		*Alias
+	}{
+		TanggalTarget: i.TanggalTarget.Format("2006-01-02"), // Format tanggal YYYY-MM-DD
+		TanggalActual: i.TanggalActual.Format("2006-01-02"), // Format tanggal YYYY-MM-DD
+		Alias:         (*Alias)(&i),
+	})
+}
+
 // model for perdin
 type Perdin struct {
 	ID        uint      `gorm:"primaryKey"`
@@ -82,6 +129,7 @@ type Perdin struct {
 	Hotel     string    `json:"hotel"`
 	Transport string    `json:"transport"`
 	CreateBy  string    `json:"create_by"`
+	Info      string    `json:"info"`
 }
 
 func (i Perdin) MarshalJSON() ([]byte, error) {
@@ -112,6 +160,7 @@ type Project struct {
 	TanggalTor      time.Time `json:"-"`
 	Pic             string    `json:"pic"`
 	CreateBy        string    `json:"create_by"`
+	Info            string    `json:"info"`
 }
 
 func (i Project) MarshalJSON() ([]byte, error) {
@@ -221,6 +270,7 @@ type SuratMasuk struct {
 	DestinyDiv string    `json:"destiny_div"`
 	Tanggal    time.Time `json:"-"`
 	CreateBy   string    `json:"create_by"`
+	Info       string    `json:"info"`
 }
 
 func (i SuratMasuk) MarshalJSON() ([]byte, error) {
@@ -245,6 +295,7 @@ type SuratKeluar struct {
 	Pic       string    `json:"pic"`
 	Tanggal   time.Time `json:"-"`
 	CreateBy  string    `json:"create_by"`
+	Info      string    `json:"info"`
 }
 
 func (i SuratKeluar) MarshalJSON() ([]byte, error) {
@@ -268,6 +319,7 @@ type Arsip struct {
 	NoBox             string    `json:"no_box"`
 	TanggalPenyerahan time.Time `json:"-"`
 	Keterangan        string    `json:"keterangan"`
+	Info              string    `json:"info"`
 }
 
 func (i Arsip) MarshalJSON() ([]byte, error) {

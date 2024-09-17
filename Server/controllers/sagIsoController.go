@@ -23,6 +23,7 @@ type SagisoRequest struct {
 	Pic      string `json:"pic"`
 	Kategori string `json:"kategori"`
 	CreateBy string `json:"create_by"`
+	Info     string `json:"info"`
 }
 
 func SagisoIndex(c *gin.Context) {
@@ -68,6 +69,7 @@ func SagisoCreate(c *gin.Context) {
 		Pic:      requestBody.Pic,
 		Kategori: requestBody.Kategori,
 		CreateBy: requestBody.CreateBy,
+		Info:     requestBody.CreateBy,
 	}
 
 	result := initializers.DB.Create(&sagiso)

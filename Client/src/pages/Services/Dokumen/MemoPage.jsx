@@ -54,6 +54,7 @@ export function MemoPage() {
           ExportExcel="exportMemo"
           UpdateExcel="updateMemo"
           importExcel="uploadMemo"
+          InfoColumn={true}
         />
         {/* End Table */}
       </div>

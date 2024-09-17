@@ -6,7 +6,10 @@ export function getMemos(callback) {
   return axios
     .get(`${API_URL}`)
     .then((response) => {
-      callback(response.data.memo);
+      callback(response.data.memo.map(memo => ({
+        ...memo,
+        info: memo.info // Menyertakan kolom Info
+      })));
     })
     .catch((error) => {
       throw new Error(`Gagal mengambil data. Alasan: ${error.message}`);
@@ -16,7 +19,7 @@ export function getMemos(callback) {
 export function addMemo(data) {
   const { username, ...rest } = data;
   return axios
-    .post(`${API_URL}`, { ...rest })
+    .post(`${API_URL}`, { ...rest, info: username }) // Tambahkan info
     .then((response) => {
       return response.data.memo;
     })
@@ -41,7 +44,6 @@ export function deleteMemo(id) {
   return axios
     .delete(`${API_URL}/${id}`)
     .then((response) => {
-      
       return response.data;
     })
     .catch((error) => {

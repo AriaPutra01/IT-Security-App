@@ -27,6 +27,8 @@ import { BaseProjectPage } from "./pages/Services/RencanaKerja/BaseProjectPage";
 // Kegiatan Proses
 import { TimelineProjectPage } from "./pages/Services/KegiatanProses/TimelineProjectPage";
 import { TimelineDesktopPage } from "./pages/Services/KegiatanProses/TimelineDesktopPage";
+import { MeetingPage } from "./pages/Services/KegiatanProses/MeetingPage";
+import { MeetingListPage } from "./pages/Services/KegiatanProses/MeetingListPage";
 import { BookingRapatPage } from "./pages/Services/KegiatanProses/BookingRapatPage";
 import { JadwalRapatPage } from "./pages/Services/KegiatanProses/JadwalRapatPage";
 import { JadwalCutiPage } from "./pages/Services/KegiatanProses/JadwalCutiPage";
@@ -163,6 +165,22 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <JadwalCutiPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/meeting",
+    element: (
+      <ProtectedRoute>
+        <MeetingPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/meeting-list",
+    element: (
+      <ProtectedRoute>
+        <MeetingListPage />
       </ProtectedRoute>
     ),
   },

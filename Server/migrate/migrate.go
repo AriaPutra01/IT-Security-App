@@ -33,6 +33,8 @@ func main() {
 		&models.JadwalCuti{},
 		&models.Notification{},
 		&models.Arsip{},
+		&models.Meeting{},
+		&models.MeetingList{},
 	)
 
 }

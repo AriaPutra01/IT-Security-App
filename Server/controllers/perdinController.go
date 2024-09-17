@@ -22,6 +22,7 @@ type perdinRequest struct {
 	Hotel     string `json:"hotel"`
 	Transport string `json:"transport"`
 	CreateBy  string `json:"create_by"`
+	Info      string `json:"info"`
 }
 
 func PerdinCreate(c *gin.Context) {
@@ -53,6 +54,7 @@ func PerdinCreate(c *gin.Context) {
 		Hotel:     requestBody.Hotel,
 		Transport: requestBody.Transport,
 		CreateBy:  requestBody.CreateBy,
+		Info:       requestBody.CreateBy,
 	}
 
 	result := initializers.DB.Create(&perdin)

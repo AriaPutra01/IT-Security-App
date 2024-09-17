@@ -1,7 +1,6 @@
 import React from "react";
 
-export const SearchInput = (props) => {
-  const { value, onChange } = props;
+export const SearchInput = ({ value, onChange }) => {
   return (
     <form className="w-auto">
       <div className="relative">

@@ -138,6 +138,8 @@ const App = ({ services, children }) => {
           <SidebarItem href="/booking-rapat" text="Booking Ruang Rapat" />
           <SidebarItem href="/jadwal-rapat" text="Jadwal Rapat" />
           <SidebarItem href="/jadwal-cuti" text="Jadwal Cuti" />
+          <SidebarItem href="/meeting" text="Meeting" />
+          <SidebarItem href="/meeting-list" text="Meeting List" />
         </SidebarCollapse>
         <SidebarCollapse text="Informasi" icon={<SlEnvolopeLetter />}>
           <SidebarItem href="/surat-masuk" text="Surat Masuk" />

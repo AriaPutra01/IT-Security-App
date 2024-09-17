@@ -43,6 +43,7 @@ export function SuratKeluarPage() {
           ExportExcel="exportSuratKeluar"
           UpdateExcel="updateSuratKeluar"
           importExcel="uploadSuratKeluar"
+          InfoColumn={true}
         />
         {/* End Table */}
       </div>

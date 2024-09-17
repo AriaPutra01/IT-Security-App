@@ -23,6 +23,7 @@ type SuratMasukRequest struct {
 	DestinyDiv string `json:"destiny_div"`
 	Tanggal    string `json:"tanggal"`
 	CreateBy   string `json:"create_by"`
+	Info       string `json:"info"`
 }
 
 func SuratMasukCreate(c *gin.Context) {
@@ -56,6 +57,7 @@ func SuratMasukCreate(c *gin.Context) {
 		DestinyDiv: requestBody.DestinyDiv,
 		Tanggal:    tanggal,
 		CreateBy:   requestBody.CreateBy,
+		Info:       requestBody.CreateBy,
 	}
 
 	result := initializers.DB.Create(&surat_masuk)

@@ -61,6 +61,26 @@ func main() {
 	r.PUT("/user/:id", controllers.UserUpdate)
 	r.DELETE("/user/:id", controllers.UserDelete)
 
+	// Routes for MeetingList
+	r.GET("/meetingList", controllers.MeetingListIndex)
+	r.POST("/meetingList", controllers.MeetingListCreate)
+	r.GET("/meetingList/:id", controllers.MeetingListShow)
+	r.PUT("/meetingList/:id", controllers.MeetingListUpdate)
+	r.DELETE("/meetingList/:id", controllers.MeetingListDelete)
+	r.GET("/exportMeetingList", controllers.CreateExcelMeetingList)
+	r.GET("/updateMeetingList", controllers.UpdateSheetMeetingList)
+	r.POST("/uploadMeetingList", controllers.ImportExcelMeetingList)
+
+	// Routes for Meeting
+	r.GET("/meetings", controllers.MeetingIndex)
+	r.POST("/meetings", controllers.MeetingCreate)
+	r.GET("/meetings/:id", controllers.MeetingShow)
+	r.PUT("/meetings/:id", controllers.MeetingUpdate)
+	r.DELETE("/meetings/:id", controllers.MeetingDelete)
+	r.GET("/exportMeeting", controllers.CreateExcelMeeting)
+	r.GET("/updateMeeting", controllers.UpdateSheetMeeting)
+	r.POST("/uploadMeeting", controllers.ImportExcelMeeting)
+
 	// Routes for Memo
 	r.GET("/memos", controllers.MemoIndex)
 	r.POST("/memos", controllers.MemoCreate)

@@ -48,6 +48,7 @@ export function SuratMasukPage() {
           ExportExcel="exportSuratMasuk"
           UpdateExcel="updateSuratMasuk"
           importExcel="uploadSuratMasuk"
+          InfoColumn={true}
         />
         {/* End Table */}
       </div>

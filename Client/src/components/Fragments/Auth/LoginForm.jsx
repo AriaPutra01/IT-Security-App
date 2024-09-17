@@ -16,7 +16,6 @@ export function LoginForm() {
         email,
         password,
       });
-      // Redirect ke dashboard
       window.location.href = "/dashboard";
     } catch (error) {
       Swal.fire({

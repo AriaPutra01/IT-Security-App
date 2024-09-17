@@ -84,6 +84,7 @@ export function ProjectPage() {
           ExportExcel="exportProject"
           UpdateExcel="updateProject"
           importExcel="uploadProject"
+          InfoColumn={true}
         />
         {/* End Table */}
       </div>

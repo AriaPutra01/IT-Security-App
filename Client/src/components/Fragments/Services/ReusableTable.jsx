@@ -1,4 +1,4 @@
-// import { FormatDate } from "../../../Utilities/FormatDate";
+import { FormatDate } from "../../../Utilities/FormatDate";
 import { ReusableForm } from "../../Fragments/Services/ReusableForm";
 import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
@@ -23,6 +23,7 @@ export const ReusableTable = ({
   ImportExcel,
   formConfig,
   setFormConfig,
+  InfoColumn,
 }) => {
   const { token } = useToken(); // Ambil token dari context
   let userRole = "";
@@ -109,6 +110,7 @@ export const ReusableTable = ({
 
   useEffect(() => {
     get((data) => {
+      // ambil dari API
       setMainData(data || []);
     });
   }, []);
@@ -138,6 +140,8 @@ export const ReusableTable = ({
   };
 
   const AddSubmit = async (data) => {
+    // Pastikan data.anggaran adalah number dan tidak undefined
+    data.anggaran = data.anggaran ? data.anggaran.toString() : "0";
     try {
       const response = await set(data); // tambah data ke API
       Swal.fire({
@@ -163,6 +167,8 @@ export const ReusableTable = ({
   };
 
   const EditSubmit = async (data) => {
+    // Ubah anggaran menjadi string dan pastikan tidak undefined
+    data.anggaran = data.anggaran ? data.anggaran.toString() : "0";
     try {
       const response = await update(data.ID, data); // edit data ke API
       Swal.fire({
@@ -190,7 +196,6 @@ export const ReusableTable = ({
       onCloseFormModal();
     }
   };
-
   const handleDelete = async (id) => {
     Swal.fire({
       title: "Apakah Anda yakin?",
@@ -266,16 +271,38 @@ export const ReusableTable = ({
   //   }
   // };
 
+  const renderCellContent = (field, value) => {
+    switch (field.type) {
+      case "number":
+        return `Rp. ${new Intl.NumberFormat("id-ID").format(value)}`; // Format currency dengan "Rp"
+      case "date":
+        return FormatDate(value);
+      default:
+        return value;
+    }
+  };
+
   const header = formConfig.fields.map((field) => {
     return {
       name: field.label,
-      selector: (row) => row[field.name],
+      selector: (row) => {
+        return renderCellContent(field, row[field.name]); // Panggil renderCellContent untuk semua field
+      },
       sortable: true,
     };
   });
 
   const columns = [
     ...header,
+    ...(InfoColumn
+      ? [
+          {
+            name: "Info", // Menambahkan kolom Info
+            selector: (row) => row.info, // Ganti 'info' dengan nama field yang sesuai dari data
+            sortable: true,
+          },
+        ]
+      : []), // Tambahkan kolom Info hanya jika showInfoColumn true
     {
       name: "Action",
       cell: (data) => (
